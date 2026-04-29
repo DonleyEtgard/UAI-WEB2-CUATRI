@@ -1,5 +1,4 @@
- import { Schema, model, InferSchemaType } from "mongoose";
-
+import { Schema, model, InferSchemaType } from "mongoose";
 
 const userSchema = new Schema(
   {
@@ -16,10 +15,41 @@ const userSchema = new Schema(
       required: true,
       unique: true
     },
+plan: {
+  type: String,
+  enum: ["free", "basic", "active", "suspended"],
+  default: "free"
+},
+
+subscriptionStart: {
+  type: Date
+},
+
+lastPaymentQR: {
+  type: String
+},
+
+subscriptionEnd: {
+  type: Date
+},
+subscriptionPaid: {
+  type: Boolean,
+  default: false
+},
+image: {
+  type: String
+},
+    role: {
+  type: String,
+  enum: ["superadmin", "admin", "seller"],
+  default: "seller"
+},
+
     isActive: {
       type: Boolean,
       default: true
     },
+
     firebaseUid: {
       type: String,
       required: false,
@@ -29,6 +59,7 @@ const userSchema = new Schema(
   {
     timestamps: true,
   }
+  
 );
 
 type UserType = InferSchemaType<typeof userSchema>;

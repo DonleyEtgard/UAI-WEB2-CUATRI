@@ -1,4 +1,15 @@
 node_modules
 dist
+build
+out
+
 .env
-src/firebase-key.json
+
+**/firebase-key.json
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+
+*.tsbuildinfo

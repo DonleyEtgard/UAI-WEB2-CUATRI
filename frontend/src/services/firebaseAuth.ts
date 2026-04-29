@@ -3,9 +3,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  User,
+  type User, 
 } from "firebase/auth";
-import { auth } from "../firebase/firebaseConfig";
+import { auth } from "../firebase/firebase";
 
 // Crear usuario (registro)
 export const registerUser = (email: string, password: string) =>
