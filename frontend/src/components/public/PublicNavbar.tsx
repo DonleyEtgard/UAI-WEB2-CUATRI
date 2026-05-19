@@ -1,0 +1,37 @@
+import { Link } from "react-router-dom";
+
+const PublicNavbar = () => {
+  return (
+    <header className="public-navbar flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-black/70 to-black/40 backdrop-blur-md">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/25 to-secondary/25 border border-outline-variant/80 flex items-center justify-center text-xl">
+          🏪
+        </div>
+        <div>
+          <div className="navbar-brand font-bold text-white tracking-[0.12em]">HAITIBIZ</div>
+          <div className="navbar-subtitle text-on-surface-variant">ERP • POS • SaaS</div>
+        </div>
+      </div>
+
+      <nav className="text-on-surface-variant">
+        <Link to="/" className="hover:text-white transition">Inicio</Link>
+        <Link to="/about" className="hover:text-white transition">Nosotros</Link>
+        <Link to="/contact" className="hover:text-white transition">Contacto</Link>
+        <Link to="/login" className="hover:text-emerald-300 transition">Login</Link>
+      </nav>
+
+      <div className="text-on-surface-variant">
+        <div className="hidden lg:flex items-center gap-2 bg-surface-container/60 border border-outline-variant/60 rounded-full px-3 py-1 navbar-status">
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          Online • Sincronizado
+        </div>
+        <Link to="/register" className="btn">
+          🚀 Acceder
+        </Link>
+      </div>
+    </header>
+  );
+};
+
+export default PublicNavbar;
+

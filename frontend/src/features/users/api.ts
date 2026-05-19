@@ -1,23 +1,4 @@
-const BASE_URL = "http://localhost:3000/api";
-
-// 🔧 helper reutilizable
-const request = async (endpoint: string, options: RequestInit = {}) => {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
-  });
-
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    throw new Error(data?.message || "API Error");
-  }
-
-  return data;
-};
+import API from "../../services/api";
 
 // ==========================
 // 👤 TYPES
@@ -26,7 +7,7 @@ const request = async (endpoint: string, options: RequestInit = {}) => {
 export type User = {
   _id: string;
   email: string;
-  role: "superadmin" | "admin" | "seller";
+  role: "superadmin" | "admin" | "employee";
   isActive: boolean;
 };
 
@@ -40,12 +21,10 @@ export const registerUser = async (data: {
   password: string;
   name: string;
   lastName: string;
-  role?: "admin" | "seller";
+  role?: "admin" | "employee";
 }) => {
-  return request("/users/register", {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  const res = await API.post("/users/register", data);
+  return res.data;
 };
 
 // 🔐 LOGIN
@@ -53,24 +32,22 @@ export const loginUser = async (data: {
   email: string;
   password: string;
 }) => {
-  return request("/users/login", {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  const res = await API.post("/users/login", data);
+  return res.data;
 };
 
 // ==========================
 // 👥 USERS
 // ==========================
 
-// 📋 GET ALL (⚠️ necesitas backend)
+// 📋 GET ALL USERS
 export const getUsers = async (): Promise<User[]> => {
-  return request("/users");
+  const res = await API.get("/users");
+  return res.data;
 };
 
 // 🔄 TOGGLE STATUS
 export const toggleUserStatus = async (id: string) => {
-  return request(`/users/${id}/toggle-status`, {
-    method: "PATCH"
-  });
+  const res = await API.patch(`/users/${id}/toggle-status`);
+  return res.data;
 };

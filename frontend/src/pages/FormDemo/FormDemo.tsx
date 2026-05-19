@@ -9,94 +9,128 @@ interface FormData {
   email: string;
 }
 
+// 🧠 Validación con mensajes claros
 const schema = Joi.object({
-  firstName: Joi.string().min(3).max(30).required(),
-  lastName: Joi.string().min(3).max(30).required(),
-  email: Joi.string().email().required(),
+  firstName: Joi.string().min(3).max(30).required().messages({
+    "string.empty": "First name is required",
+    "string.min": "Minimum 3 characters",
+  }),
+  lastName: Joi.string().min(3).max(30).required().messages({
+    "string.empty": "Last name is required",
+  }),
+  email: Joi.string().email({ tlds: false }).required().messages({
+    "string.email": "Invalid email",
+    "string.empty": "Email is required",
+  }),
 });
 
 export const FormDemo = () => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     resolver: joiResolver(schema),
     mode: "onSubmit",
   });
 
-  const onSubmit = (data: FormData) => {
-    
+  // 🚀 Submit
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    setSuccess("");
+
+    try {
+      // Simulación de API
+      await new Promise((res) => setTimeout(res, 1000));
+
+      console.log("Form data:", data);
+
+      setSuccess("Form submitted successfully!");
+      reset(); // 💥 limpia el formulario
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-md mx-auto p-6 bg-gray-900 shadow-md rounded"
+      className="max-w-md mx-auto p-6 bg-gray-900 shadow-md rounded space-y-4"
     >
-      <div className="mb-4">
-        <label
-          htmlFor="firstName"
-          className="block text-neutral-400 text-sm font-bold mb-2"
-        >
-          First Name:
+      <h2 className="text-xl font-bold text-white text-center">
+        Contact Form
+      </h2>
+
+      {/* First Name */}
+      <div>
+        <label className="block text-neutral-400 text-sm mb-1">
+          First Name
         </label>
         <input
           type="text"
-          id="firstName"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-neutral-400 leading-tight focus:outline-none focus:shadow-outline"
+          {...register("firstName")}
+          className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
         />
         {errors.firstName && (
-          <p className="text-red-500 text-xs italic">
+          <p className="text-red-500 text-xs mt-1">
             {errors.firstName.message}
           </p>
         )}
       </div>
 
-      <div className="mb-4">
-        <label
-          htmlFor="lastName"
-          className="block text-neutral-400 text-sm font-bold mb-2"
-        >
-          Last Name:
+      {/* Last Name */}
+      <div>
+        <label className="block text-neutral-400 text-sm mb-1">
+          Last Name
         </label>
         <input
           type="text"
-          id="lastName"
           {...register("lastName")}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-neutral-400 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
         />
         {errors.lastName && (
-          <p className="text-red-500 text-xs italic">
+          <p className="text-red-500 text-xs mt-1">
             {errors.lastName.message}
           </p>
         )}
       </div>
 
-      <div className="mb-6">
-        <label
-          htmlFor="email"
-          className="block text-neutral-400 text-sm font-bold mb-2"
-        >
-          Email:
+      {/* Email */}
+      <div>
+        <label className="block text-neutral-400 text-sm mb-1">
+          Email
         </label>
         <input
           type="email"
-          id="email"
           {...register("email")}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-neutral-400 leading-tight focus:outline-none focus:shadow-outline"
+          className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
         />
         {errors.email && (
-          <p className="text-red-500 text-xs italic">{errors.email.message}</p>
+          <p className="text-red-500 text-xs mt-1">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
+      {/* Botón */}
       <button
         type="submit"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        disabled={loading}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold disabled:opacity-50"
       >
-        Submit
+        {loading ? "Sending..." : "Submit"}
       </button>
+
+      {/* Mensaje éxito */}
+      {success && (
+        <p className="text-green-400 text-sm text-center">{success}</p>
+      )}
     </form>
   );
 };

@@ -1,23 +1,55 @@
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  type User, 
+  signInWithEmailAndPassword,
+  type User,
 } from "firebase/auth";
-import { auth } from "../firebase/firebase";
 
-// Crear usuario (registro)
-export const registerUser = (email: string, password: string) =>
-  createUserWithEmailAndPassword(auth, email, password);
+import { auth } from "../firebase/config";
 
-// Iniciar sesión
-export const loginUser = (email: string, password: string) =>
-  signInWithEmailAndPassword(auth, email, password);
+const requireAuth = () => {
+  if (!auth) {
+    throw new Error(
+      "Firebase Auth is not initialized. Check your .env variables."
+    );
+  }
 
-// Cerrar sesión
-export const logoutUser = () => signOut(auth);
+  return auth;
+};
 
-// Escuchar cambios de sesión
-export const observeAuth = (callback: (user: User | null) => void) =>
-  onAuthStateChanged(auth, callback);
+// REGISTER
+export const registerUser = (
+  email: string,
+  password: string
+) => {
+  return createUserWithEmailAndPassword(
+    requireAuth(),
+    email,
+    password
+  );
+  };
+
+// LOGIN
+export const loginUser = (
+  email: string,
+  password: string
+) => {
+  return signInWithEmailAndPassword(
+    requireAuth(),
+    email,
+    password
+  );
+};
+
+// LOGOUT
+export const logoutUser = () => {
+  return signOut(requireAuth());
+};
+
+// OBSERVER
+export const observeAuth = (
+  callback: (user: User | null) => void
+) => {
+  return onAuthStateChanged(requireAuth(), callback);
+};

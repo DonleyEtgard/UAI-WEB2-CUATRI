@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProducts } from "./hooks";
 import ProductForm from "./ProductForm";
 
@@ -29,6 +29,10 @@ const ProductsPage = () => {
     setSelectedProduct(null);
     setShowForm(false);
   };
+
+   useEffect(() => {
+    loadProducts();
+  }, []); // Only run once on mount
 
   // ❌ eliminar
   const handleDelete = async (id: string) => {
@@ -68,7 +72,7 @@ const ProductsPage = () => {
           </thead>
 
           <tbody>
-            {products.map((p: any) => (
+            {Array.isArray(products) && products.map((p: any) => (
               <tr key={p._id} className="border-t">
                 <td className="p-3">{p.name}</td>
                 <td className="p-3">${p.price}</td>
@@ -96,7 +100,7 @@ const ProductsPage = () => {
               </tr>
             ))}
 
-            {products.length === 0 && (
+            {(!products || products.length === 0) && (
               <tr>
                 <td colSpan={5} className="p-4 text-center text-gray-500">
                   No products yet

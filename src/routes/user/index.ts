@@ -1,19 +1,52 @@
-import express from 'express';
-import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
-import { isSuperAdmin } from "../../middlewares/isSuperAdmin";
-import { toggleUserStatus } from "./controllers";
-
-import controllers from './controllers';
+import express from "express";
+import controllers from "./controllers";
+import { toggleUserStatus, getUsers, paySubscription, createSubscriptionPayment, getMe, getUserById } from "./controllers";
+import { authenticateJWT } from "../../middlewares/authenticateJWT";
+import { authorizeSuperadminOnly, authorizeUserOrSuperadmin } from "../../middlewares/authorizeUserOrSuperadmin";
 
 const router = express.Router();
 
-router.post('/register', controllers.registerUser);
-router.post('/login', controllers.loginWithEmailPassword);
+// ==========================
+// AUTH
+// ==========================
+router.post("/register", controllers.registerUser);
+router.post("/login", controllers.loginWithEmailPassword);
+
+// ==========================
+// USERS
+// ==========================
+router.get("/", authenticateJWT, authorizeSuperadminOnly, getUsers);
+
+// usuario autenticado
+router.get("/me", authenticateJWT, getMe);
+
+// usuario por id (ownership o superadmin)
+router.get("/:id", authenticateJWT, authorizeUserOrSuperadmin, getUserById);
+
+
+
 router.patch(
   "/:id/toggle-status",
-  authenticateFirebase,
-  isSuperAdmin,
+  authenticateJWT,
+  authorizeUserOrSuperadmin,
   toggleUserStatus
-); 
+);
+
+
+// ==========================
+// 💳 PAYMENTS (FIXED)
+// ==========================
+router.post(
+  "/pay-subscription",
+  authenticateJWT,
+  paySubscription
+);
+
+router.post(
+  "/create-payment",
+  authenticateJWT,
+  createSubscriptionPayment
+);
+
 
 export default router;

@@ -21,22 +21,28 @@
   },
   "homepage": "https://github.com/DonleyEtgard/UAI-WEB2-CUATRI#readme",
   "dependencies": {
-    "@reduxjs/toolkit": "^2.9.2",
+    "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.12.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "firebase-admin": "^13.5.0",
+    "express-rate-limit": "^8.5.1",
+    "firebase-admin": "^13.8.0",
+    "helmet": "^8.1.0",
     "joi": "^18.0.1",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.2",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^24.3.0",
+    "baseline-browser-mapping": "^2.10.29",
+    "tailwindcss": "^4.2.4",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   }

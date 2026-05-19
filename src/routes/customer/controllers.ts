@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import Customer from "../../models/Customer";
+import { authenticateJWT } from '../../middlewares/authenticateJWT';
 
 // 📌 Crear cliente
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, debt } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: "Name is required" });
@@ -13,15 +14,20 @@ export const createCustomer = async (req: Request, res: Response) => {
     // ✅ evitar duplicados por email
     if (email) {
       const existing = await Customer.findOne({ email });
+
       if (existing) {
-        return res.status(400).json({ message: "Customer already exists" });
+        return res.status(400).json({
+          message: "Customer already exists"
+        });
       }
     }
 
     const customer = await Customer.create({
       name,
       email,
-      phone
+      phone,
+      debt: debt || 0,
+      payments: []
     });
 
     res.status(201).json(customer);
@@ -37,8 +43,9 @@ export const createCustomer = async (req: Request, res: Response) => {
 // 📌 Obtener todos
 export const getCustomers = async (_req: Request, res: Response) => {
   try {
-    const customers = await Customer.find({ isActive: true })
-      .sort({ createdAt: -1 }); // 🔥 ordenados
+    const customers = await Customer.find({
+      isActive: true
+    }).sort({ createdAt: -1 });
 
     res.json(customers);
 
@@ -58,7 +65,9 @@ export const getCustomerById = async (req: Request, res: Response) => {
     const customer = await Customer.findById(id);
 
     if (!customer || !customer.isActive) {
-      return res.status(404).json({ message: "Customer not found" });
+      return res.status(404).json({
+        message: "Customer not found"
+      });
     }
 
     res.json(customer);
@@ -78,12 +87,14 @@ export const updateCustomer = async (req: Request, res: Response) => {
 
     const customer = await Customer.findByIdAndUpdate(
       id,
-      req.body, // 🔥 más flexible
+      req.body,
       { new: true }
     );
 
     if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
+      return res.status(404).json({
+        message: "Customer not found"
+      });
     }
 
     res.json(customer);
@@ -91,6 +102,51 @@ export const updateCustomer = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       message: "Error updating customer",
+      error: error.message
+    });
+  }
+};
+
+// 📌 Agregar pago
+export const addPayment = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { amount } = req.body;
+
+    if (!amount) {
+      return res.status(400).json({
+        message: "Amount is required"
+      });
+    }
+
+    const customer = await Customer.findByIdAndUpdate(
+      id,
+      {
+        $push: {
+          payments: {
+            amount,
+            date: new Date()
+          }
+        },
+
+        $inc: {
+          debt: -amount
+        }
+      },
+      { new: true }
+    );
+
+    if (!customer) {
+      return res.status(404).json({
+        message: "Customer not found"
+      });
+    }
+
+    res.json(customer);
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error adding payment",
       error: error.message
     });
   }
@@ -108,10 +164,14 @@ export const deleteCustomer = async (req: Request, res: Response) => {
     );
 
     if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
+      return res.status(404).json({
+        message: "Customer not found"
+      });
     }
 
-    res.json({ message: "Customer deleted successfully" });
+    res.json({
+      message: "Customer deleted successfully"
+    });
 
   } catch (error: any) {
     res.status(500).json({

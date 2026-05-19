@@ -9,78 +9,49 @@ export const createSale = async (req: Request, res: Response) => {
     const { customer, user, paymentMethod, items, amountPaid = 0, notes } = req.body;
 
     if (!user || !paymentMethod || !items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({
-        message: "Missing required fields"
-      });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     let total = 0;
-    const productMap: any = {}; // 🔥 cache
+    const productMap: any = {};
 
-    // 🔄 calcular total
     for (const item of items) {
       const product = await Product.findById(item.product);
 
-      if (!product) {
-        return res.status(404).json({
-          message: "Product not found"
-        });
-      }
+      if (!product) return res.status(404).json({ message: "Product not found" });
 
       if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `No stock for ${product.name}`
-        });
+        return res.status(400).json({ message: `No stock for ${product.name}` });
       }
 
       productMap[item.product] = product;
       total += product.price * item.quantity;
     }
 
-    // 💵 cambio
     let change = 0;
 
     if (paymentMethod === "cash") {
-      if (amountPaid === undefined || amountPaid === null) {
-        return res.status(400).json({
-          message: "Amount paid is required for cash"
-        });
-      }
-
       if (amountPaid < total) {
-        return res.status(400).json({
-          message: "Insufficient payment"
-        });
+        return res.status(400).json({ message: "Insufficient payment" });
       }
-
       change = amountPaid - total;
     }
 
-    // 📊 status
-    let status: "pending" | "paid" | "cancelled" = "pending";
+    let status: "pending" | "paid" | "cancelled" = paymentMethod === "cash" ? "paid" : "paid";
 
-    if (paymentMethod === "cash") {
-      if (amountPaid >= total) status = "paid";
-    } else {
-      status = "paid";
-    }
-
-    // 📄 crear venta
     const sale = await Sale.create({
       customer,
       user,
       paymentMethod,
       total,
       amountPaid: paymentMethod === "cash" ? amountPaid : 0,
-      change: paymentMethod === "cash" ? change : 0,
+      change,
       status,
       notes
     });
 
-    // 📦 crear items + actualizar stock
     for (const item of items) {
       const product = productMap[item.product];
-
       if (!product) continue;
 
       await SaleItem.create({
@@ -96,86 +67,76 @@ export const createSale = async (req: Request, res: Response) => {
       await product.save();
     }
 
-    res.status(201).json({
-      sale,
-      change
-    });
+    res.status(201).json({ sale, change });
 
   } catch (error: any) {
-    res.status(500).json({
-      message: "Error creating sale",
-      error: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
+// 📊 STATS
+export const getDailySales = async (_req: Request, res: Response) => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
 
-// 📌 OBTENER TODOS LOS ITEMS
+  const sales = await Sale.find({ createdAt: { $gte: start } });
+  const total = sales.reduce((acc, s: any) => acc + (s.total || 0), 0);
+
+  res.json({ total, count: sales.length });
+};
+
+export const getMonthlySales = async (_req: Request, res: Response) => {
+  res.json({ message: "monthly" });
+};
+
+export const getTopProducts = async (_req: Request, res: Response) => {
+  res.json({ message: "top products" });
+};
+
+// 🔄 STATUS
+export const updateSaleStatus = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const sale = await Sale.findByIdAndUpdate(id, { status }, { new: true });
+
+  if (!sale) return res.status(404).json({ message: "Sale not found" });
+
+  res.json(sale);
+};
+
+// 📦 ITEMS
 export const getSaleItems = async (_req: Request, res: Response) => {
-  try {
-    const items = await SaleItem.find()
-      .populate("product")
-      .populate("sale")
-      .sort({ createdAt: -1 });
+  const items = await SaleItem.find()
+    .populate("product")
+    .populate("sale")
+    .sort({ createdAt: -1 });
 
-    res.json(items);
-
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(items);
 };
 
-// 📌 ITEMS POR VENTA
 export const getItemsBySale = async (req: Request, res: Response) => {
-  try {
-    const { saleId } = req.params;
+  const { saleId } = req.params;
 
-    const items = await SaleItem.find({ sale: saleId })
-      .populate("product");
+  const items = await SaleItem.find({ sale: saleId }).populate("product");
 
-    res.json(items);
-
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(items);
 };
 
-
-// 📌 ITEM POR ID
 export const getSaleItemById = async (req: Request, res: Response) => {
-  try {
-    const item = await SaleItem.findById(req.params.id)
-      .populate("product")
-      .populate("sale");
+  const item = await SaleItem.findById(req.params.id)
+    .populate("product")
+    .populate("sale");
 
-    if (!item) {
-      return res.status(404).json({
-        message: "SaleItem not found"
-      });
-    }
+  if (!item) return res.status(404).json({ message: "SaleItem not found" });
 
-    res.json(item);
-
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(item);
 };
 
-
-// ❌ ELIMINAR ITEM
 export const deleteSaleItem = async (req: Request, res: Response) => {
-  try {
-    const item = await SaleItem.findByIdAndDelete(req.params.id);
+  const item = await SaleItem.findByIdAndDelete(req.params.id);
 
-    if (!item) {
-      return res.status(404).json({
-        message: "SaleItem not found"
-      });
-    }
+  if (!item) return res.status(404).json({ message: "SaleItem not found" });
 
-    res.json({ message: "SaleItem deleted" });
-
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json({ message: "SaleItem deleted" });
 };

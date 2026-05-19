@@ -14,7 +14,7 @@ const ProductForm = ({ onSubmit, initialData, onClose }: ProductFormProps) => {
     stock: 0,
     description: "",
     category: "",
-    image: "" // 🔥 nuevo
+    image: ""
   });
 
   const [preview, setPreview] = useState<string | null>(null);
@@ -27,23 +27,19 @@ const ProductForm = ({ onSubmit, initialData, onClose }: ProductFormProps) => {
     }
   }, [initialData]);
 
-  // 🔥 manejar imagen
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // preview local
     const url = URL.createObjectURL(file);
     setPreview(url);
 
-    // ⚠️ por ahora simulamos (después lo subís a server)
     setForm({
       ...form,
       image: url
     });
   };
 
-  // ✏️ cambios normales
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -76,12 +72,15 @@ const ProductForm = ({ onSubmit, initialData, onClose }: ProductFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md w-full max-w-md text-black"
+    >
       <h2 className="text-xl font-bold mb-4">
         {initialData ? "Edit Product" : "New Product"}
       </h2>
 
-      {/* 📷 IMAGE */}
+      {/* IMAGE */}
       <input type="file" accept="image/*" onChange={handleImage} />
 
       {preview && (
@@ -92,28 +91,73 @@ const ProductForm = ({ onSubmit, initialData, onClose }: ProductFormProps) => {
         />
       )}
 
-      <input name="name" placeholder="Product name" value={form.name} onChange={handleChange} className="w-full mb-3 p-2 border rounded" />
+      {/* INPUTS (sin Tailwind extra, usa tu CSS global) */}
+      <input
+        name="name"
+        placeholder="Product name"
+        value={form.name}
+        onChange={handleChange}
+      />
 
-      <input type="number" name="price" placeholder="Price" value={form.price} onChange={handleChange} className="w-full mb-3 p-2 border rounded" />
+      <input
+        type="number"
+        name="price"
+        placeholder="Price"
+        value={form.price}
+        onChange={handleChange}
+      />
 
-      <input type="number" name="cost" placeholder="Cost" value={form.cost} onChange={handleChange} className="w-full mb-3 p-2 border rounded" />
+      <input
+        type="number"
+        name="cost"
+        placeholder="Cost"
+        value={form.cost}
+        onChange={handleChange}
+      />
 
-      <input type="number" name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} className="w-full mb-3 p-2 border rounded" />
+      <input
+        type="number"
+        name="stock"
+        placeholder="Stock"
+        value={form.stock}
+        onChange={handleChange}
+      />
 
-      <input name="category" placeholder="Category" value={form.category} onChange={handleChange} className="w-full mb-3 p-2 border rounded" />
+      <input
+        name="category"
+        placeholder="Category"
+        value={form.category}
+        onChange={handleChange}
+      />
 
-      <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className="w-full mb-4 p-2 border rounded" />
+      <input
+        name="description"
+        placeholder="Description"
+        value={form.description}
+        onChange={handleChange}
+      />
 
-      <div className="flex justify-between">
-        <button type="submit" disabled={loading} className="bg-blue-500 text-white px-4 py-2 rounded">
+      {/* BUTTONS */}
+      <div className="flex justify-between mt-4">
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+        >
           {loading ? "Saving..." : "Save"}
         </button>
 
         {onClose && (
-          <button type="button" onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+          >
             Cancel
           </button>
         )}
+
       </div>
     </form>
   );

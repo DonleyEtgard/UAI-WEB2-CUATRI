@@ -1,18 +1,31 @@
 import { Request, Response } from "express";
+import Joi from "joi";
 import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
+
+// Validation schemas
+const createProductSchema = Joi.object({
+  name: Joi.string().min(1).max(100).required(),
+  price: Joi.number().min(0).required(),
+  cost: Joi.number().min(0).required(),
+  stock: Joi.number().integer().min(0).required(),
+  description: Joi.string().max(500).optional(),
+  category: Joi.string().max(50).optional()
+});
 
 // 📌 Crear producto
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { name, price, cost, stock, description, category } = req.body;
-
-    // ✅ Validaciones básicas
-    if (!name || price == null || cost == null || stock == null) {
+    // Validate input
+    const { error, value } = createProductSchema.validate(req.body);
+    if (error) {
       return res.status(400).json({
-        message: "Name, price, cost and stock are required"
+        message: "Validation error",
+        error: error.details[0].message
       });
     }
+
+    const { name, price, cost, stock, description, category } = value;
 
     // ✅ Evitar duplicados por nombre
     const existing = await Product.findOne({ name });

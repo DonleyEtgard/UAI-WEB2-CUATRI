@@ -1,11 +1,10 @@
-import API from "../../api/axios";
 import { useState, useEffect } from "react";
-import { toggleUserStatus } from "../users/api";
+import API from "../../services/api";
 
 type User = {
   _id: string;
   email: string;
-  role: "superadmin" | "admin" | "seller";
+  role: "superadmin" | "admin" | "employee";
   isActive: boolean;
 };
 
@@ -16,10 +15,13 @@ const UserTable = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/users"); // ⚠️ necesitás esta ruta en backend
-      setUsers(res.data);
+
+      const res = await API.get<User[]>("/users");
+
+      setUsers(res.data ?? []);
     } catch (err) {
-      console.error(err);
+      console.error("Error loading users:", err);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -31,8 +33,8 @@ const UserTable = () => {
 
   const handleToggle = async (id: string) => {
     try {
-      await toggleUserStatus(id);
-      loadUsers(); // 🔄 refresca
+      await API.patch(`/users/${id}/toggle-status`);
+      loadUsers();
     } catch (err) {
       console.error(err);
     }
@@ -59,34 +61,18 @@ const UserTable = () => {
             <tr key={user._id} className="border-t">
               <td className="p-2">{user.email}</td>
 
-              <td className="p-2">
-                <span className="px-2 py-1 bg-blue-100 rounded text-sm">
-                  {user.role}
-                </span>
-              </td>
+              <td className="p-2">{user.role}</td>
 
               <td className="p-2">
-                <span
-                  className={`px-2 py-1 rounded text-sm ${
-                    user.isActive
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {user.isActive ? "Active" : "Disabled"}
-                </span>
+                {user.isActive ? "Active" : "Disabled"}
               </td>
 
               <td className="p-2">
                 <button
                   onClick={() => handleToggle(user._id)}
-                  className={`px-3 py-1 rounded text-white ${
-                    user.isActive
-                      ? "bg-red-500 hover:bg-red-600"
-                      : "bg-green-500 hover:bg-green-600"
-                  }`}
+                  className="px-3 py-1 bg-indigo-600 text-white rounded"
                 >
-                  {user.isActive ? "Deactivate" : "Activate"}
+                  Toggle
                 </button>
               </td>
             </tr>

@@ -1,4 +1,4 @@
-import API from "../../api/axios";
+import API from "../../services/api";
 
 // 💳 PAGAR SUSCRIPCIÓN (cash / transfer / moncash)
 export const paySubscription = async (paymentMethod: "cash" | "transfer" | "moncash") => {

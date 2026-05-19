@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticateJWT } from "../../middlewares/authenticateJWT";
 import {
   createCustomer,
   getCustomers,
@@ -9,10 +10,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", createCustomer);
-router.get("/", getCustomers);
-router.get("/:id", getCustomerById);
-router.put("/:id", updateCustomer);
-router.delete("/:id", deleteCustomer);
+router.post("/", authenticateJWT, createCustomer);
+router.get("/", authenticateJWT, getCustomers);
+router.get("/:id", authenticateJWT, getCustomerById);
+router.put("/:id", authenticateJWT, updateCustomer);
+router.delete("/:id", authenticateJWT, deleteCustomer);
 
 export default router;

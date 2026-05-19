@@ -1,4 +1,4 @@
-import API from "../../api/axios";
+import API from "../../services/api";
 
 // 📌 OBTENER TODOS LOS PRODUCTOS
 export const getProducts = async () => {

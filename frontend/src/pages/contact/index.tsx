@@ -1,15 +1,22 @@
 import ContactForm from "../../components/ContactForm";
-import { selectCount } from "../../features/users/hooks";
-import { useAppSelector } from "../../store/hooks";
 
 const ContactPage = () => {
-    const count = useAppSelector(selectCount)
+  return (
+    <div className="text-center">
+      <h2 className="text-2xl font-semibold text-gray-800">
+            Contact
+          </h2>
 
-    console.log("Current count desde CONTACT:", count);
-  return (<>
-    <div>Contact Page</div>
-    <div><ContactForm /></div>
-  </>);
+      <p className="text-sm text-gray-500 mt-1">
+          Feel free to contact us
+          </p>
+          
+      {/* 📩 Formulario */}
+      <div className="p-4 bg-white rounded-xl shadow">
+        <ContactForm />
+      </div>
+    </div>
+  );
 };
 
 export default ContactPage;

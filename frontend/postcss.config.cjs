@@ -3,5 +3,4 @@ module.exports = {
     require('@tailwindcss/postcss'),
     require('autoprefixer')
   ]
-}
-
+};

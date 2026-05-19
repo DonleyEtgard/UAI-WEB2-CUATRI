@@ -28,7 +28,15 @@ subscriptionStart: {
 lastPaymentQR: {
   type: String
 },
-
+ // 📍 DIRECCIÓN (🔥 NUEVO)
+    address: {
+      street: { type: String },
+      number: { type: String },
+      city: { type: String },
+      state: { type: String },
+      country: { type: String, default: "Argentina" },
+      postalCode: { type: String }
+    },
 subscriptionEnd: {
   type: Date
 },
@@ -41,9 +49,14 @@ image: {
 },
     role: {
   type: String,
-  enum: ["superadmin", "admin", "seller"],
-  default: "seller"
+  enum: ["superadmin", "admin", "manager", "employee", "user"],
+  default: "user"
 },
+
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
 
     isActive: {
       type: Boolean,

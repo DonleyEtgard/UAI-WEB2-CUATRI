@@ -77,7 +77,10 @@ const POSPage = () => {
 
     try {
       await createNewSale({
-        user: "USER_ID_AQUI", // ⚠️ conectar con auth después
+        // Requiere que en el backend se use req.user.id (idealmente) o
+        // que el frontend tome el user desde tu auth (JWT).
+        // Mientras tanto, enviamos el id guardado localmente.
+        user: JSON.parse(localStorage.getItem("user") || "null")?._id,
         paymentMethod,
         items: cart.map((i) => ({
           product: i.product._id,

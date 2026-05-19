@@ -1,18 +1,53 @@
 import { Schema, model, InferSchemaType } from "mongoose";
 
-const customerSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String },
-  phone: { type: String },
+const paymentSchema = new Schema({
+  amount: {
+    type: Number,
+    required: true
+  },
 
-  // 🔥 CLAVE PARA MULTI-USUARIO
+  date: {
+    type: Date,
+    default: Date.now
+  }
+
+}, { _id: false });
+
+const customerSchema = new Schema({
+
+  name: {
+    type: String,
+    required: true
+  },
+
+  email: {
+    type: String
+  },
+
+  phone: {
+    type: String
+  },
+
+  // 🔥 MULTI-USUARIO
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true
   },
 
-  isActive: { type: Boolean, default: true }
+  // 💰 DEUDA TOTAL
+  debt: {
+    type: Number,
+    default: 0
+  },
+
+  // 📅 HISTORIAL DE PAGOS
+  payments: [paymentSchema],
+
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 
 }, { timestamps: true });
 

@@ -19,7 +19,7 @@ const PaymentPage = () => {
       )}
 
       <button onClick={() => pay("moncash")}>
-        Confirmer Paiement
+       Payment 
       </button>
 
       {loading && <p>Processing...</p>}

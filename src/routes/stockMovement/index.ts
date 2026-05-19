@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticateJWT } from "../../middlewares/authenticateJWT";
 import {
   createStockMovement,
   getStockMovements,
@@ -9,10 +10,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", createStockMovement);
-router.get("/", getStockMovements);
-router.get("/summary", getStockSummary);
-router.get("/product/:productId", getMovementsByProduct);
-router.get("/:id", getStockMovementById);
+router.post("/", authenticateJWT, createStockMovement);
+router.get("/", authenticateJWT, getStockMovements);
+router.get("/summary", authenticateJWT, getStockSummary);
+router.get("/product/:productId", authenticateJWT, getMovementsByProduct);
+router.get("/:id", authenticateJWT, getStockMovementById);
 
 export default router;
