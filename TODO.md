@@ -1,5 +1,9 @@
-te pide que cambias solamente Login - [x] Actualizar frontend/src/pages/auth/LoginPage.tsx: mantener lógica intacta; modernizar UI usando clases existentes de frontend/src/styles/index.css.
-- [x] Actualizar frontend/src/pages/auth/RegisterPage.tsx: mantener lógica intacta; modernizar UI usando clases existentes de frontend/src/styles/index.css.
-- [x] Corregir errores TS6133 previos que bloqueaban build (StatCard/BarChart).
-- [ ] Ejecutar build/lint para validar que compila completamente (puede haber más errores preexistentes no relacionados).
+# TODO
+
+## Fix "useAuth must be used within an AuthProvider" on /login and /register
+
+- [ ] Identify mismatch between AuthContext imports (frontend/src/context/AuthContext.tsx vs frontend/src/features/auth/AuthContext.tsx)
+- [ ] Update pages/components that import the wrong AuthContext so they all use the same AuthProvider (the one actually mounted in frontend/src/main.tsx)
+- [ ] Verify router paths used in RoleGuard redirects (/auth/login vs /login) are consistent (optional)
+- [ ] Run frontend dev build/tests (npm run dev / npm run build) and confirm no runtime error
 

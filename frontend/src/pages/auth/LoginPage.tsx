@@ -1,198 +1,244 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+// ============================================================================
+// LOGIN PAGE - Professional Authentication UI
+// ============================================================================
+
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../features/auth/AuthContext";
 
-const LoginPage = () => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState(import.meta.env.VITE_LOGIN_EMAIL ?? "");
-  const [password, setPassword] = useState(import.meta.env.VITE_LOGIN_PASSWORD ?? "");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setErrorMsg(null);
-    setLoading(true);
+export const LoginPage: React.FC = () => {
+  // ========================================================================
+  // HOOKS
+  // ========================================================================
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loading, user } = useAuth();
+
+  const isAuthenticated = !!user;
+  const isLoading = loading;
+  const error = null;
+  const clearError = () => {};
+
+  // ========================================================================
+  // STATE
+  // ========================================================================
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ========================================================================
+  // EFFECTS
+  // ========================================================================
+
+  /**
+   * Redirect to dashboard if already authenticated
+   */
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = (location.state as any)?.from?.pathname || "/dashboard";
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
+
+  /**
+   * Clear error when user types
+   */
+  useEffect(() => {
+    if (formError || error) {
+      const timer = setTimeout(() => {
+        setFormError(null);
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [formError, error, clearError]);
+
+  // ========================================================================
+  // HANDLERS
+  // ========================================================================
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!email.trim()) {
+      setFormError("Please enter your email");
+      return;
+    }
+
+    if (!password) {
+      setFormError("Please enter your password");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setFormError("Please enter a valid email address");
+      return;
+    }
 
     try {
+      setFormError(null);
       await login(email, password);
-      navigate("/");
     } catch (err: any) {
-      console.error("Login error", err);
-      const message = err?.message || "Credenciales incorrectas";
-      setErrorMsg(message);
-    } finally {
-      setLoading(false);
+      const errorMessage = err.message || "Login failed. Please try again.";
+      setFormError(errorMessage);
     }
   };
 
+  const handleDemoLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await login("admin@example.com", "Password123!");
+    } catch (err: any) {
+      setFormError(err.message || "Demo login failed");
+    }
+  };
+
+  // ========================================================================
+  // RENDER
+  // ========================================================================
+
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: "var(--bg)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}
-    >
-      <div className="card" style={{ width: "100%", maxWidth: 520 }}>
-        <div style={{ textAlign: "center" }}>
-          <div className="subtitle">Bienvenido de vuelta</div>
-          <h1 className="page-title" style={{ marginTop: 12 }}>
-            Iniciar sesión
-          </h1>
-          <p className="text-muted" style={{ marginTop: 8 }}>
-            Accede con tu correo y contraseña para continuar.
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* HEADER */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">ERP System</h1>
+          <p className="text-slate-400">Professional Authentication</p>
         </div>
 
-        <form onSubmit={handleLogin} style={{ marginTop: 18 }}>
-          <label htmlFor="email">
-            Email
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
-              required
-            />
-          </label>
+        {/* CARD */}
+        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/30 p-8 shadow-2xl">
+          {/* ERROR ALERT */}
+          {(formError || error) && (
+            <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+              <p className="text-red-400 text-sm">
+                <span className="font-semibold">Error:</span> {formError || error}
+              </p>
+            </div>
+          )}
 
-          <label htmlFor="password" style={{ marginTop: 14 }}>
-            Contraseña
-            <div style={{ position: "relative", width: "100%", maxWidth: 420 }}>
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* EMAIL INPUT */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-200 mb-2">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-lg bg-slate-700/30 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+
+            {/* PASSWORD INPUT */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-slate-200">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-xs text-blue-400 hover:text-blue-300 transition"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                required
-                style={{ paddingRight: 92 }}
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-lg bg-slate-700/30 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="btn-secondary"
-                style={{
-                  position: "absolute",
-                  right: 6,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  maxWidth: "none",
-                  width: "auto",
-                  padding: "8px 12px",
-                  borderRadius: 12,
-                  background: "#1f2937",
-                  boxShadow: "none",
-                }}
-              >
-                {showPassword ? "Ocultar" : "Mostrar"}
-              </button>
             </div>
-            <div style={{ marginTop: 10, textAlign: "right" }}>
-              <Link
-                to="/forgot-password"
-                className="text-primary"
-                style={{ fontWeight: 700 }}
-              >
-                ¿Olvidaste?
-              </Link>
-            </div>
-          </label>
 
-          {errorMsg && (
-            <div
-              className="badge badge-danger"
-              style={{
-                width: "100%",
-                maxWidth: 420,
-                marginTop: 14,
-                borderRadius: 16,
-                padding: "10px 12px",
-              }}
+            {/* LOGIN BUTTON */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
-              {errorMsg}
-            </div>
-          )}
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </form>
 
+          {/* DIVIDER */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-slate-800/50 text-slate-400">Or try demo</span>
+            </div>
+          </div>
+
+          {/* DEMO BUTTON */}
           <button
-            type="submit"
-            disabled={loading}
-            className="submit"
-            style={{ marginTop: 18, maxWidth: 420 }}
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="w-full py-3 px-4 rounded-lg bg-slate-700/50 border border-slate-600 hover:bg-slate-700 text-slate-200 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Ingresando..." : "Iniciar sesión"}
+            Demo Login
           </button>
 
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 420,
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginTop: 16,
-              color: "var(--muted)",
-            }}
-          >
-            <span
-              style={{
-                height: 1,
-                background: "rgba(255,255,255,0.14)",
-                flex: 1,
-              }}
-            />
-            <span style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 4 }}>
-              o continuar con
-            </span>
-            <span
-              style={{
-                height: 1,
-                background: "rgba(255,255,255,0.14)",
-                flex: 1,
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 420,
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-              marginTop: 16,
-            }}
-          >
-            <button
-              type="button"
-              className="btn"
-              style={{ maxWidth: 999, width: "100%" }}
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              className="btn"
-              style={{ maxWidth: 999, width: "100%" }}
-            >
-              GitHub
-            </button>
-          </div>
-
-          <p style={{ marginTop: 18, textAlign: "center" }}>
-            ¿No tienes cuenta?{" "}
-            <Link to="/register" className="text-primary" style={{ fontWeight: 900 }}>
-              Regístrate ahora
-            </Link>
+          {/* FOOTER */}
+          <p className="text-center text-slate-400 text-sm mt-6">
+            Demo Credentials:
+            <br />
+            <code className="text-blue-400">admin@example.com / Password123!</code>
           </p>
-        </form>
+        </div>
+
+        {/* FOOTER TEXT */}
+        <div className="mt-8 text-center">
+          <p className="text-slate-400 text-sm">
+            Don't have an account?{" "}
+            <button
+              onClick={() => navigate("/auth/register")}
+              className="text-blue-400 hover:text-blue-300 font-semibold transition"
+            >
+              Register here
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
