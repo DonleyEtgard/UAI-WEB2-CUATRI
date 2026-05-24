@@ -54,102 +54,119 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
-      <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Decorative Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[120px]" />
       
-      <div className="w-full max-w-[560px] z-10">
-        <div className="glass-morphism rounded-3xl p-8 md:p-10">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Create Workspace</h1>
-            <p className="text-slate-400 mt-2">Scale your business with professional tools</p>
+      <div className="w-full z-10 animate-in fade-in zoom-in duration-500">
+        <div className="form-container" style={{ maxWidth: '600px' }}>
+          {/* HEADER */}
+          <div className="flex flex-col items-center mb-10">
+            <div className="haitibiz-logo mb-4">
+              <span className="haitibiz-logo-icon">🏪</span>
+            </div>
+            <h1 className="haitibiz-title">
+              HAITI<span>BIZ</span>
+            </h1>
+            <p className="haitibiz-subtitle">Create Professional Workspace</p>
           </div>
 
+          {/* ERROR ALERT */}
           {(formError || error) && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium animate-in fade-in zoom-in duration-300">
-              <span className="font-bold">Error:</span> {formError || error}
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300 flex items-center gap-3">
+              <span className="text-lg">⚠️</span>
+              <p className="text-sm font-medium text-red-400">{formError || error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 ml-1">First Name</label>
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="form-grid-2">
+              <label htmlFor="name">
+                First Name
                 <input
+                  id="name"
                   name="name"
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 ml-1">Last Name</label>
+              </label>
+              <label htmlFor="lastName">
+                Last Name
                 <input
+                  id="lastName"
                   name="lastName"
                   type="text"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
-              </div>
+              </label>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 ml-1">Email Address</label>
+            <label htmlFor="email">
+              Email Address
               <input
+                id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="erp-input"
                 required
               />
-            </div>
+            </label>
 
             {/* ADDRESS SECTION */}
-            <div className="pt-2">
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 ml-1">Full Address</label>
+            <label htmlFor="address">
+              Full Address
               <input
+                id="address"
                 name="address"
                 type="text"
                 placeholder="123 Street Name"
                 value={formData.address}
                 onChange={handleChange}
-                className="erp-input mb-3"
                 required
               />
-              <div className="grid grid-cols-2 gap-4">
+            </label>
+
+            <div className="form-grid-2">
+              <label htmlFor="city">
+                City
                 <input
+                  id="city"
                   name="city"
                   type="text"
-                  placeholder="City"
                   value={formData.city}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
+              </label>
+              <label htmlFor="zipCode">
+                Zip Code
                 <input
+                  id="zipCode"
                   name="zipCode"
                   type="text"
-                  placeholder="Zip Code"
                   value={formData.zipCode}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
-              </div>
+              </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div>
-                <div className="flex items-center justify-between mb-1.5 ml-1">
-                  <label className="block text-xs font-bold text-slate-400 uppercase">Password</label>
+            <div className="form-grid-2">
+              <label htmlFor="password">
+                <div className="flex justify-between items-center w-full">
+                  <span>Password</span>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-[10px] font-bold text-blue-400 hover:text-blue-300"
+                    style={{ background: 'none', boxShadow: 'none', width: 'auto', padding: 0, margin: 0 }}
                   >
                     {showPassword ? "HIDE" : "SHOW"}
                   </button>
@@ -159,17 +176,18 @@ const RegisterPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1.5 ml-1">
-                  <label className="block text-xs font-bold text-slate-400 uppercase">Confirm</label>
+              </label>
+
+              <label htmlFor="confirmPassword">
+                <div className="flex justify-between items-center w-full">
+                  <span>Confirm</span>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                    className="text-[10px] font-bold text-blue-400 hover:text-blue-300"
+                    style={{ background: 'none', boxShadow: 'none', width: 'auto', padding: 0, margin: 0 }}
                   >
                     {showPassword ? "HIDE" : "SHOW"}
                   </button>
@@ -179,20 +197,25 @@ const RegisterPage: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="erp-input"
                   required
                 />
-              </div>
+              </label>
             </div>
 
-            <button type="submit" disabled={isLoading} className="erp-button-primary mt-6">
-              {isLoading ? "Provisioning..." : "Launch ERP Workspace"}
+            <button type="submit" disabled={isLoading} className="mt-4">
+              {isLoading ? "Provisioning Workspace..." : "Launch ERP Platform"}
             </button>
           </form>
 
           <p className="mt-8 text-center text-slate-400 text-sm font-medium">
             Back to Haitian platform?{" "}
-            <button onClick={() => navigate("/login")} className="text-indigo-400 hover:text-indigo-300 font-bold underline underline-offset-4 transition-all">Sign In</button>
+            <button 
+              onClick={() => navigate("/login")} 
+              className="text-blue-400 hover:text-blue-300 font-bold transition-colors underline underline-offset-4"
+              style={{ background: 'none', boxShadow: 'none', width: 'auto', padding: 0, display: 'inline', transform: 'none' }}
+            >
+              Sign In
+            </button>
           </p>
         </div>
       </div>

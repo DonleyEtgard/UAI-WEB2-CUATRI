@@ -38,7 +38,7 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <div className="flex h-screen bg-background text-white overflow-hidden">
       <Sidebar isOpen={open} onClose={() => setOpen(false)} />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Navbar onToggleSidebar={() => setOpen((prev) => !prev)} />

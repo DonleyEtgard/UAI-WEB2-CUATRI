@@ -46,12 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="h-px bg-outline-variant/60 mb-4" />
 
         <nav className="flex flex-col gap-1">
-          <NavLink to="dashboard" className={linkClass} onClick={onClose}>
+          <NavLink to="/app" className={linkClass} end onClick={onClose}>
             <span className="text-lg">🏠</span>
             <span>Dashboard</span>
           </NavLink>
 
-          <NavLink to="sales" className={linkClass} onClick={onClose}>
+          <NavLink to="sales" className={linkClass} end onClick={onClose}>
             <span className="text-lg">🧾</span>
             <span>Ventas</span>
           </NavLink>
@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <span>Productos</span>
           </NavLink>
 
-          <NavLink to="clients" className={linkClass} onClick={onClose}>
+          <NavLink to="customers" className={linkClass} onClick={onClose}>
             <span className="text-lg">👥</span>
             <span>Clientes</span>
           </NavLink>
@@ -72,10 +72,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </NavLink>
 
           {(user?.role === "admin" || user?.role === "superadmin") && (
-            <NavLink to="users" className={linkClass} onClick={onClose}>
-              <span className="text-lg">👤</span>
-              <span>Usuarios</span>
-            </NavLink>
+            <>
+              <NavLink to="users" className={linkClass} end onClick={onClose}>
+                <span className="text-lg">👤</span>
+                <span>Usuarios</span>
+              </NavLink>
+              <NavLink to="users/roles" className={linkClass} onClick={onClose}>
+                <span className="text-lg">🔐</span>
+                <span>Roles</span>
+              </NavLink>
+              <NavLink to="reports/sales" className={linkClass} onClick={onClose}>
+                <span className="text-lg">📈</span>
+                <span>Reportes</span>
+              </NavLink>
+            </>
           )}
 
           {user?.role === "admin" && (
@@ -108,4 +118,3 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 };
 
 export default Sidebar;
-

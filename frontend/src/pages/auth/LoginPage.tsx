@@ -6,7 +6,7 @@ import React, { useState,useEffect,} from "react";
 
 import { useNavigate, useLocation,} from "react-router-dom";
 
-import { useAuth } from "@/context/AuthContext"; // Usa alias si lo tienes, o asegura la ruta única
+import { useAuth } from "@/context/AuthContext";
 
 // ============================================================================
 // COMPONENT
@@ -140,116 +140,97 @@ const LoginPage: React.FC = () => {
   // ========================================================================
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]" />
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[120px]" />
 
-      <div className="w-full max-w-md z-10 animate-in fade-in zoom-in duration-500">
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl ring-1 ring-white/10">
+      <div className="w-full z-10 animate-in fade-in zoom-in duration-500">
+        <div className="form-container">
           {/* HEADER */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 mb-6 shadow-lg shadow-blue-500/20">
-              <span className="text-3xl">🏪</span>
+          <div className="flex flex-col items-center mb-10">
+            <div className="haitibiz-logo mb-4">
+              <span className="haitibiz-logo-icon">🏪</span>
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Welcome Back
+            <h1 className="haitibiz-title">
+              HAITI<span>BIZ</span>
             </h1>
-            <p className="text-slate-400 mt-2 font-medium">
-              Access your professional ERP Dashboard
-            </p>
+            <p className="haitibiz-subtitle">Professional ERP Platform</p>
           </div>
 
-          <div className="space-y-6">
-            {/* ERROR ALERT */}
-            {(formError || error) && (
-              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center gap-3 text-red-400">
-                  <span className="text-lg">⚠️</span>
-                  <p className="text-sm font-medium">{formError || error}</p>
-                </div>
-              </div>
-            )}
-
-            {/* FORM */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-semibold text-slate-300 mb-2 ml-1"
-                >
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                  disabled={isLoading}
-                  className="w-full px-4 py-3.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all disabled:opacity-50"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2 ml-1">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-semibold text-slate-300"
-                  >
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    {showPassword ? "HIDE" : "SHOW"}
-                  </button>
-                </div>
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  className="w-full px-4 py-3.5 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all disabled:opacity-50"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none mt-4"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Processing...</span>
-                  </div>
-                ) : (
-                  "Sign In"
-                )}
-              </button>
-            </form>
-
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-slate-700/50"></div>
-              <span className="flex-shrink mx-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                Demo Access
-              </span>
-              <div className="flex-grow border-t border-slate-700/50"></div>
+          {/* ERROR ALERT */}
+          {(formError || error) && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300 flex items-center gap-3">
+              <span className="text-lg">⚠️</span>
+              <p className="text-sm font-medium text-red-400">{formError || error}</p>
             </div>
+          )}
 
-            <button
-              onClick={handleDemoLogin}
-              disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-slate-800/40 border border-slate-700 hover:bg-slate-800/60 text-slate-300 font-semibold transition-all disabled:opacity-50"
-            >
-              Try Demo Account
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <label htmlFor="email">
+              Email Address
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                disabled={isLoading}
+                required
+              />
+            </label>
+
+            <label htmlFor="password">
+              <div className="flex justify-between items-center w-full">
+                <span>Password</span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-xs font-bold text-blue-400 hover:text-blue-300"
+                  style={{ background: 'none', boxShadow: 'none', width: 'auto', padding: 0, margin: 0 }}
+                >
+                  {showPassword ? "HIDE" : "SHOW"}
+                </button>
+              </div>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                disabled={isLoading}
+                required
+              />
+            </label>
+
+            <button type="submit" disabled={isLoading} className="mt-4">
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Processing...</span>
+                </div>
+              ) : (
+                "Sign In to Dashboard"
+              )}
             </button>
+          </form>
+
+          <div className="relative flex items-center py-6">
+            <div className="flex-grow border-t border-slate-700/50"></div>
+            <span className="flex-shrink mx-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
+              Quick Access
+            </span>
+            <div className="flex-grow border-t border-slate-700/50"></div>
           </div>
+
+          <button
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="btn-secondary"
+          >
+            Try Demo Account
+          </button>
         </div>
 
         <p className="mt-8 text-center text-slate-400 text-sm font-medium">
@@ -257,6 +238,7 @@ const LoginPage: React.FC = () => {
           <button
             onClick={() => navigate("/register")}
             className="text-blue-400 hover:text-blue-300 font-bold transition-colors underline underline-offset-4"
+            style={{ background: 'none', boxShadow: 'none', width: 'auto', padding: 0, display: 'inline', transform: 'none' }}
           >
             Create account
           </button>

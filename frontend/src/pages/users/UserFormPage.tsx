@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { registerUser } from "../../firebase/auth";
 import { createOrUpdateUserProfile } from "../../firebase/firestore";
 import type { AppUser } from "../../types/firestore";

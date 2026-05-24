@@ -1,5 +1,5 @@
 // ============================================================================
-// APP ROUTER - Professional React Router v7 Setup
+// APP ROUTER - Centralized Routing System
 // ============================================================================
 
 import React, { Suspense } from "react";
@@ -10,164 +10,170 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// ============================================================================
-// PAGES & COMPONENTS
-// ============================================================================
+// LAYOUTS
+import Layout from "../components/layout/Layout";
+import PublicLayout from "../components/public/PublicLayout";
 
-// Auth Pages
-import LoginPage from "@/pages/auth/LoginPage";
-import RegisterPage from "@/pages/auth/RegisterPage";
+// GUARDS
+import { RoleGuard } from "../components/auth/RoleGuard";
 
-// Guards
-import {
-  AuthGuard,
-  SuperAdminGuard,
-  AdminGuard,
-} from "@/components/auth/RoleGuard";
-
-// Layouts (create these based on your design)
-// import DashboardLayout from "@/layouts/DashboardLayout";
-// import AuthLayout from "@/layouts/AuthLayout";
-
-// ============================================================================
-// LOADING FALLBACK
-// ============================================================================
+// PAGES
+import HomePage from "../pages/home/HomePage";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import ContactPage from "../pages/contact";
+import AboutPage from "../pages/about";
+import DashboardPage from "../pages/dashboard/DashboardPage";
+import ProductsPage from "../features/products/ProductsPage";
+import SalesPage from "../pages/sales/SalesPage";
+import SalesDetailsPage from "../pages/sales/SaleDetailPage";
+import SalesReportPage from "../pages/sales/SalesReportPage";
+import CustomersPage from "../pages/customers/CustomersPage";
+import MovementsPage from "../pages/stock/StockMovementsPage";
+import UserPage from "../pages/users/UserPage";
+import UserRolePage from "../pages/users/UserRolePage";
+import { FormDemo } from "../pages/FormDemo/FormDemo";
+import ReduxDemoPage from "../pages/redux-demo";
+import NotFound from "../components/common/NotFound";
 
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen bg-slate-900">
+  <div className="flex items-center justify-center min-h-screen bg-background">
     <div className="text-center">
-      <svg className="animate-spin h-12 w-12 text-blue-500 mx-auto mb-4" viewBox="0 0 24 24">
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-        />
-      </svg>
-      <p className="text-slate-300">Loading...</p>
+      <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+      <p className="text-muted">Loading...</p>
     </div>
   </div>
 );
-
-// ============================================================================
-// PLACEHOLDER PAGES
-// ============================================================================
-
-const DashboardPage = () => (
-  <div className="min-h-screen bg-slate-900 p-8">
-    <h1 className="text-4xl font-bold text-white">Dashboard</h1>
-    <p className="text-slate-400 mt-4">Welcome to your dashboard</p>
-  </div>
-);
-
-const AdminPage = () => (
-  <div className="min-h-screen bg-slate-900 p-8">
-    <h1 className="text-4xl font-bold text-white">Admin Panel</h1>
-    <p className="text-slate-400 mt-4">Admin only area</p>
-  </div>
-);
-
-const SuperAdminPage = () => (
-  <div className="min-h-screen bg-slate-900 p-8">
-    <h1 className="text-4xl font-bold text-white">SuperAdmin Panel</h1>
-    <p className="text-slate-400 mt-4">SuperAdmin only area</p>
-  </div>
-);
-
-const NotFoundPage = () => (
-  <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-      <p className="text-slate-400 mb-8">Page not found</p>
-      <a href="/dashboard" className="text-blue-400 hover:text-blue-300">
-        Back to Dashboard
-      </a>
-    </div>
-  </div>
-);
-
-const UnauthorizedPage = () => (
-  <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-6xl font-bold text-red-500 mb-4">403</h1>
-      <p className="text-slate-400 mb-8">Access Denied</p>
-      <a href="/dashboard" className="text-blue-400 hover:text-blue-300">
-        Back to Dashboard
-      </a>
-    </div>
-  </div>
-);
-
-// ============================================================================
-// APP ROUTER COMPONENT
-// ============================================================================
 
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
-          {/* ============================================================ */}
           {/* PUBLIC ROUTES */}
-          {/* ============================================================ */}
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="form-demo" element={<FormDemo />} />
+            <Route path="redux-demo" element={<ReduxDemoPage />} />
+          </Route>
 
-          <Route path="/auth/login" element={<LoginPage />} />
-          <Route path="/auth/register" element={<RegisterPage />} />
+          {/* PRIVATE ROUTES */}
+          <Route path="/app" element={<Layout />}>
+            {/* Dashboard */}
+            <Route
+              index
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                  <DashboardPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="dashboard"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                  <DashboardPage />
+                </RoleGuard>
+              }
+            />
 
-          {/* ============================================================ */}
-          {/* PROTECTED ROUTES - AUTHENTICATED */}
-          {/* ============================================================ */}
+            {/* Products */}
+            <Route
+              path="products"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                  <ProductsPage />
+                </RoleGuard>
+              }
+            />
 
-          <Route
-            path="/dashboard"
-            element={
-              <AuthGuard>
-                <DashboardPage />
-              </AuthGuard>
-            }
-          />
+            {/* Sales */}
+            <Route path="sales">
+              <Route
+                index
+                element={
+                  <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                    <SalesPage />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="details/:id"
+                element={
+                  <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                    <SalesDetailsPage />
+                  </RoleGuard>
+                }
+              />
+            </Route>
 
-          {/* ============================================================ */}
-          {/* PROTECTED ROUTES - ADMIN ONLY */}
-          {/* ============================================================ */}
+            {/* Reports */}
+            <Route
+              path="reports"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <DashboardPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="reports/sales"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <SalesReportPage />
+                </RoleGuard>
+              }
+            />
 
-          <Route
-            path="/admin"
-            element={
-              <AdminGuard>
-                <AdminPage />
-              </AdminGuard>
-            }
-          />
+            {/* Customers */}
+            <Route path="clients" element={<Navigate to="/app/customers" replace />} />
+            <Route
+              path="customers"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                  <CustomersPage />
+                </RoleGuard>
+              }
+            />
 
-          {/* ============================================================ */}
-          {/* PROTECTED ROUTES - SUPERADMIN ONLY */}
-          {/* ============================================================ */}
+            {/* Stock */}
+            <Route
+              path="stock"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <MovementsPage />
+                </RoleGuard>
+              }
+            />
 
-          <Route
-            path="/superadmin"
-            element={
-              <SuperAdminGuard>
-                <SuperAdminPage />
-              </SuperAdminGuard>
-            }
-          />
+            {/* Users */}
+            <Route
+              path="users"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <UserPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="users/roles"
+              element={
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <UserRolePage />
+                </RoleGuard>
+              }
+            />
 
-          {/* ============================================================ */}
-          {/* ERROR ROUTES */}
-          {/* ============================================================ */}
+            {/* Private 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
 
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          <Route path="/404" element={<NotFoundPage />} />
-
-          {/* ============================================================ */}
-          {/* CATCH ALL - REDIRECT */}
-          {/* ============================================================ */}
-
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* GLOBAL REDIRECTS */}
+          <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </Suspense>

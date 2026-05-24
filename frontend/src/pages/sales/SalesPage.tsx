@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import API from "../../services/api";
+import UnifiedSearchFilter from "../../components/dashboard/UnifiedSearchFilter";
 
 type Sale = {
   _id: string;
@@ -12,6 +13,12 @@ type Sale = {
 const SalesPage = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    searchQuery: "",
+    category: "all",
+    dateFrom: "",
+    dateTo: "",
+  });
 
   // ==========================
   // 📦 LOAD SALES
@@ -37,10 +44,34 @@ const SalesPage = () => {
   }, []);
 
   // ==========================
+  // 🔍 LÓGICA DE FILTRADO
+  // ==========================
+  const filteredSales = useMemo(() => {
+    return sales.filter((sale) => {
+      const customer = sale.customer?.toLowerCase() || "";
+      const query = filters.searchQuery.toLowerCase();
+      const saleDate = new Date(sale.createdAt);
+
+      const matchesSearch = customer.includes(query) || 
+                           sale.paymentMethod.toLowerCase().includes(query) ||
+                           sale._id.toLowerCase().includes(query);
+
+      let matchesDate = true;
+      if (filters.dateFrom) matchesDate = matchesDate && saleDate >= new Date(filters.dateFrom);
+      if (filters.dateTo) {
+        const endDate = new Date(new Date(filters.dateTo).setHours(23, 59, 59, 999));
+        matchesDate = matchesDate && saleDate <= endDate;
+      }
+
+      return matchesSearch && matchesDate;
+    });
+  }, [sales, filters]);
+
+  // ==========================
   // 📊 KPI
   // ==========================
-  const totalRevenue = sales.reduce((acc, s) => acc + s.total, 0);
-  const avgTicket = sales.length ? totalRevenue / sales.length : 0;
+  const totalRevenue = filteredSales.reduce((acc, s) => acc + s.total, 0);
+  const avgTicket = filteredSales.length ? totalRevenue / filteredSales.length : 0;
 
   return (
     <div className="space-y-6">
@@ -54,12 +85,15 @@ const SalesPage = () => {
         </button>
       </div>
 
+      {/* BARRA DE BÚSQUEDA Y FILTROS */}
+      <UnifiedSearchFilter onSearch={setFilters} />
+
       {/* KPI */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         <div className="bg-white p-4 rounded-xl shadow">
           <p className="text-gray-500">Total Sales</p>
-          <p className="text-xl font-bold">{sales.length}</p>
+          <p className="text-xl font-bold">{filteredSales.length}</p>
         </div>
 
         <div className="bg-green-50 p-4 rounded-xl shadow">
@@ -95,14 +129,14 @@ const SalesPage = () => {
             </thead>
 
             <tbody>
-              {sales.length === 0 ? (
+              {filteredSales.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-4 text-gray-500">
                     No sales found
                   </td>
                 </tr>
               ) : (
-                sales.map((sale) => (
+                filteredSales.map((sale) => (
                   <tr key={sale._id} className="border-t hover:bg-gray-50">
 
                     <td className="p-3">
