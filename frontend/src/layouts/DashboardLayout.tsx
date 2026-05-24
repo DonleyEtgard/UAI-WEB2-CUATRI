@@ -1,10 +1,23 @@
-import { Outlet, Link } from "react-router-dom";
-import { useAppSelector } from "../store/hooks";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const DashboardLayout = () => {
-  const user = useAppSelector((state) => state.auth.user);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const role = user?.role;
+
+  /**
+   * Logout handler
+   */
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">
@@ -16,28 +29,31 @@ const DashboardLayout = () => {
         <nav className="flex flex-col gap-3 text-sm">
 
           {/* TODOS */}
-          <Link to="/dashboard">📊 Dashboard</Link>
-          <Link to="/sales">💰 Ventas</Link>
-          <Link to="/products">📦 Productos</Link>
+          <Link to="/app/dashboard">📊 Dashboard</Link>
+          <Link to="/app/sales">💰 Ventas</Link>
+          <Link to="/app/products">📦 Productos</Link>
 
           {/* SOLO ADMIN */}
           {(role === "admin" || role === "superadmin") && (
-            <Link to="/users">👤 Usuarios</Link>
+            <Link to="/app/users">👤 Usuarios</Link>
           )}
 
           {/* SOLO SUPERADMIN */}
           {role === "superadmin" && (
-            <Link to="/settings">⚙️ Configuración</Link>
+            <Link to="/app/settings">⚙️ Configuración</Link>
           )}
 
           {/* REPORTES (ADMIN + SUPERADMIN) */}
           {(role === "admin" || role === "superadmin") && (
-            <Link to="/reports/sales">📈 Reportes</Link>
+            <Link to="/app/reports/sales">📈 Reportes</Link>
           )}
 
-          <Link to="/" className="text-red-400 mt-6">
+          <button
+            onClick={handleLogout}
+            className="text-left text-red-400 mt-6 hover:text-red-300 transition"
+          >
             🚪 Salir
-          </Link>
+          </button>
 
         </nav>
       </aside>

@@ -1,24 +1,51 @@
 import { Request, Response, NextFunction } from "express";
 
-export const authorizeUserOrSuperadmin = (req: Request, res: Response, next: NextFunction) => {
-  const user = req.user;
-  if (!user) return res.status(401).json({ message: "Unauthorized" });
+export const authorizeSuperadminOnly = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.dbUser;
 
-  if (user.role === "superadmin") return next();
+  if (!user) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
 
-  // ownership by route param
+  if (user.role !== "superadmin") {
+    return res.status(403).json({
+      message: "Forbidden",
+    });
+  }
+
+  next();
+};
+
+export const authorizeUserOrSuperadmin = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.dbUser;
+
+  if (!user) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+
+  if (user.role === "superadmin") {
+    return next();
+  }
+
   const resourceUserId = req.params.id;
-  if (resourceUserId && user.id === resourceUserId) return next();
 
-  return res.status(403).json({ message: "Forbidden" });
+  if (resourceUserId && user._id.toString() === resourceUserId) {
+    return next();
+  }
+
+  return res.status(403).json({
+    message: "Forbidden",
+  });
 };
-
-export const authorizeSuperadminOnly = (req: Request, res: Response, next: NextFunction) => {
-  const user = req.user;
-  if (!user) return res.status(401).json({ message: "Unauthorized" });
-  if (user.role !== "superadmin") return res.status(403).json({ message: "Forbidden" });
-  return next();
-};
-
-export default authorizeUserOrSuperadmin;
-

@@ -4,14 +4,25 @@ const PublicNavbar = () => {
   return (
     <header className="public-navbar flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-black/70 to-black/40 backdrop-blur-md">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/25 to-secondary/25 border border-outline-variant/80 flex items-center justify-center text-xl">
-          🏪
+       <div className="flex items-center gap-4">
+           {/* LOGO */}
+           <div className="haitibiz-logo">
+          <span className="haitibiz-logo-icon">🌐</span>
+            </div>
+
+           {/* TEXT */}
+          <div className="flex flex-col">
+          <h1 className="haitibiz-title">
+            HAITI<span>BIZ</span>
+          </h1>
+
+         <p className="haitibiz-subtitle">
+         ERP • POS • SaaS Platform
+        </p>
         </div>
-        <div>
-          <div className="navbar-brand font-bold text-white tracking-[0.12em]">HAITIBIZ</div>
-          <div className="navbar-subtitle text-on-surface-variant">ERP • POS • SaaS</div>
-        </div>
+       </div>
       </div>
+
 
       <nav className="text-on-surface-variant">
         <Link to="/" className="hover:text-white transition">Inicio</Link>
@@ -25,7 +36,7 @@ const PublicNavbar = () => {
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
           Online • Sincronizado
         </div>
-        <Link to="/register" className="btn">
+        <Link to="/register" className="hover:text-white transition">
           🚀 Acceder
         </Link>
       </div>

@@ -595,6 +595,92 @@ button:hover,
   transform: translateY(0);
 }
 
+/* =========================
+   HAITIBIZ MODERN LOGO
+========================= */
+
+.haitibiz-logo {
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 22px;
+
+  background: linear-gradient(
+    135deg,
+    #6366f1 0%,
+    #8b5cf6 50%,
+    #06b6d4 100%
+  );
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    0 10px 25px rgba(99,102,241,0.35),
+    inset 0 1px 1px rgba(255,255,255,0.2);
+
+  transition: all 0.3s ease;
+}
+
+.haitibiz-logo:hover {
+  transform: translateY(-3px) scale(1.04);
+
+  box-shadow:
+    0 16px 40px rgba(99,102,241,0.45),
+    inset 0 1px 1px rgba(255,255,255,0.25);
+}
+
+.haitibiz-logo-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.haitibiz-title {
+  margin: 0;
+
+  font-size: 2rem;
+  font-weight: 900;
+
+  letter-spacing: 0.18em;
+  line-height: 1;
+
+  color: rgb(31, 91, 202);
+
+  text-transform: uppercase;
+}
+
+.haitibiz-title span {
+  background: linear-gradient(
+    90deg,
+    #818cf8,
+    #22d3ee
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* =========================
+   SUBTITLE
+========================= */
+
+.haitibiz-subtitle {
+  margin-top: 4px;
+
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+
+  color: #9ca3af;
+
+  text-transform: uppercase;
+}
 /* =========================================================
    COLOR HELPERS
 ========================================================= */

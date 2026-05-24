@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Customer from "../../models/Customer";
-import { authenticateJWT } from '../../middlewares/authenticateJWT';
 
 // 📌 Crear cliente
 export const createCustomer = async (req: Request, res: Response) => {

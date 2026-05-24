@@ -1,4 +1,4 @@
-import { useAuth } from "../features/auth/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { hasPermission, canView, canCreate, canUpdate, canDelete, getAccessibleModules } from "../config/rbac";
 import type { RolePermissions } from "../config/rbac";
 

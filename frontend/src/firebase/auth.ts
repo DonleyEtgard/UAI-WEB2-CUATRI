@@ -1,38 +1,114 @@
-﻿import {
+﻿// ============================================================================
+// FIREBASE AUTH FUNCTIONS - Professional Authentication
+// ============================================================================
+
+import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  type User,
+  type User as FirebaseUser,
+  getIdToken,
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth } from "./config";
 
+/**
+ * Validate Firebase Auth is initialized
+ */
 const requireAuth = () => {
   if (!auth) {
-    throw new Error("Firebase Auth is not initialized. Set VITE_FIREBASE_* env variables.");
+    throw new Error(
+      "Firebase Auth is not initialized. Set VITE_FIREBASE_* env variables."
+    );
   }
   return auth;
 };
 
-// 🔐 REGISTER
-export const registerUser = (email: string, password: string) => {
-  return createUserWithEmailAndPassword(requireAuth(), email, password);
+// ============================================================================
+// AUTHENTICATION FUNCTIONS
+// ============================================================================
+
+/**
+ * Register a new user with Firebase Auth
+ * @param email - User email
+ * @param password - User password
+ * @returns Firebase User credential
+ */
+export const registerUser = async (email: string, password: string) => {
+  try {
+    const credential = await createUserWithEmailAndPassword(
+      requireAuth(),
+      email,
+      password
+    );
+    return credential;
+  } catch (error) {
+    throw error;
+  }
 };
 
-// 🔐 LOGIN
-export const loginUser = (email: string, password: string) => {
-  return signInWithEmailAndPassword(requireAuth(), email, password);
+/**
+ * Login user with Firebase Auth
+ * @param email - User email
+ * @param password - User password
+ * @returns Firebase User credential
+ */
+export const loginUser = async (email: string, password: string) => {
+  try {
+    const credential = await signInWithEmailAndPassword(
+      requireAuth(),
+      email,
+      password
+    );
+    return credential;
+  } catch (error) {
+    throw error;
+  }
 };
 
-// 🚪 LOGOUT
-export const logoutUser = () => {
-  return signOut(requireAuth());
+/**
+ * Logout current user
+ * @returns Promise
+ */
+export const logoutUser = async () => {
+  try {
+    await signOut(requireAuth());
+  } catch (error) {
+    throw error;
+  }
 };
 
-// 👀 OBSERVADOR DE SESIÓN GLOBAL
-export const observeAuth = (
-  callback: (user: User | null) => void
-) => {
+/**
+ * Get ID Token from Firebase User
+ * Forces refresh to ensure token is current
+ * @param user - Firebase User
+ * @returns ID Token string
+ */
+export const getFirebaseIdToken = async (
+  user: FirebaseUser
+): Promise<string> => {
+  try {
+    const token = await getIdToken(user, true); // true = force refresh
+    return token;
+  } catch (error) {
+    throw new Error("Failed to get Firebase ID Token");
+  }
+};
+
+/**
+ * Observe auth state changes
+ * @param callback - Function called with user or null
+ * @returns Unsubscribe function
+ */
+export const observeAuth = (callback: (user: FirebaseUser | null) => void) => {
   return onAuthStateChanged(requireAuth(), callback);
+};
+
+/**
+ * Get current user
+ * @returns Current Firebase User or null
+ */
+export const getCurrentUser = () => {
+  return requireAuth().currentUser;
 };

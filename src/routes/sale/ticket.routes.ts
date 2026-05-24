@@ -1,9 +1,9 @@
 import express from "express";
 import { getTicket } from "./ticket.controllers";
-import { authenticateJWT } from '../../middlewares/authenticateJWT';
+import { authenticateFirebase } from '../../middlewares/authenticateFirebase';
 
 const router = express.Router();
 
-router.get("/:id", getTicket);
+router.get("/:id", authenticateFirebase, getTicket);
 
 export default router;

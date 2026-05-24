@@ -1,5 +1,5 @@
 import express from "express";
-import { authenticateJWT } from '../../middlewares/authenticateJWT';
+import { authenticateFirebase } from '../../middlewares/authenticateFirebase';
 
 import {
   createSale,
@@ -18,21 +18,21 @@ import { getTicket } from "./ticket.controllers";
 const router = express.Router();
 
 // 📊 STATS
-router.get("/stats/daily", authenticateJWT, getDailySales);
-router.get("/stats/monthly", authenticateJWT, getMonthlySales);
-router.get("/stats/top-products", authenticateJWT, getTopProducts);
+router.get("/stats/daily", authenticateFirebase, getDailySales);
+router.get("/stats/monthly", authenticateFirebase, getMonthlySales);
+router.get("/stats/top-products", authenticateFirebase, getTopProducts);
 
 // 🧾 TICKET
-router.get("/ticket/:id", authenticateJWT, getTicket);
+router.get("/ticket/:id", authenticateFirebase, getTicket);
 
 // 🛒 SALES
-router.post("/", authenticateJWT, createSale);
-router.patch("/:id/status", authenticateJWT, updateSaleStatus);
+router.post("/", authenticateFirebase, createSale);
+router.patch("/:id/status", authenticateFirebase, updateSaleStatus);
 
 // 📦 ITEMS
-router.get("/items", authenticateJWT, getSaleItems);
-router.get("/items/sale/:saleId", authenticateJWT, getItemsBySale);
-router.get("/items/:id", authenticateJWT, getSaleItemById);
-router.delete("/items/:id", authenticateJWT, deleteSaleItem);
+router.get("/items", authenticateFirebase, getSaleItems);
+router.get("/items/sale/:saleId", authenticateFirebase, getItemsBySale);
+router.get("/items/:id", authenticateFirebase, getSaleItemById);
+router.delete("/items/:id", authenticateFirebase, deleteSaleItem);
 
 export default router;

@@ -8,12 +8,12 @@ import {
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Layout = () => {
   const [open, setOpen] = useState(false);
 
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const location = useLocation();
 
@@ -22,7 +22,7 @@ const Layout = () => {
   }, [location.pathname]);
 
   // ⏳ esperar auth
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-on-surface">
         <span className="animate-pulse text-sm">

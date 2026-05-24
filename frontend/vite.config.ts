@@ -39,6 +39,11 @@ function serviceWorkerPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), serviceWorkerPlugin()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 5173,
     proxy: {

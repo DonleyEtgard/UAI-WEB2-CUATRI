@@ -1,5 +1,5 @@
 import express from "express";
-import { authenticateJWT } from "../../middlewares/authenticateJWT";
+import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 import {
   createCustomer,
   getCustomers,
@@ -10,10 +10,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", authenticateJWT, createCustomer);
-router.get("/", authenticateJWT, getCustomers);
-router.get("/:id", authenticateJWT, getCustomerById);
-router.put("/:id", authenticateJWT, updateCustomer);
-router.delete("/:id", authenticateJWT, deleteCustomer);
+router.post("/", authenticateFirebase, createCustomer);
+router.get("/", authenticateFirebase, getCustomers);
+router.get("/:id", authenticateFirebase, getCustomerById);
+router.put("/:id", authenticateFirebase, updateCustomer);
+router.delete("/:id", authenticateFirebase, deleteCustomer);
 
 export default router;

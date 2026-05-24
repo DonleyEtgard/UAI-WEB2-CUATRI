@@ -1,59 +1,156 @@
 import axios from "axios";
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import type { Response } from "express";
 import admin from "../../firebase";
 import User from "../../models/User";
+import type { AuthRequest } from "../../types/auth";
 
-const signToken = (user: { _id: any; role: string }) => {
-  return jwt.sign(
-    {
-      userId: String(user._id),
-      role: user.role,
-    },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "15m" }
-  );
+// ============================================================================
+// AUTHENTICATION CONTROLLERS
+// ============================================================================
+
+/**
+ * GET /api/users/me
+ * Get current authenticated user profile from MongoDB
+ * Requires: Firebase Authentication
+ */
+export const getMeController = async (req: AuthRequest, res: Response) => {
+  try {
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
+
+    if (!req.firebaseUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
+
+    // ===================================================================
+    // GET USER FROM DATABASE
+    // ===================================================================
+
+    const user = await User.findOne({
+      firebaseUid: req.firebaseUser.uid,
+    }).select("-__v");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User profile not found",
+        error: "USER_NOT_FOUND",
+      });
+    }
+
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        user,
+      },
+    });
+  } catch (error: any) {
+    console.error("Get me error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching user profile",
+      error: error.message,
+    });
+  }
 };
 
-// ==========================
-// 👤 REGISTER
-// ==========================
-export const registerUser = async (req: Request, res: Response) => {
+/**
+ * POST /api/users/register
+ * Register new user in MongoDB after Firebase registration
+ * Called from frontend after Firebase auth.createUserWithEmailAndPassword()
+ * Requires: Firebase ID Token
+ */
+export const registerController = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
-    const { email, password, name, lastName, role, address } = req.body;
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
 
-    if (!email || !password || !name || !lastName) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    if (role === "superadmin") {
-      return res.status(403).json({ message: "Not allowed to create superadmin" });
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    const userRecord = await admin.auth().createUser({ email, password });
-
-    const now = new Date();
-    const subscriptionEnd = new Date();
-    subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 3);
-
-    const mongoRole = role && typeof role === "string" ? role : "user";
-
-    const user = new User({
+    const {
       name,
       lastName,
       email,
-      firebaseUid: userRecord.uid,
+      firebaseUid,
+      role,
+      image,
+      address,
+    } = req.body;
+
+    if (!firebaseUid || !email || !name || !lastName) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields: firebaseUid, email, name, lastName",
+        error: "INVALID_INPUT",
+      });
+    }
+
+    // ===================================================================
+    // BLOCK SUPERADMIN CREATION
+    // ===================================================================
+
+    if (role === "superadmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Not allowed to create superadmin",
+        error: "FORBIDDEN_ROLE",
+      });
+    }
+
+    // ===================================================================
+    // CHECK IF USER EXISTS
+    // ===================================================================
+
+    const existingUser = await User.findOne({
+      $or: [{ email }, { firebaseUid }],
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists with this email or Firebase UID",
+        error: "USER_EXISTS",
+      });
+    }
+
+    // ===================================================================
+    // CREATE USER IN MONGODB
+    // ===================================================================
+
+    const now = new Date();
+
+    const subscriptionEnd = new Date();
+    subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 3);
+
+    const mongoRole =
+      role && typeof role === "string" ? role : "employee";
+
+    const newUser = new User({
+      firebaseUid,
+      email,
+      name,
+      lastName,
+
+      // ================================================================
+      // NEW FIELDS
+      // ================================================================
+
       role: mongoRole,
-      plan: "free",
-      isVerified: false,
-      isActive: true,
-      subscriptionStart: now,
-      subscriptionEnd,
+      image: image || "",
+
       address: {
         street: address?.street || "",
         number: address?.number || "",
@@ -62,112 +159,302 @@ export const registerUser = async (req: Request, res: Response) => {
         country: address?.country || "Argentina",
         postalCode: address?.postalCode || "",
       },
+
+      // ================================================================
+      // DEFAULTS
+      // ================================================================
+
+      plan: "free",
+      isVerified: false,
+      isActive: true,
+
+      subscriptionStart: now,
+      subscriptionEnd,
+      subscriptionPaid: false,
     });
 
-    await user.save();
+    await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully", user });
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: {
+        user: newUser,
+      },
+    });
   } catch (error: any) {
-    res.status(500).json({
-      message: "Error while registering user",
+    console.error("Register error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error registering user",
       error: error.message,
     });
   }
 };
 
-// ==========================
-// 👑 GET USERS (superadmin only)
-// ==========================
-export const getUsers = async (_req: Request, res: Response) => {
+/**
+ * GET /api/users/:id
+ * Get user by ID (Admin/SuperAdmin only)
+ * Requires: Firebase Authentication + Admin Role
+ */
+export const getUserByIdController = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
-    const users = await User.find().select("-password");
-    res.json(users);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Error fetching users",
-      error: error.message,
-    });
-  }
-};
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
 
-// ==========================
-// 👤 GET ME
-// ==========================
-export const getMe = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
 
-    const user = await User.findById(userId).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // Check if user is admin or superadmin
+    if (!["admin", "superadmin"].includes(req.dbUser.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can view other users",
+        error: "FORBIDDEN",
+      });
+    }
 
-    res.json(user);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Error fetching me",
-      error: error.message,
-    });
-  }
-};
-
-// ==========================
-// 👤 GET USER BY ID (ownership o superadmin via middleware)
-// ==========================
-export const getUserById = async (req: Request, res: Response) => {
-  try {
     const { id } = req.params;
 
-    const user = await User.findById(id).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // ===================================================================
+    // GET USER
+    // ===================================================================
 
-    res.json(user);
+    const user = await User.findById(id).select("-__v");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: "NOT_FOUND",
+      });
+    }
+
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        user,
+      },
+    });
   } catch (error: any) {
-    res.status(500).json({
+    console.error("Get user error:", error);
+
+    return res.status(500).json({
+      success: false,
       message: "Error fetching user",
       error: error.message,
     });
   }
 };
 
-// ==========================
-// 🔐 LOGIN (Firebase email+password → JWT propio)
-// ==========================
-export const loginWithEmailPassword = async (req: Request, res: Response) => {
+/**
+ * GET /api/users
+ * List all users (Admin/SuperAdmin only)
+ * Requires: Firebase Authentication + Admin Role
+ */
+export const listUsersController = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
-    const { email, password } = req.body;
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
 
-    const apiKey = process.env.FIREBASE_API_KEY ?? process.env.VITE_FIREBASE_API_KEY;
-    if (!apiKey) return res.status(500).json({ message: "FIREBASE_API_KEY or VITE_FIREBASE_API_KEY missing" });
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
 
-    const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+    // Check if user is admin or superadmin
+    if (!["admin", "superadmin"].includes(req.dbUser.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can list users",
+        error: "FORBIDDEN",
+      });
+    }
 
-    await axios.post(url, {
-      email,
-      password,
-      returnSecureToken: true,
-    });
+    // ===================================================================
+    // GET USERS
+    // ===================================================================
 
-    const dbUser = await User.findOne({ email });
+    const page = parseInt(req.query.page as string) || 1;
 
-    if (!dbUser) return res.status(404).json({ message: "User not found" });
-    if (!dbUser.isActive) return res.status(403).json({ message: "User is disabled" });
+    const limit = parseInt(req.query.limit as string) || 10;
 
-    const token = signToken(dbUser);
+    const skip = (page - 1) * limit;
 
-    return res.json({
-      token,
-      user: {
-        id: String(dbUser._id),
-        _id: String(dbUser._id),
-        email: dbUser.email,
-        role: dbUser.role,
-        isActive: dbUser.isActive,
+    const users = await User.find()
+      .select("-__v")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await User.countDocuments();
+
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        users,
+
+        pagination: {
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
+        },
       },
     });
   } catch (error: any) {
-    res.status(401).json({
-      message: "Login failed",
-      error: error.response?.data || error.message,
+    console.error("List users error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error listing users",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PATCH /api/users/:id
+ * Update user (user can update own profile, admin/superadmin can update any)
+ * Requires: Firebase Authentication
+ */
+export const updateUserController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
+
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
+
+    const { id } = req.params;
+
+    const updates = req.body;
+
+    // Check authorization
+    const isOwnProfile = req.dbUser._id.toString() === id;
+
+    const isAdmin = ["admin", "superadmin"].includes(
+      req.dbUser.role
+    );
+
+    if (!isOwnProfile && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Can only update your own profile",
+        error: "FORBIDDEN",
+      });
+    }
+
+    // Don't allow role updates except by superadmin
+    if (updates.role && req.dbUser.role !== "superadmin") {
+      delete updates.role;
+    }
+
+    // Don't allow firebaseUid updates
+    if (updates.firebaseUid) {
+      delete updates.firebaseUid;
+    }
+
+    // Don't allow creating superadmin
+    if (
+      updates.role === "superadmin" &&
+      req.dbUser.role !== "superadmin"
+    ) {
+      delete updates.role;
+    }
+
+    // ===================================================================
+    // UPDATE USER
+    // ===================================================================
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      {
+        ...updates,
+
+        address: {
+          street: updates.address?.street,
+          number: updates.address?.number,
+          city: updates.address?.city,
+          state: updates.address?.state,
+          country: updates.address?.country,
+          postalCode: updates.address?.postalCode,
+        },
+
+        image: updates.image,
+
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-__v");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: "NOT_FOUND",
+      });
+    }
+
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: {
+        user,
+      },
+    });
+  } catch (error: any) {
+    console.error("Update user error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error updating user",
+      error: error.message,
     });
   }
 };
@@ -175,9 +462,9 @@ export const loginWithEmailPassword = async (req: Request, res: Response) => {
 // ==========================
 // 💳 PAYMENT SUBSCRIPTION (JWT)
 // ==========================
-export const paySubscription = async (req: any, res: Response) => {
+export const paySubscription = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.dbUser?._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const user = await User.findById(userId);
@@ -211,9 +498,9 @@ export const paySubscription = async (req: any, res: Response) => {
 // ==========================
 // 💳 CREATE PAYMENT (QR)
 // ==========================
-export const createSubscriptionPayment = async (req: any, res: Response) => {
+export const createSubscriptionPayment = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.dbUser?._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const user = await User.findById(userId);
@@ -230,28 +517,79 @@ export const createSubscriptionPayment = async (req: any, res: Response) => {
     res.status(500).json({ message: "Error creating payment", error: error.message });
   }
 };
-
-// ==========================
-// 🔄 TOGGLE USER (ownership enforced by middleware)
-// ==========================
-export const toggleUserStatus = async (req: any, res: Response) => {
+/**
+ * DELETE /api/users/:id
+ * Delete user (SuperAdmin only, soft delete)
+ * Requires: Firebase Authentication + SuperAdmin Role
+ */
+export const deleteUserController = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
+    // ===================================================================
+    // VALIDATION
+    // ===================================================================
+
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
+
+    if (req.dbUser.role !== "superadmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only superadmins can delete users",
+        error: "FORBIDDEN",
+      });
+    }
+
     const { id } = req.params;
 
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // ===================================================================
+    // SOFT DELETE
+    // ===================================================================
 
-    user.isActive = !user.isActive;
-    await user.save();
+    const user = await User.findByIdAndUpdate(
+      id,
+      {
+        isActive: false,
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    ).select("-__v");
 
-    res.json({ message: "User status updated", user });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: "NOT_FOUND",
+      });
+    }
+
+    // ===================================================================
+    // RESPONSE
+    // ===================================================================
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: {
+        user,
+      },
+    });
   } catch (error: any) {
-    res.status(500).json({ message: "Error updating user", error: error.message });
+    console.error("Delete user error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting user",
+      error: error.message,
+    });
   }
 };
-
-export default {
-  registerUser,
-  loginWithEmailPassword,
-};
-

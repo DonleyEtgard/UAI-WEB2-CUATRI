@@ -1,40 +1,155 @@
-import { Request, Response, NextFunction } from "express";
+// ============================================================================
+// AUTHENTICATE FIREBASE MIDDLEWARE - Token Verification
+// ============================================================================
+
+import { Response, NextFunction } from "express";
 import admin from "../firebase";
 import User from "../models/User";
+import type { AuthRequest, FirebaseDecoded, DBUser } from "../types/auth";
 
+// ============================================================================
+// MIDDLEWARE
+// ============================================================================
+
+/**
+ * Middleware to authenticate Firebase ID Token
+ * Verifies token and retrieves user from MongoDB
+ */
 export const authenticateFirebase = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    // =====================================================================
+    // 1. EXTRACT AND VALIDATE TOKEN
+    // =====================================================================
 
-    // 🔥 buscar usuario en Mongo
-    const dbUser = await User.findOne({
-      firebaseUid: decodedToken.uid,
-    });
+    const authHeader = req.headers.authorization;
 
-    if (!dbUser) {
-      return res.status(404).json({ message: "User not found in DB" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "No authorization token provided",
+        error: "MISSING_TOKEN",
+      });
     }
 
-    // 🔥 guardar en request
-    (req as any).firebaseUser = decodedToken;
-    (req as any).dbUser = dbUser;
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid authorization header format",
+        error: "INVALID_FORMAT",
+      });
+    }
+
+    // =====================================================================
+    // 2. VERIFY FIREBASE TOKEN
+    // =====================================================================
+
+    let decodedToken: FirebaseDecoded;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(token);
+    } catch (error: any) {
+      const errorCode = error.code || "INVALID_TOKEN";
+
+      // Specific Firebase error messages
+      let message = "Invalid or expired token";
+
+      if (errorCode === "auth/argument-error") {
+        message = "Invalid token format";
+      } else if (errorCode === "auth/id-token-expired") {
+        message = "Token has expired";
+      } else if (errorCode === "auth/invalid-id-token") {
+        message = "Invalid token";
+      }
+
+      return res.status(401).json({
+        success: false,
+        message,
+        error: errorCode,
+      });
+    }
+
+    // =====================================================================
+    // 3. FIND USER IN MONGODB
+    // =====================================================================
+
+    let dbUser: DBUser | null = null;
+    try {
+      const found = await User.findOne({ firebaseUid: decodedToken.uid }).select(
+        "-__v"
+      );
+
+      if (found) {
+        // cast mongoose doc to DBUser shape
+        dbUser = {
+          _id: String(found._id),
+          role: found.role,
+          email: found.email,
+          name: found.name,
+          lastName: found.lastName,
+          firebaseUid: found.firebaseUid,
+          isActive: found.isActive,
+        } as DBUser;
+      }
+    } catch (error) {
+      console.error("Database error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error fetching user from database",
+        error: "DB_ERROR",
+      });
+    }
+
+    // =====================================================================
+    // 4. ATTACH TO REQUEST
+    // =====================================================================
+
+    req.firebaseUser = decodedToken;
+    req.dbUser = dbUser;
 
     next();
-  } catch (error) {
-    return res.status(401).json({
-      message: "Invalid or expired token",
+  } catch (error: any) {
+    console.error("Authentication middleware error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Authentication error",
+      error: "AUTH_ERROR",
     });
   }
 };
+
+/**
+ * Middleware to ensure user is authenticated and exists in database
+ */
+export const requireAuthenticated = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // This middleware expects `authenticateFirebase` to have run first in the
+    // route chain. It only checks that the DB user exists.
+    if (!req.dbUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User profile not found in database",
+        error: "USER_NOT_FOUND",
+      });
+    }
+
+    return next();
+  } catch (error) {
+    console.error("Required authentication error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Authentication error",
+      error: "AUTH_ERROR",
+    });
+  }
+};
+
+export default authenticateFirebase;

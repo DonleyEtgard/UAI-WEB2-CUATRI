@@ -1,7 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useAuth } from "../../features/auth/AuthContext";
-
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 import {
   Container,
@@ -15,6 +13,7 @@ import {
   Stack,
   Divider,
 } from "@mui/material";
+
 import {
   Business,
   ShoppingCart,
@@ -28,82 +27,119 @@ import {
 } from "@mui/icons-material";
 
 const HomePage = () => {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate("/app", { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-
-  // Mientras carga la sesión, mostramos un fallback en vez de pantalla vacía
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#f8fafc",
+          bgcolor: "#050816",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Typography color="text.secondary">Cargando...</Typography>
+        <Typography color="#94a3b8">
+          Cargando...
+        </Typography>
       </Box>
     );
   }
 
-  // Si está autenticado, evitamos frame en blanco mientras redirigimos.
   if (isAuthenticated) {
     return (
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#f8fafc",
+          bgcolor: "#050816",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Typography color="text.secondary">Redirigiendo...</Typography>
+        <Typography color="#94a3b8">
+          Redirigiendo...
+        </Typography>
       </Box>
     );
   }
 
   const features = [
     {
-      icon: <Business sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <Business
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Gestión Empresarial",
       description:
         "Sistema completo para administrar tu negocio de manera eficiente y profesional.",
     },
     {
-      icon: <ShoppingCart sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <ShoppingCart
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Punto de Venta",
       description:
         "Procesamiento rápido de ventas con integración completa al inventario.",
     },
     {
-      icon: <People sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <People
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Gestión de Clientes",
       description:
         "Mantén un registro completo de tus clientes y su historial de compras.",
     },
     {
-      icon: <Inventory sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <Inventory
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Control de Inventario",
       description:
         "Seguimiento en tiempo real de stock, movimientos y alertas automáticas.",
     },
     {
-      icon: <Analytics sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <Analytics
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Reportes y Analytics",
       description:
         "Informes detallados y métricas para tomar mejores decisiones.",
     },
     {
-      icon: <Security sx={{ fontSize: 40, color: "#6366f1" }} />,
+      icon: (
+        <Security
+          sx={{
+            fontSize: 40,
+            color: "#8b5cf6",
+          }}
+        />
+      ),
       title: "Seguridad Avanzada",
       description:
         "Protección de datos con roles y permisos personalizables.",
@@ -111,96 +147,177 @@ const HomePage = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f8fafc" }}>
-      {/* Hero Section */}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background:
+          "radial-gradient(circle at top left, rgba(99,102,241,0.25), transparent 30%), radial-gradient(circle at bottom right, rgba(139,92,246,0.18), transparent 30%), #050816",
+        color: "white",
+      }}
+    >
+      {/* HERO */}
       <Box
         sx={{
-          backgroundImage: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+          background:
+            "linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.92) 50%, rgba(88,28,135,0.85) 100%)",
           color: "white",
           py: { xs: 8, md: 12 },
           position: "relative",
           overflow: "hidden",
+          borderBottom:
+            "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(12px)",
         }}
       >
-        <Container maxWidth="lg">
+        {/* Glow */}
+        <Box
+          sx={{
+            position: "absolute",
+            width: 500,
+            height: 500,
+            borderRadius: "50%",
+            background:
+              "rgba(99,102,241,0.18)",
+            filter: "blur(120px)",
+            top: -120,
+            right: -120,
+            zIndex: 0,
+          }}
+        />
+
+        <Container
+          maxWidth="lg"
+          sx={{ position: "relative", zIndex: 2 }}
+        >
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
               gap: 4,
               alignItems: "center",
             }}
           >
+            {/* LEFT */}
             <Box sx={{ flex: 1 }}>
+              <Chip
+                label="⚡ ERP • POS • SaaS"
+                sx={{
+                  mb: 3,
+                  bgcolor:
+                    "rgba(99,102,241,0.15)",
+                  color: "#c4b5fd",
+                  border:
+                    "1px solid rgba(255,255,255,0.08)",
+                }}
+              />
+
               <Typography
                 variant="h1"
                 component="h1"
                 sx={{
-                  fontSize: { xs: "2.5rem", md: "3.5rem" },
-                  fontWeight: 700,
+                  fontSize: {
+                    xs: "3rem",
+                    md: "5rem",
+                  },
+                  fontWeight: 800,
                   mb: 2,
-                  lineHeight: 1.2,
+                  lineHeight: 1.1,
+                  background:
+                    "linear-gradient(90deg,#ffffff,#a5b4fc,#c084fc)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor:
+                    "transparent",
+                  letterSpacing: "0.05em",
+                  textShadow:
+                    "0 0 25px rgba(99,102,241,0.35)",
                 }}
               >
-                HAITIBIZ ERP
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  mb: 4,
-                  opacity: 0.9,
-                  fontWeight: 300,
-                  lineHeight: 1.4,
-                }}
-              >
-                Sistema de Gestión Empresarial Profesional
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 4, opacity: 0.8 }}>
-                Gestiona ventas, inventario, clientes y operaciones desde una sola
-                plataforma. Funciona online y offline, con sincronización
-                automática.
+                💠 HAITIBIZ
               </Typography>
 
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <Typography
+                variant="h4"
+                sx={{
+                  mb: 3,
+                  color: "#cbd5e1",
+                  fontWeight: 300,
+                }}
+              >
+                Plataforma inteligente para
+                negocios modernos
+              </Typography>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  mb: 5,
+                  color: "#94a3b8",
+                  fontSize: "1.1rem",
+                  lineHeight: 1.8,
+                  maxWidth: 650,
+                }}
+              >
+                Gestiona ventas, inventario,
+                clientes, estadísticas y
+                operaciones desde un solo lugar.
+                Diseñado para empresas modernas
+                que necesitan velocidad,
+                automatización y escalabilidad.
+              </Typography>
+
+              <Stack
+                direction={{
+                  xs: "column",
+                  sm: "row",
+                }}
+                spacing={2}
+              >
                 <Button
                   component={Link}
                   to="/register"
                   variant="contained"
                   size="large"
                   sx={{
-                    bgcolor: "white",
-                    color: "#6366f1",
-                    px: 4,
-                    py: 1.5,
-                    fontSize: "1.1rem",
-                    fontWeight: 600,
+                    background:
+                      "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                    px: 5,
+                    py: 1.7,
+                    borderRadius: "14px",
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    boxShadow:
+                      "0 0 25px rgba(99,102,241,0.45)",
+
                     "&:hover": {
-                      bgcolor: "#f1f5f9",
-                      transform: "translateY(-2px)",
+                      transform:
+                        "translateY(-3px)",
                     },
-                    transition: "all 0.3s ease",
                   }}
                 >
                   Comenzar Ahora
                 </Button>
+
                 <Button
                   component={Link}
                   to="/login"
                   variant="outlined"
                   size="large"
                   sx={{
-                    borderColor: "white",
+                    borderColor:
+                      "rgba(255,255,255,0.2)",
                     color: "white",
-                    px: 4,
-                    py: 1.5,
-                    fontSize: "1.1rem",
-                    fontWeight: 600,
+                    px: 5,
+                    py: 1.7,
+                    borderRadius: "14px",
+
                     "&:hover": {
-                      borderColor: "#f1f5f9",
-                      bgcolor: "rgba(255,255,255,0.1)",
-                      transform: "translateY(-2px)",
+                      borderColor: "#8b5cf6",
+                      bgcolor:
+                        "rgba(255,255,255,0.05)",
                     },
-                    transition: "all 0.3s ease",
                   }}
                 >
                   Iniciar Sesión
@@ -208,52 +325,102 @@ const HomePage = () => {
               </Stack>
             </Box>
 
+            {/* RIGHT */}
             <Box sx={{ flex: 1 }}>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: { xs: 300, md: 400 },
+                  height: {
+                    xs: 320,
+                    md: 450,
+                  },
                 }}
               >
                 <Paper
-                  elevation={8}
+                  elevation={0}
                   sx={{
-                    p: 4,
-                    borderRadius: 4,
-                    bgcolor: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(10px)",
+                    p: 5,
+                    borderRadius: "28px",
+                    background:
+                      "rgba(15,23,42,0.75)",
+                    border:
+                      "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter:
+                      "blur(18px)",
                     width: "100%",
-                    maxWidth: 400,
+                    maxWidth: 430,
+                    boxShadow:
+                      "0 0 40px rgba(99,102,241,0.25)",
                   }}
                 >
                   <Typography
-                    variant="h4"
-                    sx={{ color: "#6366f1", fontWeight: 700, mb: 2, textAlign: "center" }}
+                    variant="h1"
+                    sx={{
+                      textAlign: "center",
+                      mb: 2,
+                    }}
                   >
-                    🏪
+                    ⚡
                   </Typography>
+
                   <Typography
-                    variant="h6"
-                    sx={{ color: "#1e293b", fontWeight: 600, mb: 2, textAlign: "center" }}
+                    variant="h5"
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: 700,
+                      mb: 2,
+                      color: "white",
+                    }}
                   >
-                    App Instalable
+                    ERP Inteligente
                   </Typography>
+
                   <Typography
-                    variant="body2"
-                    sx={{ color: "#64748b", textAlign: "center", mb: 3 }}
+                    variant="body1"
+                    sx={{
+                      textAlign: "center",
+                      color: "#94a3b8",
+                      mb: 4,
+                      lineHeight: 1.7,
+                    }}
                   >
-                    Funciona como aplicación nativa en Android, iOS y PC
+                    Plataforma cloud moderna con
+                    soporte PWA, sincronización en
+                    tiempo real y acceso desde
+                    cualquier dispositivo.
                   </Typography>
+
                   <Stack
+                    component={"div"}
                     direction="row"
                     spacing={1}
-                    sx={{ justifyContent: "center", flexWrap: "wrap" }}
+                    sx={{ justifyContent: "center" }}
                   >
-                    <Chip label="PWA" size="small" sx={{ bgcolor: "#6366f1", color: "white" }} />
-                    <Chip label="Offline" size="small" sx={{ bgcolor: "#10b981", color: "white" }} />
-                    <Chip label="Responsive" size="small" sx={{ bgcolor: "#f59e0b", color: "white" }} />
+                    <Chip
+                      label="PWA"
+                      sx={{
+                        bgcolor: "#6366f1",
+                        color: "white",
+                      }}
+                    />
+
+                    <Chip
+                      label="Cloud"
+                      sx={{
+                        bgcolor: "#8b5cf6",
+                        color: "white",
+                      }}
+                    />
+
+                    <Chip
+                      label="Offline"
+                      sx={{
+                        bgcolor: "#10b981",
+                        color: "white",
+                      }}
+                    />
                   </Stack>
                 </Paper>
               </Box>
@@ -262,38 +429,51 @@ const HomePage = () => {
         </Container>
       </Box>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
-        <Box sx={{ textAlign: "center", mb: 8 }}>
+      {/* FEATURES */}
+      <Container
+        maxWidth="lg"
+        sx={{ py: { xs: 8, md: 12 } }}
+      >
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: 8,
+          }}
+        >
           <Typography
             variant="h2"
-            component="h2"
             sx={{
-              fontSize: { xs: "2rem", md: "2.5rem" },
-              fontWeight: 700,
-              color: "#1e293b",
+              fontWeight: 800,
               mb: 3,
+              color: "white",
             }}
           >
             Características Principales
           </Typography>
+
           <Typography
             variant="h6"
             sx={{
-              color: "#64748b",
-              maxWidth: 600,
+              color: "#94a3b8",
+              maxWidth: 700,
               mx: "auto",
-              lineHeight: 1.6,
+              lineHeight: 1.7,
             }}
           >
-            Todo lo que necesitas para gestionar tu negocio de manera eficiente
+            Todo lo que necesitas para gestionar
+            tu empresa de forma moderna,
+            profesional y escalable.
           </Typography>
         </Box>
 
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+            },
             gap: 4,
           }}
         >
@@ -302,31 +482,51 @@ const HomePage = () => {
               key={index}
               sx={{
                 height: "100%",
-                transition: "all 0.3s ease",
+                borderRadius: "24px",
+                background:
+                  "rgba(15,23,42,0.75)",
+                border:
+                  "1px solid rgba(255,255,255,0.06)",
+                backdropFilter: "blur(16px)",
+                transition: "0.35s",
+                color: "white",
+
                 "&:hover": {
-                  transform: "translateY(-8px)",
-                  boxShadow: "0 20px 40px rgba(99,102,241,0.15)",
+                  transform:
+                    "translateY(-10px)",
+                  boxShadow:
+                    "0 0 35px rgba(99,102,241,0.35)",
+                  border:
+                    "1px solid rgba(99,102,241,0.4)",
                 },
               }}
             >
-              <CardContent sx={{ p: 4, textAlign: "center" }}>
-                <Box sx={{ mb: 3 }}>{feature.icon}</Box>
+              <CardContent
+                sx={{
+                  p: 4,
+                  textAlign: "center",
+                }}
+              >
+                <Box sx={{ mb: 3 }}>
+                  {feature.icon}
+                </Box>
+
                 <Typography
                   variant="h5"
-                  component="h3"
                   sx={{
-                    fontWeight: 600,
-                    color: "#1e293b",
+                    fontWeight: 700,
                     mb: 2,
+                    color: "white",
                   }}
                 >
                   {feature.title}
                 </Typography>
+
                 <Typography
-                  variant="body2"
+                  variant="body1"
                   sx={{
-                    color: "#64748b",
-                    lineHeight: 1.6,
+                    color: "#94a3b8",
+                    lineHeight: 1.8,
                   }}
                 >
                   {feature.description}
@@ -337,34 +537,51 @@ const HomePage = () => {
         </Box>
       </Container>
 
-      {/* CTA Section */}
-      <Box sx={{ bgcolor: "#1e293b", color: "white", py: { xs: 8, md: 10 } }}>
-        <Container maxWidth="md" sx={{ textAlign: "center" }}>
+      {/* CTA */}
+      <Box
+        sx={{
+          background:
+            "linear-gradient(135deg,#0f172a,#111827,#312e81)",
+          color: "white",
+          py: { xs: 8, md: 10 },
+          borderTop:
+            "1px solid rgba(255,255,255,0.08)",
+          borderBottom:
+            "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <Container
+          maxWidth="md"
+          sx={{ textAlign: "center" }}
+        >
           <Typography
             variant="h3"
-            component="h2"
             sx={{
-              fontSize: { xs: "2rem", md: "2.5rem" },
-              fontWeight: 700,
+              fontWeight: 800,
               mb: 3,
             }}
           >
-            ¿Listo para transformar tu negocio?
+            ¿Listo para escalar tu negocio?
           </Typography>
+
           <Typography
             variant="h6"
             sx={{
-              mb: 4,
-              opacity: 0.9,
+              mb: 5,
+              color: "#cbd5e1",
               fontWeight: 300,
-              lineHeight: 1.6,
             }}
           >
-            Únete a miles de empresas que ya confían en HAITIBIZ ERP
+            Miles de empresas ya utilizan
+            HAITIBIZ ERP para automatizar sus
+            operaciones.
           </Typography>
 
           <Stack
-            direction={{ xs: "column", sm: "row" }}
+            direction={{
+              xs: "column",
+              sm: "row",
+            }}
             spacing={2}
             sx={{ justifyContent: "center" }}
           >
@@ -374,38 +591,29 @@ const HomePage = () => {
               variant="contained"
               size="large"
               sx={{
-                bgcolor: "#6366f1",
+                background:
+                  "linear-gradient(135deg,#6366f1,#8b5cf6)",
                 px: 6,
                 py: 2,
-                fontSize: "1.2rem",
-                fontWeight: 600,
-                "&:hover": {
-                  bgcolor: "#5855eb",
-                  transform: "translateY(-2px)",
-                },
-                transition: "all 0.3s ease",
+                borderRadius: "14px",
+                fontWeight: 700,
               }}
             >
               Crear Cuenta Gratis
             </Button>
+
             <Button
               component={Link}
               to="/contact"
               variant="outlined"
               size="large"
               sx={{
-                borderColor: "white",
+                borderColor:
+                  "rgba(255,255,255,0.2)",
                 color: "white",
                 px: 6,
                 py: 2,
-                fontSize: "1.2rem",
-                fontWeight: 600,
-                "&:hover": {
-                  borderColor: "#6366f1",
-                  bgcolor: "#6366f1",
-                  transform: "translateY(-2px)",
-                },
-                transition: "all 0.3s ease",
+                borderRadius: "14px",
               }}
             >
               Contactar Soporte
@@ -414,91 +622,147 @@ const HomePage = () => {
         </Container>
       </Box>
 
-      {/* Footer */}
-      <Box sx={{ bgcolor: "#0f172a", color: "white", py: 6 }}>
+      {/* FOOTER */}
+      <Box
+        sx={{
+          background:
+            "linear-gradient(to bottom,#020617,#050816)",
+          color: "white",
+          py: 6,
+          borderTop:
+            "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         <Container maxWidth="lg">
-          <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              gap: 4,
+            }}
+          >
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                HAITIBIZ ERP
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 800,
+                  mb: 2,
+                }}
+              >
+                💠 HAITIBIZ
               </Typography>
-              <Typography variant="body2" sx={{ color: "#94a3b8", lineHeight: 1.6, mb: 2 }}>
-                Sistema de gestión empresarial profesional diseñado para pequeñas y medianas empresas.
-                Funciona online y offline con sincronización automática.
+
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#94a3b8",
+                  lineHeight: 1.8,
+                  mb: 3,
+                }}
+              >
+                ERP moderno diseñado para
+                pequeñas y medianas empresas.
               </Typography>
-              <Stack direction="row" spacing={1}>
-                <Chip label="v1.0.0" size="small" sx={{ bgcolor: "#6366f1", color: "white" }} />
-                <Chip label="PWA Ready" size="small" sx={{ bgcolor: "#10b981", color: "white" }} />
+
+              <Stack
+                direction="row"
+                spacing={1}
+              >
+                <Chip
+                  label="v1.0.0"
+                  sx={{
+                    bgcolor: "#6366f1",
+                    color: "white",
+                  }}
+                />
+
+                <Chip
+                  label="PWA Ready"
+                  sx={{
+                    bgcolor: "#10b981",
+                    color: "white",
+                  }}
+                />
               </Stack>
             </Box>
 
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Navegación
-              </Typography>
-              <Stack spacing={1}>
-                <Button
-                  component={Link}
-                  to="/login"
-                  sx={{
-                    color: "#94a3b8",
-                    justifyContent: "flex-start",
-                    p: 0,
-                    minHeight: "auto",
-                    "&:hover": { color: "white" },
-                  }}
-                >
-                  Iniciar Sesión
-                </Button>
-                <Button
-                  component={Link}
-                  to="/register"
-                  sx={{
-                    color: "#94a3b8",
-                    justifyContent: "flex-start",
-                    p: 0,
-                    minHeight: "auto",
-                    "&:hover": { color: "white" },
-                  }}
-                >
-                  Crear Cuenta
-                </Button>
-                <Button
-                  component={Link}
-                  to="/contact"
-                  sx={{
-                    color: "#94a3b8",
-                    justifyContent: "flex-start",
-                    p: 0,
-                    minHeight: "auto",
-                    "&:hover": { color: "white" },
-                  }}
-                >
-                  Contacto
-                </Button>
-              </Stack>
-            </Box>
-
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  mb: 2,
+                }}
+              >
                 Contacto
               </Typography>
+
               <Stack spacing={2}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Email sx={{ color: "#6366f1", fontSize: 20 }} />
-                  <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Email
+                    sx={{
+                      color: "#8b5cf6",
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      color: "#94a3b8",
+                    }}
+                  >
                     soporte@haitibiz.com
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Phone sx={{ color: "#6366f1", fontSize: 20 }} />
-                  <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Phone
+                    sx={{
+                      color: "#8b5cf6",
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      color: "#94a3b8",
+                    }}
+                  >
                     +54 9 341 XXX XXXX
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <LocationOn sx={{ color: "#6366f1", fontSize: 20 }} />
-                  <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <LocationOn
+                    sx={{
+                      color: "#8b5cf6",
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      color: "#94a3b8",
+                    }}
+                  >
                     Rosario, Santa Fe, Argentina
                   </Typography>
                 </Box>
@@ -506,36 +770,27 @@ const HomePage = () => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, bgcolor: "#334155" }} />
+          <Divider
+            sx={{
+              my: 4,
+              bgcolor:
+                "rgba(255,255,255,0.08)",
+            }}
+          />
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
-            <Typography variant="body2" sx={{ color: "#94a3b8" }}>
-              © 2024 HAITIBIZ ERP. Todos los derechos reservados.
-            </Typography>
-            <Stack direction="row" spacing={3}>
-              <Typography
-                variant="body2"
-                sx={{ color: "#94a3b8", cursor: "pointer", "&:hover": { color: "white" } }}
-              >
-                Privacidad
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#94a3b8", cursor: "pointer", "&:hover": { color: "white" } }}
-              >
-                Términos
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#94a3b8", cursor: "pointer", "&:hover": { color: "white" } }}
-              >
-                Soporte
-              </Typography>
-            </Stack>
-          </Box>
+          <Typography
+             sx={{
+           textAlign: "center",
+            color: "#64748b",
+            }}
+                        >
+              © 2026 HAITIBIZ ERP. Todos los
+                      derechos reservados.
+                       </Typography>
         </Container>
       </Box>
     </Box>
   );
 };
+
 export default HomePage;

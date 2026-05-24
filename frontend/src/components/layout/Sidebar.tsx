@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 type SidebarProps = {
   isOpen: boolean;

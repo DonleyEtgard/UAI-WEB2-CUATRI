@@ -1,6 +1,6 @@
 import express from "express";
 
-import { authenticateJWT } from "../../middlewares/authenticateJWT";
+import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 
 import {
   getSaleItems,
@@ -17,10 +17,10 @@ const router = express.Router();
 // =====================
 
 // 🔥 específico → general
-router.get("/sale/:saleId", authenticateJWT, getItemsBySale);
-router.get("/", authenticateJWT, getSaleItems);
-router.get("/:id", authenticateJWT, getSaleItemById);
-router.delete("/:id", authenticateJWT, deleteSaleItem);
+router.get("/sale/:saleId", authenticateFirebase, getItemsBySale);
+router.get("/", authenticateFirebase, getSaleItems);
+router.get("/:id", authenticateFirebase, getSaleItemById);
+router.delete("/:id", authenticateFirebase, deleteSaleItem);
 
 
 export default router;
