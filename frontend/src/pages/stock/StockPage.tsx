@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getStockMovements } from "../../services/stock.service";
 import type { StockMovement } from "../../services/stock.service";
 
-const StockMovementsPage = () => {
+const StockPage = () => {
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -65,4 +65,4 @@ const StockMovementsPage = () => {
   );
 };
 
-export default StockMovementsPage;
+export default StockPage;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../services/api";
 
@@ -25,6 +25,7 @@ type User = {
 const UserDetailPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const fetchUser = async () => {
     const res = await API.get(`/users/${id}`);
@@ -39,12 +40,16 @@ const UserDetailPage = () => {
 
   useEffect(() => {
     fetchUser();
+    const timer = setTimeout(() => {
+      pageRef.current?.classList.add("visible");
+    }, 100);
+    return () => clearTimeout(timer);
   }, [id]);
 
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="container space-y-6">
+    <div ref={pageRef} className="container space-y-6 fade-in-up">
 
       {/* HEADER */}
       <div className="card flex justify-between items-center">

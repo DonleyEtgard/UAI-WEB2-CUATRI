@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import API from "../../services/api";
 import UnifiedSearchFilter from "../../components/dashboard/UnifiedSearchFilter";
-import EditUserModal from "../../pages/users/EditUserModal";
+import EditUserModal from "./EditUserModal";
 
 import {
   Users,
   UserPlus,
   Shield,
-  ShieldCheck,
   Mail,
+  ShieldCheck,
   MoreVertical,
   Trash2,
 } from "lucide-react";
@@ -36,6 +36,7 @@ const UserPage = () => {
     dateFrom: "",
     dateTo: "",
   });
+  const pageRef = useRef<HTMLDivElement>(null);
 
   // Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,6 +63,11 @@ const UserPage = () => {
 
   useEffect(() => {
     loadUsers();
+    // Trigger animation
+    const timer = setTimeout(() => {
+      pageRef.current?.classList.add("visible");
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // ==========================================================================
@@ -139,11 +145,11 @@ const UserPage = () => {
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const fullName =
-        `${user.name} ${user.lastName}`.toLowerCase();
+        `${user?.name || ''} ${user?.lastName || ''}`.toLowerCase();
 
-      const email = user.email.toLowerCase();
+      const email = user?.email?.toLowerCase() || "";
 
-      const role = user.role.toLowerCase();
+      const role = user?.role?.toLowerCase() || "";
 
       const query =
         filters.searchQuery.toLowerCase();
@@ -216,8 +222,8 @@ const UserPage = () => {
   // ==========================================================================
 
   return (
-    <>
-      <div className="container py-8 animate-in fade-in duration-700">
+    <div ref={pageRef} className="fade-in-up">
+      <div className="container py-8">
 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
@@ -379,9 +385,7 @@ const UserPage = () => {
                         </td>
 
                         <td className="text-right">
-                          <div className="flex justify-end items-center gap-3">
-
-                            <div className="flex justify-end items-center gap-2">
+                          <div className="flex justify-end items-center gap-4">
 
                               {/* EDIT */}
                               <button
@@ -438,7 +442,6 @@ const UserPage = () => {
                                 <MoreVertical size={18} />
                               </button>
 
-                            </div>
                           </div>
                         </td>
 
@@ -466,7 +469,7 @@ const UserPage = () => {
           isLoading={loading}
         />
       )}
-    </>
+    </div>
   );
 };
 

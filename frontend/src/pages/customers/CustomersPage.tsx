@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import API from "../../services/api";
 import UnifiedSearchFilter from "../../components/dashboard/UnifiedSearchFilter";
 import { Users, UserPlus, Mail, Phone, MoreVertical } from "lucide-react";
@@ -26,6 +26,7 @@ const CustomersPage = () => {
     dateFrom: "",
     dateTo: "",
   });
+  const pageRef = useRef<HTMLDivElement>(null);
 
   // ==========================
   // 📦 LOAD CUSTOMERS
@@ -46,6 +47,11 @@ const CustomersPage = () => {
 
   useEffect(() => {
     loadCustomers();
+    // Trigger animation
+    const timer = setTimeout(() => {
+      pageRef.current?.classList.add("visible");
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // ==========================
@@ -87,7 +93,7 @@ const CustomersPage = () => {
   }).length;
 
   return (
-    <div className="container py-8 animate-in fade-in duration-700">
+    <div ref={pageRef} className="container py-8 fade-in-up">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
         <div>

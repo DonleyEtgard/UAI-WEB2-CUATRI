@@ -14,7 +14,7 @@ type Sale = {
   createdAt: string;
 };
 
-const SalesReportPage = () => {
+const ReportsPage = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -29,14 +29,11 @@ const SalesReportPage = () => {
     try {
       setLoading(true);
 
-      const response = await API.get<{
-        success?: boolean;
-        data?: {
-          sales?: Sale[];
-        };
-      }>("/sales");
+      const response = await API.get<Sale[]>("/sales");
 
-      const salesData = response.data?.data?.sales ?? [];
+      // Si tu backend devuelve { data: [...] } usa response.data.data
+      // Si devuelve [...] usa response.data directamente
+      const salesData = Array.isArray(response.data) ? response.data : [];
 
       setSales(salesData);
     } catch (error) {
@@ -62,7 +59,7 @@ const SalesReportPage = () => {
   const filteredSales = useMemo(() => {
     return sales.filter((sale) => {
       const customer = sale.customer?.toLowerCase() || "";
-      const payment = sale.paymentMethod.toLowerCase();
+      const payment = sale.paymentMethod?.toLowerCase() || "";
       const query = filters.searchQuery.toLowerCase();
       const saleDate = new Date(sale.createdAt);
 
@@ -247,4 +244,4 @@ const SalesReportPage = () => {
   );
 };
 
-export default SalesReportPage;
+export default ReportsPage;

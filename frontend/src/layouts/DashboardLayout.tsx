@@ -1,74 +1,135 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import { useEffect, useMemo, useState } from "react";
+
 import { useAuth } from "../context/AuthContext";
 
+import Sidebar from "../components/layout/Sidebar";
+import Navbar from "../components/layout/Navbar";
+
 const DashboardLayout = () => {
+
+  // Iniciamos en true para que en desktop el sidebar esté expandido por defecto
+  const [open, setOpen] = useState(true);
+
   const { user, logout } = useAuth();
+
   const navigate = useNavigate();
 
-  const role = user?.role;
+  const location = useLocation();
 
-  /**
-   * Logout handler
-   */
+  // Protección extra: Si por algún motivo AuthGuard deja pasar un null user
+  if (!user && location.pathname.startsWith('/app')) {
+    return null; // El AuthGuard se encargará de redirigir, aquí evitamos errores de renderizado
+  }
+
+  // =========================================================
+  // LOGOUT
+  // =========================================================
+
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/login", { replace: true });
+
+      navigate("/", { // Redirige a la HomePage después del logout
+        replace: true,
+      });
+
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
+  // =========================================================
+  // AUTO CLOSE MOBILE SIDEBAR
+  // =========================================================
+
+  useEffect(() => {
+    // Solo cerramos automáticamente en pantallas móviles (< 768px)
+    if (window.innerWidth < 768) {
+      setOpen(false);
+    }
+  }, [location.pathname]);
+
+  // =========================================================
+  // PAGE TITLE
+  // =========================================================
+
+  const pageTitle = useMemo(() => {
+
+    const path = location.pathname;
+
+    if (path.endsWith("/dashboard")) return "Dashboard";
+    if (path.includes("/products")) return "Gestión de Productos";
+    if (path.includes("/sales")) return "Panel de Ventas";
+    if (path.includes("/customers")) return "Directorio de Clientes";
+    if (path.includes("/stock")) return "Control de Inventario";
+    if (path.includes("/users/roles")) return "Gestión de Roles";
+    if (path.includes("/users")) return "Administración de Usuarios";
+    if (path.includes("/reports")) return "Reportes y Estadísticas";
+
+    return "HAITIBIZ ERP";
+
+  }, [location.pathname]);
+
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
-    <div className="flex min-h-screen bg-gray-950 text-white">
+    <div
+      className={`
+        flex md:grid
+        transition-[grid-template-columns] duration-300 ease-in-out
+        ${open ? "md:grid-cols-[288px_1fr]" : "md:grid-cols-[0px_1fr]"}
+        h-screen
+        bg-background
+        text-white
+        overflow-hidden
+      `}
+    >
 
       {/* SIDEBAR */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 p-4">
-        <h1 className="text-xl font-bold mb-6">HAITIBIZ ERP</h1>
+      <Sidebar
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        // En desktop, el grid lo posicionará. En móvil, sigue siendo fixed.
+        onLogout={handleLogout} // Pasamos la función de logout al Sidebar
+      />
 
-        <nav className="flex flex-col gap-3 text-sm">
+      {/* CONTENT */}
+      <div
+        className="
+          flex
+          flex-col
+          flex-1
+          min-w-0
+          overflow-hidden
+          md:col-start-2 /* Asegura que este div comience en la segunda columna del grid */
+        "
+      >
 
-          {/* TODOS */}
-          <Link to="/app/dashboard">📊 Dashboard</Link>
-          <Link to="/app/sales">💰 Ventas</Link>
-          <Link to="/app/products">📦 Productos</Link>
+        {/* NAVBAR */}
+        <Navbar
+          title={pageTitle}
+          userName={user?.name || user?.email || "Usuario"}
+          onToggleSidebar={() =>
+            setOpen((prev) => !prev)
+          }
+        />
 
-          {/* SOLO ADMIN */}
-          {(role === "admin" || role === "superadmin") && (
-            <Link to="/app/users">👤 Usuarios</Link>
-          )}
-
-          {/* SOLO SUPERADMIN */}
-          {role === "superadmin" && (
-            <Link to="/app/settings">⚙️ Configuración</Link>
-          )}
-
-          {/* REPORTES (ADMIN + SUPERADMIN) */}
-          {(role === "admin" || role === "superadmin") && (
-            <Link to="/app/reports/sales">📈 Reportes</Link>
-          )}
-
-          <button
-            onClick={handleLogout}
-            className="text-left text-red-400 mt-6 hover:text-red-300 transition"
-          >
-            🚪 Salir
-          </button>
-
-        </nav>
-      </aside>
-
-      {/* MAIN */}
-      <div className="flex-1 flex flex-col">
-
-        <header className="h-14 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6">
-          <div>👋 {user?.email}</div>
-          <div className="text-xs bg-gray-800 px-3 py-1 rounded">
-            {role}
-          </div>
-        </header>
-
-        <main className="p-6">
+        {/* MAIN */}
+        <main
+          className="
+            flex-1
+            overflow-y-auto
+            p-6
+          "
+        >
           <Outlet />
         </main>
 

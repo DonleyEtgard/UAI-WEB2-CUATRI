@@ -115,26 +115,6 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  /**
-   * Demo login
-   */
-  const handleDemoLogin =
-    async () => {
-      try {
-        setFormError(null);
-
-        await login(
-          "admin@example.com",
-          "Password123!"
-        );
-      } catch (err: any) {
-        setFormError(
-          err.message ||
-            "Demo login failed"
-        );
-      }
-    };
-
   // ========================================================================
   // RENDER
   // ========================================================================
@@ -224,13 +204,7 @@ const LoginPage: React.FC = () => {
             <div className="flex-grow border-t border-slate-700/50"></div>
           </div>
 
-          <button
-            onClick={handleDemoLogin}
-            disabled={isLoading}
-            className="btn-secondary"
-          >
-            Try Demo Account
-          </button>
+
         </div>
 
         <p className="mt-8 text-center text-slate-400 text-sm font-medium">

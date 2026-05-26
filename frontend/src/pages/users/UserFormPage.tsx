@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { registerUser } from "../../firebase/auth";
 import { createOrUpdateUserProfile } from "../../firebase/firestore";
@@ -14,10 +14,19 @@ const initialState: Partial<AppUser> = {
 };
 
 const UserFormPage = () => {
-  const { user } = useAuth();
+  // Casteamos el contexto para asegurar que TS reconozca organizationId
+  const { user } = useAuth() as { user: AppUser | null };
   const [form, setForm] = useState<Partial<AppUser>>(initialState);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      pageRef.current?.classList.add("visible");
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ✅ tipado correcto (sin any)
   const handleChange = <K extends keyof Partial<AppUser>>(
@@ -71,7 +80,7 @@ const UserFormPage = () => {
   };
 
   return (
-    <div className="container">
+    <div ref={pageRef} className="container fade-in-up">
       <div className="card space-y-6">
 
         {/* HEADER */}

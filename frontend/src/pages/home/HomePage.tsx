@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import {
@@ -42,24 +42,6 @@ const HomePage = () => {
       >
         <Typography color="#94a3b8">
           Cargando...
-        </Typography>
-      </Box>
-    );
-  }
-
-  if (isAuthenticated) {
-    return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          bgcolor: "#050816",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography color="#94a3b8">
-          Redirigiendo...
         </Typography>
       </Box>
     );

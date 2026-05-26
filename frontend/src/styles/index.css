@@ -661,6 +661,7 @@ button:hover,
   );
 
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -786,3 +787,11 @@ button:hover,
     max-width: 100%;
   }
 } 
+
+/* =========================================================
+   LAYOUT UTILITIES
+========================================================= */
+.transition-grid {
+  transition: grid-template-columns 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: grid-template-columns;
+}

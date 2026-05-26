@@ -9,7 +9,7 @@ const AboutPage = () => {
         </h1>
 
         <p className="text-on-surface-variant max-w-2xl">
-          CORE ERP is a business management platform designed to centralize sales,
+          HAITIBIZ ERP is a business management platform designed to centralize sales,
           customers, and inventory in real time with a modern and scalable experience.
         </p>
       </div>

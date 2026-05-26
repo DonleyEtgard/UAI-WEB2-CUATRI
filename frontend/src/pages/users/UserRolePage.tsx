@@ -1,6 +1,17 @@
+import { useEffect, useRef } from "react";
+
 const UserRolesPage = () => {
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      pageRef.current?.classList.add("visible");
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="container space-y-6">
+    <div ref={pageRef} className="container space-y-6 fade-in-up">
 
       {/* HEADER */}
       <div>
