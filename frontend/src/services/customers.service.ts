@@ -1,10 +1,6 @@
 import API from "./api";
 import { getWithCache, requestOrQueue } from "./offlineApi";
 
-// ==========================
-// TYPES
-// ==========================
-
 export interface Payment {
   amount: number;
   date: string;
@@ -13,22 +9,12 @@ export interface Payment {
 export interface Customer {
   _id?: string;
 
-  personalInfo: {
-    firstName: string;
-    lastName: string;
-  };
+  // ✅ COINCIDE CON BACKEND
+  name: string;
 
-  contactInfo: {
-    email: string;
-    phone?: string;
-  };
+  email?: string;
 
-  address?: {
-    street?: string;
-    city?: string;
-    country?: string;
-    postalCode?: string;
-  };
+  phone?: string;
 
   debt?: number;
 
@@ -40,32 +26,44 @@ export interface Customer {
   updatedAt?: string;
 }
 
+
 // ==========================
 // API
 // ==========================
 
+// 📌 Obtener todos
 export const getCustomers = async (): Promise<Customer[]> => {
   return await getWithCache<Customer[]>("/customers");
 };
 
+
+// 📌 Obtener por ID
 export const getCustomerById = async (
   id: string
 ): Promise<Customer> => {
+
   return await getWithCache<Customer>(
     `/customers/${id}`
   );
 };
 
+
+// 📌 Crear cliente
 export const createCustomer = async (
   data: Customer
 ): Promise<Customer> => {
 
+  // ✅ fallback offline
   const fallbackCustomer: Customer = {
     ...data,
 
     _id: `offline_customer_${Date.now()}`,
 
     isActive: true,
+
+    debt: data.debt || 0,
+
+    payments: [],
   };
 
   return await requestOrQueue<Customer>(
@@ -76,6 +74,8 @@ export const createCustomer = async (
   );
 };
 
+
+// 📌 Actualizar cliente
 export const updateCustomer = async (
   id: string,
   data: Partial<Customer>
@@ -89,6 +89,25 @@ export const updateCustomer = async (
   return res.data;
 };
 
+
+// 📌 Agregar pago
+export const addPayment = async (
+  id: string,
+  amount: number
+): Promise<Customer> => {
+
+  const res = await API.post(
+    `/customers/${id}/payment`,
+    {
+      amount
+    }
+  );
+
+  return res.data;
+};
+
+
+// 📌 Eliminar cliente (soft delete)
 export const deleteCustomer = async (
   id: string
 ) => {

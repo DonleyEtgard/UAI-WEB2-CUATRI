@@ -1,4 +1,5 @@
 import API from "./api";
+import { getWithCache, requestOrQueue } from "./offlineApi";
 
 // ==========================
 // TYPES
@@ -11,22 +12,33 @@ export type PaymentMethod = {
   isActive: boolean;
 };
 
+// Basado en src/models/Payment.ts (Mongoose model)
+export type Payment = {
+  _id: string;
+  user: string; // Asumiendo ObjectId se representa como string
+  amount: number;
+  method: "cash" | "transfer" | "moncash";
+  status: "pending" | "paid" | "failed";
+  qrData?: string;
+  reference?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 // ==========================
 // PAYMENT METHODS API
 // ==========================
 
 // 📌 GET ALL
 export const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
-  const res = await API.get("/payment-methods");
-  return res.data;
+  return await getWithCache<PaymentMethod[]>("/payment-methods");
 };
 
 // 📌 GET ONE
 export const getPaymentMethodById = async (
   id: string
 ): Promise<PaymentMethod> => {
-  const res = await API.get(`/payment-methods/${id}`);
-  return res.data;
+  return await getWithCache<PaymentMethod>(`/payment-methods/${id}`);
 };
 
 // ➕ CREATE
@@ -35,22 +47,33 @@ export const createPaymentMethod = async (data: {
   type: "cash" | "card" | "transfer";
   isActive?: boolean;
 }): Promise<PaymentMethod> => {
-  const res = await API.post("/payment-methods", data);
-  return res.data;
+  // Fallback para creación offline
+  const fallbackMethod: PaymentMethod = {
+    ...data,
+    _id: `off_${Date.now()}`, // Generar un ID temporal para el modo offline
+    isActive: data.isActive ?? true,
+  };
+  return await requestOrQueue<PaymentMethod>(
+    "POST",
+    "/payment-methods",
+    data,
+    fallbackMethod
+  );
 };
 
 // ✏️ UPDATE
-export const updatePaymentMethod = async (id: string, data: any) => {
-  const res = await API.put(`/payment-methods/${id}`, data);
-  return res.data;
+export const updatePaymentMethod = async (
+  id: string,
+  data: Partial<PaymentMethod>
+): Promise<PaymentMethod> => {
+  return await requestOrQueue<PaymentMethod>("PUT", `/payment-methods/${id}`, data);
 };
 
 // ❌ DELETE
 export const deletePaymentMethod = async (
   id: string
 ): Promise<{ message: string }> => {
-  const res = await API.delete(`/payment-methods/${id}`);
-  return res.data;
+  return await requestOrQueue<{ message: string }>("DELETE", `/payment-methods/${id}`);
 };
 
 // ==========================
@@ -59,12 +82,12 @@ export const deletePaymentMethod = async (
 
 // 🔥 Pagar suscripción
 export const paySubscription = (paymentMethod: string) => {
-  return API.post("/users/pay-subscription", {
-    paymentMethod,
-  });
+  // Asumiendo que paySubscription devuelve un objeto Payment o similar
+  return requestOrQueue<Payment>("POST", "/users/pay-subscription", { paymentMethod });
 };
 
 // 🔥 Generar QR / pago
 export const createSubscriptionPayment = () => {
-  return API.post("/users/create-payment");
+  // Asumiendo que createSubscriptionPayment devuelve un objeto con qr
+  return requestOrQueue<{ qr: string }>("POST", "/users/create-payment");
 };

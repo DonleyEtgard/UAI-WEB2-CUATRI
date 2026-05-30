@@ -39,11 +39,24 @@ function serviceWorkerPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), serviceWorkerPlugin()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+ resolve: {
+  alias: {
+    '@': path.resolve(__dirname, './src'),
+
+    // Forzar una única instancia de React
+    react: path.resolve(__dirname, './node_modules/react'),
+    'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
   },
+},
+optimizeDeps: {
+  include: [
+    'react',
+    'react-dom',
+    'lucide-react',
+    'react-apexcharts',
+    'apexcharts',
+  ],
+},
   server: {
     port: 5173,
     proxy: {

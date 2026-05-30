@@ -8,6 +8,7 @@ import App from "./App";
 import "./styles/index.css";
 import { registerServiceWorker } from "./pwa/registerServiceWorker";
 import { AuthProvider } from "./context/AuthContext";
+import { GlobalSearchProvider } from "./context/GlobalSearchContext";
 import { BrowserRouter } from "react-router-dom";
 
 createRoot(
@@ -15,9 +16,11 @@ createRoot(
 ).render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <GlobalSearchProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </GlobalSearchProvider>
     </AuthProvider>
   </React.StrictMode>
 );

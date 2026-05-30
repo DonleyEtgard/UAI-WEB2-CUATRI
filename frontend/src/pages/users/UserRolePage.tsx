@@ -1,61 +1,64 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import API from "../../services/api";
 
-const UserRolesPage = () => {
-  const pageRef = useRef<HTMLDivElement>(null);
+const UserRolePage = () => {
+  const { id } = useParams();
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      pageRef.current?.classList.add("visible");
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    API.get(`/users/${id}`).then(res => {
+      setRole(res.data.role);
+      setLoading(false);
+    });
+  }, [id]);
+
+  const handleUpdate = async () => {
+    setSaving(true);
+    try {
+      await API.patch(`/users/${id}`, { role });
+      alert("Rol actualizado");
+      navigate("/users");
+    } catch (err) {
+      alert("Error al actualizar rol");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <p className="p-10 text-center">Cargando...</p>;
 
   return (
-    <div ref={pageRef} className="container space-y-6 fade-in-up">
-
-      {/* HEADER */}
-      <div>
-        <h1>Role Management</h1>
-        <p className="text-muted">
-          Define access levels and permissions for each role
+    <div className="container max-w-md py-8">
+      <h1 className="text-2xl font-bold mb-6">Gestionar Rol</h1>
+      <div className="card space-y-6">
+        <div>
+          <label className="text-sm font-medium">Seleccionar nuevo rol</label>
+          <select 
+            className="input w-full mt-2" 
+            value={role} 
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="employee">Empleado</option>
+            <option value="admin">Administrador</option>
+            <option value="superadmin">Super Administrador</option>
+          </select>
+        </div>
+        <p className="text-xs text-gray-500 italic">
+          Nota: El cambio de rol afecta los permisos de acceso de forma inmediata en el backend.
         </p>
-      </div>
-
-      {/* ROLES CARD */}
-      <div className="card space-y-4">
-
-        {/* ADMIN */}
-        <div className="flex-between" style={{ paddingBottom: "10px", borderBottom: "1px solid #1f2937" }}>
-          <div>
-            <p className="font-semibold">Admin</p>
-            <p className="text-muted-sm">
-              Full system access and management
-            </p>
-          </div>
-
-          <span className="badge badge-success">
-            Full Access
-          </span>
+        <div className="flex gap-4">
+          <button className="btn-primary flex-1" onClick={handleUpdate} disabled={saving}>
+            {saving ? "Guardando..." : "Actualizar Rol"}
+          </button>
+          <button className="btn-secondary" onClick={() => navigate("/users")}>Cancelar</button>
         </div>
-
-        {/* EMPLOYEE */}
-        <div className="flex-between">
-          <div>
-            <p className="font-semibold">Employee</p>
-            <p className="text-muted-sm">
-              Access limited to sales operations
-            </p>
-          </div>
-
-          <span className="badge badge-warning">
-            Sales Only
-          </span>
-        </div>
-
       </div>
-
     </div>
   );
 };
 
-export default UserRolesPage;
+export default UserRolePage;

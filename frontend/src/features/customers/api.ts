@@ -1,74 +1,83 @@
-import API from "../../services/api";
+import {
+  getCustomers,
+  getCustomerById,
+  createCustomer,
+  updateCustomer,
+  deleteCustomer,
+  addPayment,
+} from "../../services/customers.service";
 
-// 📌 OBTENER TODOS LOS CLIENTES
-export const getCustomers = async () => {
-  const res = await API.get("/customers");
-  return res.data;
+import type {
+  Customer,
+  Payment,
+} from "../../services/customers.service";
+
+
+export type {
+  Customer,
+  Payment,
 };
 
-// 📌 OBTENER CLIENTE POR ID
-export const getCustomerById = async (id: string) => {
-  const res = await API.get(`/customers/${id}`);
-  return res.data;
-};
+// ============================================================================
+// CUSTOMERS API LAYER
+// ============================================================================
 
-// 📌 CREAR CLIENTE
-export const createCustomer = async (data: {
-  name: string;
-  email?: string;
-  phone?: string;
+// 📌 GET ALL
+export const fetchCustomers =
+  async (): Promise<Customer[]> => {
 
-  // 💰 deuda inicial
-  debt?: number;
-}) => {
+    return await getCustomers();
+  };
 
-  const res = await API.post("/customers", data);
+// 📌 GET BY ID
+export const fetchCustomerById =
+  async (
+    id: string
+  ): Promise<Customer> => {
 
-  return res.data;
-};
+    return await getCustomerById(id);
+  };
 
-// 📌 ACTUALIZAR CLIENTE
-export const updateCustomer = async (
-  id: string,
-  data: {
-    name?: string;
-    email?: string;
-    phone?: string;
+// 📌 CREATE
+export const createCustomerAction =
+  async (
+    data: Customer
+  ): Promise<Customer> => {
 
-    // 💰 deuda
-    debt?: number;
+    return await createCustomer(data);
+  };
 
-    // 📅 pagos
-    payments?: {
-      amount: number;
-      date: string;
-    }[];
+// 📌 UPDATE
+export const updateCustomerAction =
+  async (
+    id: string,
+    data: Partial<Customer>
+  ): Promise<Customer> => {
 
-    isActive?: boolean;
-  }
-) => {
+    return await updateCustomer(
+      id,
+      data
+    );
+  };
 
-  const res = await API.put(`/customers/${id}`, data);
+// 📌 DELETE
+export const deleteCustomerAction =
+  async (
+    id: string
+  ) => {
 
-  return res.data;
-};
+    return await deleteCustomer(id);
+  };
 
-// 📌 AGREGAR PAGO
-export const addPayment = async (
-  id: string,
-  amount: number
-) => {
+// 📌 ADD PAYMENT
+export const addPaymentAction =
+  async (
+    id: string,
+    amount: number
+  ): Promise<Customer> => {
 
-  const res = await API.post(
-    `/customers/${id}/payments`,
-    { amount }
-  );
-
-  return res.data;
-};
-
-// 📌 ELIMINAR (SOFT DELETE)
-export const deleteCustomer = async (id: string) => {
-  const res = await API.delete(`/customers/${id}`);
-  return res.data;
-};
+    return await addPayment(
+      id,
+      amount
+    );
+  };

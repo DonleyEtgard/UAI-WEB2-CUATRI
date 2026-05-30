@@ -1,5 +1,11 @@
 import API from "./api";
 
+// LOGIN
+export const login = async (email: string, password: string) => {
+  const res = await API.post("/users/login", { email, password });
+  return res.data;
+};
+
 // PERFIL
 export const getMe = async () => {
   const res = await API.get("/users/me");

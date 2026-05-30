@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
@@ -11,17 +10,29 @@ import productRoutes from "./routes/product";
 import customerRoutes from "./routes/customer";
 import saleRoutes from "./routes/sale";
 import stockRoutes from "./routes/stockMovement";
-import ticketRoutes from "./routes/sale/ticket.routes";
+
+// ================= MIDDLEWARES =================
 import { authenticateFirebase } from "./middlewares/authenticateFirebase";
+import {
+  authorizeAdminOrSuperadmin,
+  authorizeSuperadminOnly,
+} from "./middlewares/AuthorizeRole";
+
+import { checkSubscription } from "./middlewares/checkSubscription";
+
+// ================= DB =================
+import connectDB from "./db";
 import { createSuperadminIfNotExists } from "./seedSuperadmin";
 
-// ================= CONFIG =================
 dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// ================= MIDDLEWARES =================
+// ============================================================================
+// GLOBAL MIDDLEWARES
+// ============================================================================
+
 app.use(helmet());
 
 app.use(
@@ -44,21 +55,16 @@ app.use(
 
 app.use(express.json());
 
-// logging básico
+// LOGGING
 app.use((req, _res, next) => {
   console.log(`➡️ ${req.method} ${req.path}`);
   next();
 });
 
-// ================= ROUTES =================
-app.use("/api/users", userRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/sales", saleRoutes);
-app.use("/api/stock", stockRoutes);
-app.use("/api/tickets", ticketRoutes);
+// ============================================================================
+// HEALTH CHECK
+// ============================================================================
 
-// ================= HEALTH =================
 app.get("/", (_req, res) => {
   res.json({
     message: "🚀 API funcionando correctamente",
@@ -66,29 +72,68 @@ app.get("/", (_req, res) => {
   });
 });
 
-// ================= DATABASE =================
-const connectDB = async () => {
-  try {
-    const uri = process.env.MONGO_URI;
+// ============================================================================
+// PUBLIC ROUTES (SIN AUTH)
+// ============================================================================
 
-    if (!uri) {
-      throw new Error("❌ MONGO_URI missing in environment variables");
-    }
+// si tenés auth login externo podrías ponerlo acá
 
-    await mongoose.connect(uri);
+// ============================================================================
+// PROTECTED ROUTES (FIREBASE + MONGO)
+// ============================================================================
 
-    console.log("🟢 MongoDB connected successfully");
-  } catch (err) {
-    console.error("🔴 MongoDB connection error:", err);
-    process.exit(1);
-  }
-};
+// 🔐 USERS (RBAC completo)
+app.use(
+  "/api/users",
+  authenticateFirebase,
+  authorizeAdminOrSuperadmin,
+  checkSubscription,
+  userRoutes
+);
 
-// ================= START SERVER =================
+// 🔐 PRODUCTS (solo admin o superadmin)
+app.use(
+  "/api/products",
+  authenticateFirebase,
+  authorizeAdminOrSuperadmin,
+  checkSubscription,
+  productRoutes
+);
+
+// 🔐 CUSTOMERS
+app.use(
+  "/api/customers",
+  authenticateFirebase,
+  authorizeAdminOrSuperadmin,
+  checkSubscription,
+  customerRoutes
+);
+
+// 🔐 SALES (employees incluidos)
+app.use(
+  "/api/sales",
+  authenticateFirebase,
+  checkSubscription,
+  saleRoutes
+);
+
+// 🔐 STOCK (solo admin/superadmin)
+app.use(
+  "/api/stock",
+  authenticateFirebase,
+  authorizeAdminOrSuperadmin,
+  checkSubscription,
+  stockRoutes
+);
+
+// ============================================================================
+// START SERVER
+// ============================================================================
+
 const startServer = async () => {
   await connectDB();
 
-  // ✅ AQUÍ SÍ ES CORRECTO
+  // 🔥 CREA SUPERADMIN SI NO EXISTE
   await createSuperadminIfNotExists();
 
   app.listen(PORT, () => {

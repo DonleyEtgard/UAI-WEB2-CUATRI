@@ -13,6 +13,8 @@ import {
   logoutUser,
   observeAuth,
   getFirebaseIdToken,
+  sendEmailVerificationEmail,
+  forgotPassword as firebaseForgotPassword,
 } from "../firebase/auth";
 
 import apiClient from "../config/api";
@@ -47,6 +49,11 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<
   AuthProviderProps
 > = ({ children }) => {
+  // ==========================================================================
+  // CONFIGURACIÓN DE SEGURIDAD
+  // ==========================================================================
+  const MUST_VERIFY_EMAIL = true; // Activar para obligar verificación
+
   // ==========================================================================
   // STATE
   // ==========================================================================
@@ -219,7 +226,7 @@ export const AuthProvider: React.FC<
 
           setUser(appUser);
 
-          setIsAuthenticated(true);
+          setIsAuthenticated(MUST_VERIFY_EMAIL ? (fbUser.emailVerified || mongoUser.role === "superadmin") : true);
 
           localStorage.setItem(
             "user",
@@ -304,7 +311,7 @@ export const AuthProvider: React.FC<
 
       setUser(appUser);
       setFirebaseUser(credential.user);
-      setIsAuthenticated(true);
+      setIsAuthenticated(MUST_VERIFY_EMAIL ? (credential.user.emailVerified || mongoUser.role === "superadmin") : true);
       
       localStorage.setItem("user", JSON.stringify(appUser));
       
@@ -335,12 +342,11 @@ export const AuthProvider: React.FC<
     password: string,
     name: string,
     lastName: string,
-    street?: string,
-    city?: string,
-    zipCode?: string
+    address?: { street?: string; city?: string; postalCode?: string }
   ) => {
     try {
       setError(null);
+      setIsRegistering(true);
 
       setIsLoading(true);
 
@@ -353,6 +359,9 @@ export const AuthProvider: React.FC<
           email,
           password
         );
+
+      // Disparamos el envío del correo inmediatamente tras el registro en Firebase
+      await sendEmailVerificationEmail(credential.user);
 
       const idToken =
         await getFirebaseIdToken(
@@ -378,13 +387,8 @@ export const AuthProvider: React.FC<
           email,
           name,
           lastName,
-          firebaseUid:
-            credential.user.uid,
-          address: {
-            street,
-            city,
-            postalCode: zipCode,
-          },
+          firebaseUid: credential.user.uid,
+          address,
         });
 
       const mongoUser =
@@ -411,7 +415,7 @@ export const AuthProvider: React.FC<
         credential.user
       );
 
-      setIsAuthenticated(true);
+      setIsAuthenticated(MUST_VERIFY_EMAIL ? (credential.user.emailVerified || mongoUser.role === "superadmin") : true);
 
       localStorage.setItem(
         "user",
@@ -523,6 +527,39 @@ export const AuthProvider: React.FC<
     };
 
   // ==========================================================================
+  // RE-ENVIAR CORREO DE VERIFICACIÓN
+  // ==========================================================================
+
+  const resendVerificationEmail = async () => {
+    try {
+      setError(null);
+      if (!firebaseUser) throw new Error("Debes estar logueado para verificar el correo");
+      
+      await sendEmailVerificationEmail(firebaseUser);
+      console.log("✅ Correo de verificación enviado");
+    } catch (err: any) {
+      console.error("❌ VERIFICATION ERROR:", err);
+      setError(
+        err?.message || "Error al enviar el correo de verificación"
+      );
+    }
+  };
+
+  // ==========================================================================
+  // RECUPERAR CONTRASEÑA
+  // ==========================================================================
+
+  const sendPasswordReset = async (email: string) => {
+    try {
+      setError(null);
+      await firebaseForgotPassword(email);
+    } catch (err: any) {
+      setError(err?.message || "Error al enviar el correo de recuperación");
+      throw err;
+    }
+  };
+
+  // ==========================================================================
   // CLEAR ERROR
   // ==========================================================================
 
@@ -564,7 +601,7 @@ export const AuthProvider: React.FC<
   // CONTEXT VALUE
   // ==========================================================================
 
-  const value: AuthContextType = {
+  const value = {
     user,
 
     firebaseUser,
@@ -581,6 +618,10 @@ export const AuthProvider: React.FC<
 
     refreshToken,
 
+    resendVerificationEmail,
+
+    forgotPassword: sendPasswordReset,
+
     error,
 
     clearError,
@@ -592,7 +633,7 @@ export const AuthProvider: React.FC<
     isSuperAdmin,
 
     isEmployee,
-  };
+  } as AuthContextType;
 
   return (
     <AuthContext.Provider

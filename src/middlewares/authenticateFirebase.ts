@@ -74,6 +74,16 @@ export const authenticateFirebase = async (
     }
 
     // =====================================================================
+    // 2.1 CHECK EMAIL VERIFICATION (OPTIONAL/CONFIGURABLE)
+    // =====================================================================
+    if (!decodedToken.email_verified) {
+      // Podrías permitir ciertos endpoints (como /users/me) pero bloquear el resto
+      // Aquí lo dejamos pasar para que el frontend maneje la redirección, 
+      // o puedes ser estricto y retornar 403 aquí.
+      console.warn(`User ${decodedToken.email} is not verified.`);
+    }
+
+    // =====================================================================
     // 3. FIND USER IN MONGODB
     // =====================================================================
 

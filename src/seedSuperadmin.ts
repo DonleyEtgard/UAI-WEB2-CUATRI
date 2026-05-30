@@ -3,26 +3,25 @@ import User from "./models/User";
 
 export const createSuperadminIfNotExists = async () => {
   try {
-    const email = process.env.SUPERADMIN_EMAIL as string;
-    const password = process.env.SUPERADMIN_PASSWORD as string;
+    const email = process.env.SUPERADMIN_EMAIL;
+    const password = process.env.SUPERADMIN_PASSWORD;
 
-    // verificar en MongoDB
-    const existing = await User.findOne({ email });
-
-    if (existing) {
-      console.log("🟡 Superadmin ya existe en MongoDB");
-      return;
+    if (!email || !password) {
+      throw new Error("SUPERADMIN_EMAIL o SUPERADMIN_PASSWORD no definidos en .env");
     }
+
+    const mongoUser = await User.findOne({ email });
 
     let firebaseUser;
 
-    // verificar en Firebase Auth
     try {
       firebaseUser = await admin.auth().getUserByEmail(email);
-
       console.log("🟡 Usuario ya existe en Firebase");
-    } catch {
-      // si no existe en Firebase lo crea
+    } catch (error: any) {
+      if (error.code !== "auth/user-not-found") {
+        throw error;
+      }
+
       firebaseUser = await admin.auth().createUser({
         email,
         password,
@@ -31,18 +30,23 @@ export const createSuperadminIfNotExists = async () => {
       console.log("🟢 Usuario creado en Firebase");
     }
 
-    // crear en MongoDB
-    await User.create({
-      email,
-      firebaseUid: firebaseUser.uid,
-      role: "superadmin",
-      isActive: true,
-      name: "Super Admin",
-      lastName: "System",
-      plan: "free",
-    });
+    if (!mongoUser) {
+      await User.create({
+        email,
+        firebaseUid: firebaseUser.uid,
+        role: "superadmin",
+        isActive: true,
+        name: "Super Admin",
+        lastName: "System",
+        plan: "free",
+      });
 
-    console.log("🟢 Superadmin creado correctamente");
+      console.log("🟢 Superadmin creado en MongoDB");
+    } else {
+      console.log("🟡 Superadmin ya existe en MongoDB");
+    }
+
+    console.log("🚀 Superadmin sync completo");
   } catch (error) {
     console.error("❌ Error creando superadmin:", error);
   }

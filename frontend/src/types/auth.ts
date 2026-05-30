@@ -1,18 +1,9 @@
 import type { User as FirebaseUser } from "firebase/auth";
 
-/**
- * User roles in the application
- */
-export type UserRole = "superadmin" | "admin" | "employee";
+export type UserRole = "superadmin" | "admin" | "employee" | "manager";
 
-/**
- * Subscription plans
- */
 export type SubscriptionPlan = "free" | "basic" | "active" | "suspended";
 
-/**
- * User address information
- */
 export interface UserAddress {
   street?: string;
   number?: string;
@@ -22,9 +13,6 @@ export interface UserAddress {
   postalCode?: string;
 }
 
-/**
- * Database User model (from MongoDB)
- */
 export interface DBUser {
   _id: string;
   firebaseUid: string;
@@ -37,67 +25,55 @@ export interface DBUser {
   image?: string;
   isVerified: boolean;
   isActive: boolean;
-  subscriptionStart?: Date;
-  subscriptionEnd?: Date;
+  subscriptionStart?: string;
+  subscriptionEnd?: string;
   subscriptionPaid: boolean;
   lastPaymentQR?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
-/**
- * Combined user object used in the application
- */
 export interface AppUser extends DBUser {
   firebaseToken?: string;
 }
 
 /**
- * Authentication context state
+ * AUTH CONTEXT
  */
 export interface AuthContextType {
-  // User state
   user: AppUser | null;
-
   firebaseUser: FirebaseUser | null;
-
   isLoading: boolean;
-
   isAuthenticated: boolean;
 
-  // Methods
-  login: (
-    email: string,
-    password: string
-  ) => Promise<void>;
+  /**
+   * Firebase login (SUPERADMIN INCLUDED)
+   * This is the ONLY login used in system
+   */
+  login: (email: string, password: string) => Promise<void>;
 
+  /**
+   * Register user via Firebase + Mongo
+   */
   register: (
+    firebaseUid: string,
     email: string,
-    password: string,
     name: string,
     lastName: string,
-    street?: string,
-    city?: string,
-    zipCode?: string
+    address?: UserAddress
   ) => Promise<void>;
 
   logout: () => Promise<void>;
 
-  refreshToken: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
 
-  // Error handling
   error: string | null;
-
   clearError: () => void;
 
-  // Roles & Permissions
-  hasRole: (
-    roles: string[]
-  ) => boolean;
+  hasRole: (roles: UserRole[]) => boolean;
 
   isAdmin: boolean;
-
   isSuperAdmin: boolean;
-
   isEmployee: boolean;
 }

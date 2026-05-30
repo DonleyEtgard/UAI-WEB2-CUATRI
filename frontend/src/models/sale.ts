@@ -1,24 +1,40 @@
 export interface Sale {
-  id: string;
+  _id: string;
+
   customerId: string;
+
   items: SaleItem[];
+
   subtotal: number;
+
   tax?: number;
+
   discount?: number;
+
   totalAmount: number;
-  amountPaid: number; // 💥 NUEVO → cuánto pagó el cliente
+
+  amountPaid: number;
+
   currency: Currency;
+
   status: SaleStatus;
+
   paymentId?: string;
-  createdAt: string; // mejor obligatorio para stats
+
+  createdAt: string;
+
   updatedAt?: string;
 }
 
 export interface SaleItem {
   productId: string;
+
   productName?: string;
+
   quantity: number;
+
   unitPrice: number;
+
   totalPrice: number;
 }
 
@@ -28,15 +44,26 @@ export type SaleStatus =
   | "cancelled"
   | "refunded";
 
-export type Currency = "ARS" | "USD" | "HT";
+export type Currency = "ARS" | "USD" | "EUR";
+
+// ==========================
+// HELPERS
+// ==========================
 
 export const getChange = (sale: Sale): number => {
-  return sale.amountPaid - sale.totalAmount;
+  return Math.max(0, sale.amountPaid - sale.totalAmount);
 };
 
-export const getSalesByMonth = (sales: Sale[], month: string) => {
+export const getSalesByMonth = (
+  sales: Sale[],
+  month: number,
+  year: number
+) => {
   return sales
-    .filter(s => s.createdAt.startsWith(month))
+    .filter(s => {
+      const d = new Date(s.createdAt);
+      return d.getMonth() === month && d.getFullYear() === year;
+    })
     .reduce((acc, s) => acc + s.totalAmount, 0);
 };
 

@@ -30,7 +30,11 @@ const app = hasFirebaseEnv
     : getApps()[0]
   : null;
 
-export const auth = app ? getAuth(app) : null;
-export const db = app ? getFirestore(app) : null;
+if (!app) {
+  throw new Error("Firebase no inicializado. Revisar variables VITE_FIREBASE_*");
+}
+
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export default app;

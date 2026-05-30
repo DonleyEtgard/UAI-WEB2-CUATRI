@@ -1,4 +1,7 @@
-// Clean RegisterPage implementation
+// ============================================================================
+// REGISTER PAGE - Professional ERP Onboarding
+// ============================================================================
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -20,9 +23,17 @@ const RegisterPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  // ========================================================================
+  // EFFECTS
+  // ========================================================================
+
   useEffect(() => {
     return () => clearError?.();
   }, [clearError]);
+
+  // ========================================================================
+  // HANDLERS
+  // ========================================================================
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,7 +42,13 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError?.();
+    setFormError(null);
+    
+    if (!formData.email || !formData.password || !formData.name || !formData.lastName) {
+      setFormError("Please fill in all required fields");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setFormError("Las contraseñas no coinciden");
       return;
@@ -39,19 +56,25 @@ const RegisterPage: React.FC = () => {
     try {
       setFormError(null);
       await register(
-        formData.email.trim(), 
+        formData.email.trim().toLowerCase(), 
         formData.password,
         formData.name.trim(), 
         formData.lastName.trim(),
-        formData.address.trim() || undefined, // street
-        formData.city.trim() || undefined,
-        formData.zipCode.trim() || undefined
+        {
+          street: formData.address.trim() || undefined,
+          city: formData.city.trim() || undefined,
+          postalCode: formData.zipCode.trim() || undefined
+        }
       );
       navigate("/app/dashboard", { replace: true });
     } catch (err: any) {
       setFormError(err?.message || error || "Error al registrarse");
     }
   };
+
+  // ========================================================================
+  // RENDER
+  // ========================================================================
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
@@ -182,7 +205,7 @@ const RegisterPage: React.FC = () => {
 
               <label htmlFor="confirmPassword">
                 <div className="flex justify-between items-center w-full">
-                  <span>Confirm</span>
+                  <span>Confirm Password</span>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}

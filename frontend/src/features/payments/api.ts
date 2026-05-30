@@ -1,22 +1,44 @@
-import API from "../../services/api";
+import * as paymentService from "../../services/payments.service";
 
-// 💳 PAGAR SUSCRIPCIÓN (cash / transfer / moncash)
-export const paySubscription = async (paymentMethod: "cash" | "transfer" | "moncash") => {
-  const res = await API.post("/users/pay-subscription", {
-    paymentMethod
-  });
+import type {
+  PaymentMethod,
+  Payment,
+} from "../../services/payments.service";
 
-  return res.data;
+// ============================================================================
+// TYPES (re-export para conveniencia en el feature)
+// ============================================================================
+
+export type {
+  PaymentMethod,
+  Payment,
 };
 
-// 🔥 GENERAR QR MONCASH (sin pagar todavía)
-export const createMoncashPayment = async () => {
-  const res = await API.post("/users/create-subscription-payment");
-  return res.data;
-};
+// ============================================================================
+// PAYMENT METHODS API
+// ============================================================================
 
-// 📊 OBTENER ESTADO DE SUSCRIPCIÓN
-export const getSubscriptionStatus = async () => {
-  const res = await API.get("/users/subscription-status");
-  return res.data;
-};
+// 📌 GET ALL
+export const fetchPaymentMethods = paymentService.getPaymentMethods;
+
+// 📌 GET ONE
+export const fetchPaymentMethodById = paymentService.getPaymentMethodById;
+
+// ➕ CREATE
+export const createPaymentMethodAction = paymentService.createPaymentMethod;
+
+// ✏️ UPDATE
+export const updatePaymentMethodAction = paymentService.updatePaymentMethod;
+
+// ❌ DELETE
+export const deletePaymentMethodAction = paymentService.deletePaymentMethod;
+
+// ============================================================================
+// SUBSCRIPTION PAYMENTS API
+// ============================================================================
+
+// 💳 PAY SUBSCRIPTION
+export const paySubscriptionAction = paymentService.paySubscription;
+
+// 🔥 CREATE PAYMENT QR
+export const createSubscriptionPaymentAction = paymentService.createSubscriptionPayment;

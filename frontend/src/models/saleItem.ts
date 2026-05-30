@@ -1,13 +1,21 @@
 export interface SaleItem {
+  _id?: string;
+
   productId: string;
-  productName?: string; // útil para mostrar en UI sin consultar productos
+
+  productName?: string;
+
   quantity: number;
-  unitPrice: number; // precio al momento de la venta
-  totalPrice: number;
-  discount?: number;
+
+  unitPrice: number;
+
+  discount?: number; // monto fijo (no %)
 }
 
 export const calculateItemTotal = (item: SaleItem): number => {
   const discount = item.discount ?? 0;
-  return item.quantity * item.unitPrice - discount;
+
+  const total = item.quantity * item.unitPrice;
+
+  return Math.max(0, total - discount);
 };

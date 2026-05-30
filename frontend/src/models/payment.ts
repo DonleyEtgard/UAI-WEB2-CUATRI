@@ -3,31 +3,51 @@ export type PaymentStatus =
   | "processing"
   | "completed"
   | "failed"
-  | "refunded";
+  | "refunded"
+  | "cancelled";
 
 export type PaymentMethod =
   | "cash"
   | "credit_card"
   | "debit_card"
-  | "bank_transfer"
-  | "mercado_pago";
+  | "bank_transfer";
+
+export type PaymentGateway =
+  | "mercado_pago"
+  | "stripe"
+  | "paypal"
+  | "manual";
+
+export type Currency = "ARS" | "USD" | "EUR" | "BRL";
 
 export interface Payment {
-  id: string;
+  _id: string; // 🔥 MongoDB standard
+
   customerId: string;
+
   amount: number;
+
   currency: Currency;
+
   method: PaymentMethod;
+
+  gateway?: PaymentGateway;
+
   status: PaymentStatus;
+
   metadata?: PaymentMetadata;
+
   createdAt?: string;
+
   updatedAt?: string;
 }
 
-export type Currency = "ARS" | "USD" | "HT";
-
 export interface PaymentMetadata {
   transactionId?: string;
-  paymentGateway?: string; // ej: Stripe, MercadoPago
-  last4?: string; // últimos 4 dígitos tarjeta
+
+  paymentGateway?: PaymentGateway;
+
+  last4?: string;
+
+  receiptUrl?: string;
 }

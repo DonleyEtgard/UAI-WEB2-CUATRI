@@ -1,31 +1,19 @@
-import { useState } from "react";
-import { paySubscription, createSubscriptionPayment } from "../../services/payments.service";
+import { useSubscriptionPayment } from "@/features/payments";
 
 export default function PaymentPage() {
-  const [qr, setQr] = useState<string | null>(null);
-  const [_loading, setLoading] = useState(false);
-
-  const handleQR = async () => {
-    setLoading(true);
-    try {
-      const res = await createSubscriptionPayment();
-      setQr(res.data.qr);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { 
+    qr, 
+    loading, 
+    generateQR, 
+    confirmPayment 
+  } = useSubscriptionPayment();
 
   const handleConfirm = async () => {
-    setLoading(true);
     try {
-      await paySubscription("moncash");
+      await confirmPayment("moncash");
       alert("Suscripción activada");
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -34,10 +22,11 @@ export default function PaymentPage() {
       <h1 className="text-3xl mb-6">Pago de Suscripción</h1>
 
       <button
-        onClick={handleQR}
-        className="bg-blue-600 px-6 py-3 rounded-xl"
+        onClick={generateQR}
+        disabled={loading}
+        className="bg-blue-600 px-6 py-3 rounded-xl disabled:opacity-50"
       >
-        Generar QR
+        {loading ? "Generando..." : "Generar QR"}
       </button>
 
       {qr && (

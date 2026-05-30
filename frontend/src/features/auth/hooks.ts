@@ -1,18 +1,30 @@
 import { login } from "../../services/auth.service";
 
+interface LoginResponse {
+  idToken: string;
+  user: {
+    id: string;
+    email: string;
+    role?: string;
+  };
+}
+
 export const useLogin = () => {
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (
+    email: string,
+    password: string
+  ): Promise<LoginResponse> => {
     try {
       const data = await login(email, password);
 
       // 🔐 guardar sesión
-      localStorage.setItem("token", data.idToken);
+      localStorage.setItem("auth_token", data.idToken);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      throw error; // 🔥 importante para manejar errores en el componente
+      throw error;
     }
   };
 

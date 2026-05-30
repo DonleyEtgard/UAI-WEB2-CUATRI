@@ -1,23 +1,32 @@
+export type UserRole =
+  | "superadmin"
+  | "admin"
+  | "employee";
+
 export interface User {
   id: string;
-  username: string;
+  firebaseUid?: string;
+
+  name: string;
+  lastName: string;
   email: string;
+
   role: UserRole;
   isActive: boolean;
-  profile?: UserProfile;
+
+  image?: string;
+
+  address?: Address;
+
   createdAt: string;
   updatedAt?: string;
 }
 
-export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  avatarUrl?: string;
+export interface Address {
+  street?: string;
+  number?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
 }
-
-export type UserRole =
-  | "superadmin"
-  | "admin"
-  | "manager"
-  | "employee";

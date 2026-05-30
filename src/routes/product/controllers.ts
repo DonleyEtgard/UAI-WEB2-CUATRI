@@ -12,7 +12,76 @@ const createProductSchema = Joi.object({
   description: Joi.string().max(500).optional(),
   category: Joi.string().max(50).optional()
 });
+// 📌 Desactivar producto
+export const deactivateProduct = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
 
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        active: false
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    res.json({
+      message: "Product deactivated",
+      product
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+// 📌 Reactivar producto
+export const activateProduct = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        active: true
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    res.json({
+      message: "Product activated",
+      product
+    });
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 // 📌 Crear producto
 export const createProduct = async (req: Request, res: Response) => {
   try {

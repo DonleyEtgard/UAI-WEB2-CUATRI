@@ -1,43 +1,32 @@
-import API from "../../services/api";
+import * as salesService from "../../services/sales.service";
+import type {
+  Sale,
+  SaleItem,
+  Currency,
+  SaleStatus,
+  SaleItemInput,
+  CreateSaleData,
+  TicketInfo,
+} from "./types";
 
-// ==========================
-// 🛒 SALES
-// ==========================
+// Re-export types for convenience within the feature
+export type { Sale, SaleItem, Currency, SaleStatus, SaleItemInput, CreateSaleData, TicketInfo };
 
-export const createSale = async (data: any) => {
-  const res = await API.post("/sales", data);
-  return res.data;
-};
+// Re-export service functions as feature API actions
+export const fetchSales = salesService.getSales;
 
-// ==========================
-// 📦 SALE ITEMS
-// ==========================
+export const createSaleAction = salesService.createSale;
 
-export const getSaleItems = async () => {
-  const res = await API.get("/sale-items");
-  return res.data;
-};
+export const fetchSaleItems = salesService.getSaleItems;
 
-export const getSaleItemById = async (id: string) => {
-  const res = await API.get(`/sale-items/${id}`);
-  return res.data;
-};
+export const fetchSaleItemById = salesService.getSaleItemById;
 
-export const getItemsBySale = async (saleId: string) => {
-  const res = await API.get(`/sale-items/sale/${saleId}`);
-  return res.data;
-};
+export const fetchItemsBySale = salesService.getItemsBySale;
 
-export const deleteSaleItem = async (id: string) => {
-  const res = await API.delete(`/sale-items/${id}`);
-  return res.data;
-};
+export const deleteSaleItemAction = salesService.deleteSaleItem;
 
-// ==========================
-// 🧾 TICKET
-// ==========================
+export const fetchTicket = salesService.getTicket;
 
-export const getTicket = async (id: string) => {
-  const res = await API.get(`/ticket/${id}`);
-   return res.data;
-};
+export const sendTicketWhatsAppAction = salesService.sendTicketWhatsApp;
+
+export const sendTicketTelegramAction = salesService.sendTicketTelegram;

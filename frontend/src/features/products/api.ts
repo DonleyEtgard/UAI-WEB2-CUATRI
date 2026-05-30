@@ -1,63 +1,30 @@
-import API from "../../services/api";
+import * as productService from "../../services/products.service";
 
-// 📌 OBTENER TODOS LOS PRODUCTOS
-export const getProducts = async () => {
-  const res = await API.get("/products");
-  return res.data;
-};
+import type {
+  Product, 
+  Category, 
+  Currency, 
+  ProductStats 
+} from "./types";
 
-// 📌 OBTENER PRODUCTO POR ID
-export const getProductById = async (id: string) => {
-  const res = await API.get(`/products/${id}`);
-  return res.data;
-};
+// Re-export service functions as feature actions
+export const fetchProducts = 
+  productService.getProducts;
 
-// 📌 CREAR PRODUCTO
-export const createProduct = async (data: {
-  name: string;
-  price: number;
-  cost: number;
-  stock: number;
-  description?: string;
-  category?: string;
-}) => {
-  const res = await API.post("/products", data);
-  return res.data;
-};
+export const fetchProductById = 
+  productService.getProductById;
 
-// 📌 ACTUALIZAR PRODUCTO
-export const updateProduct = async (
-  id: string,
-  data: {
-    name?: string;
-    price?: number;
-    cost?: number;
-    stock?: number;
-    description?: string;
-    category?: string;
-    isActive?: boolean;
-  }
-) => {
-  const res = await API.put(`/products/${id}`, data);
-  return res.data;
-};
+export const createProductAction = 
+  productService.createProduct;
 
-// 📌 ELIMINAR PRODUCTO (SOFT DELETE)
-export const deleteProduct = async (id: string) => {
-  const res = await API.delete(`/products/${id}`);
-  return res.data;
-};
+export const updateProductAction = 
+  productService.updateProduct;
 
-// 🔥 ACTUALIZAR STOCK (MUY IMPORTANTE)
-export const updateStock = async (id: string, quantity: number) => {
-  const res = await API.patch(`/products/${id}/stock`, {
-    quantity
-  });
-  return res.data;
-};
+export const deleteProductAction = 
+  productService.deleteProduct;
 
-// 📊 OBTENER ESTADÍSTICAS DEL PRODUCTO
-export const getProductStats = async (id: string) => {
-  const res = await API.get(`/products/${id}/stats`);
-  return res.data;
-};
+export const updateStockAction = 
+  productService.updateStock;
+
+export const fetchProductStats = 
+  productService.getProductStats;

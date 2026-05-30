@@ -1,58 +1,82 @@
-import { useState } from "react";
-import API from "../../services/api";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useProduct, useDeleteProduct } from "@/features/products";
 
-const ProductFormPage = () => {
-  const [form, setForm] = useState({
-    name: "",
-    price: 0,
-    stock: 0,
-    category: ""
-  });
+const ProductDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { product, loading, reload } = useProduct(id || "");
+  const { handleDelete: apiDelete } = useDeleteProduct();
 
-  const handleSubmit = async () => {
-    await API.post("/products", form);
+  useEffect(() => {
+    if (id) reload();
+  }, [id, reload]);
+
+  const handleDelete = async () => {
+    if (!id) return;
+
+    const ok = confirm("¿Eliminar producto?");
+    if (!ok) return;
+
+    try {
+      await apiDelete(id);
+      navigate("/app/products");
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
   };
 
+  if (loading) return <p>Cargando...</p>;
+  if (!product) return <p>No encontrado</p>;
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow space-y-4">
+    <div className="container py-8">
+      <h1 className="page-title">
+        {product.name}
+      </h1>
 
-      <h1 className="text-xl font-bold">Create Product</h1>
+      {/* INFO */}
+      <div className="card mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-muted-xs uppercase font-bold text-gray-400">Precio</p>
+            <p className="text-xl text-primary font-bold">${product.price}</p>
+          </div>
+          <div>
+            <p className="text-muted-xs uppercase font-bold text-gray-400">Costo</p>
+            <p className="text-xl">${product.cost || "-"}</p>
+          </div>
+          <div>
+            <p className="text-muted-xs uppercase font-bold text-gray-400">Stock Disponible</p>
+            <p className="text-xl">{product.stock} unidades</p>
+          </div>
+          <div>
+            <p className="text-muted-xs uppercase font-bold text-gray-400">Categoría</p>
+            <p className="text-xl">{product.category?.name || "Sin categoría"}</p>
+          </div>
+        </div>
+        <div className="mt-6">
+          <p className="text-muted-xs uppercase font-bold text-gray-400">Descripción</p>
+          <p className="text-muted">{product.description || "Sin descripción disponible."}</p>
+        </div>
+      </div>
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Name"
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-      />
+      {/* ACTIONS */}
+      <div className="flex gap-4">
+        <button className="btn-secondary" onClick={() => navigate("/app/products")}>
+          Volver
+        </button>
 
-      <input
-        type="number"
-        className="w-full border p-2 rounded"
-        placeholder="Price"
-        onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-      />
+        <button className="btn-primary" onClick={() => navigate(`/app/products/edit/${id}`)}>
+          Editar
+        </button>
 
-      <input
-        type="number"
-        className="w-full border p-2 rounded"
-        placeholder="Stock"
-        onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
-      />
-
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Category"
-        onChange={(e) => setForm({ ...form, category: e.target.value })}
-      />
-
-      <button
-        onClick={handleSubmit}
-        className="bg-indigo-600 text-white px-4 py-2 rounded"
-      >
-        Save Product
-      </button>
-
+        <button className="text-red-600 font-semibold hover:underline px-4" onClick={handleDelete}>
+          Eliminar Producto
+        </button>
+      </div>
     </div>
   );
 };
 
-export default ProductFormPage;
+export default ProductDetailPage;

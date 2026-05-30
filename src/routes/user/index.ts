@@ -1,8 +1,5 @@
-// ============================================================================
-// USER ROUTES - Authentication & User Management
-// ============================================================================
-
 import express, { Router } from "express";
+
 import {
   getMeController,
   registerController,
@@ -10,11 +7,17 @@ import {
   listUsersController,
   updateUserController,
   deleteUserController,
-  paySubscription, 
-  createSubscriptionPayment
+  paySubscription,
+  createSubscriptionPayment,
+
+  createEmployeeController
+
 } from "./controllers";
+
 import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
+
 import { authorizeSuperadminOnly } from "../../middlewares/authorizeSuperadminOnly";
+
 import { authorizeAdminOrSuperadmin } from "../../middlewares/authorizeAdminOrSuperadmin";
 
 const router: Router = express.Router();
@@ -25,10 +28,13 @@ const router: Router = express.Router();
 
 /**
  * POST /api/users/register
- * Register new user in MongoDB after Firebase registration
- * No authentication required (called after Firebase auth)
+ * Public register
+ * ALWAYS creates ADMIN users
  */
-router.post("/register", registerController);
+router.post(
+  "/register",
+  registerController
+);
 
 // ============================================================================
 // AUTHENTICATED ROUTES
@@ -38,7 +44,11 @@ router.post("/register", registerController);
  * GET /api/users/me
  * Get current user's profile
  */
-router.get("/me", authenticateFirebase, getMeController);
+router.get(
+  "/me",
+  authenticateFirebase,
+  getMeController
+);
 
 // ============================================================================
 // ADMIN ROUTES
@@ -68,12 +78,24 @@ router.get(
 
 /**
  * PATCH /api/users/:id
- * Update user profile (user or admin/superadmin)
+ * Update user profile
  */
 router.patch(
   "/:id",
   authenticateFirebase,
   updateUserController
+);
+
+/**
+ * POST /api/users/employees
+ * Create employee
+ * Admin/Superadmin only
+ */
+router.post(
+  "/employees",
+  authenticateFirebase,
+  authorizeAdminOrSuperadmin,
+  createEmployeeController
 );
 
 // ============================================================================
@@ -82,7 +104,7 @@ router.patch(
 
 /**
  * DELETE /api/users/:id
- * Delete user (superadmin only, soft delete)
+ * Delete user (superadmin only)
  */
 router.delete(
   "/:id",
@@ -91,10 +113,26 @@ router.delete(
   deleteUserController
 );
 
+// ============================================================================
 // PAYMENTS
-// ==========================
-router.post("/pay-subscription", authenticateFirebase, paySubscription);
+// ============================================================================
 
-router.post("/create-payment", authenticateFirebase, createSubscriptionPayment);
+/**
+ * POST /api/users/pay-subscription
+ */
+router.post(
+  "/pay-subscription",
+  authenticateFirebase,
+  paySubscription
+);
+
+/**
+ * POST /api/users/create-payment
+ */
+router.post(
+  "/create-payment",
+  authenticateFirebase,
+  createSubscriptionPayment
+);
 
 export default router;

@@ -8,13 +8,12 @@ import type { AuthRequest } from "../../types/auth";
 // AUTHENTICATION CONTROLLERS
 // ============================================================================
 
-/**
- * GET /api/users/me
- * Get current authenticated user profile from MongoDB
- * Requires: Firebase Authentication
- */
-export const getMeController = async (req: AuthRequest, res: Response) => {
+export const getMeController = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
+
     // ===================================================================
     // VALIDATION
     // ===================================================================
@@ -53,7 +52,9 @@ export const getMeController = async (req: AuthRequest, res: Response) => {
         user,
       },
     });
+
   } catch (error: any) {
+
     console.error("Get me error:", error);
 
     return res.status(500).json({
@@ -61,20 +62,21 @@ export const getMeController = async (req: AuthRequest, res: Response) => {
       message: "Error fetching user profile",
       error: error.message,
     });
+
   }
 };
 
 /**
  * POST /api/users/register
- * Register new user in MongoDB after Firebase registration
- * Called from frontend after Firebase auth.createUserWithEmailAndPassword()
- * Requires: Firebase ID Token
+ * Public register
+ * ALWAYS creates ADMIN users
  */
 export const registerController = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
+
     // ===================================================================
     // VALIDATION
     // ===================================================================
@@ -84,7 +86,6 @@ export const registerController = async (
       lastName,
       email,
       firebaseUid,
-      role,
       image,
       address,
     } = req.body;
@@ -95,18 +96,6 @@ export const registerController = async (
         message:
           "Missing required fields: firebaseUid, email, name, lastName",
         error: "INVALID_INPUT",
-      });
-    }
-
-    // ===================================================================
-    // BLOCK SUPERADMIN CREATION
-    // ===================================================================
-
-    if (role === "superadmin") {
-      return res.status(403).json({
-        success: false,
-        message: "Not allowed to create superadmin",
-        error: "FORBIDDEN_ROLE",
       });
     }
 
@@ -133,10 +122,15 @@ export const registerController = async (
     const now = new Date();
 
     const subscriptionEnd = new Date();
-    subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 3);
+    subscriptionEnd.setMonth(
+      subscriptionEnd.getMonth() + 3
+    );
 
-    const mongoRole =
-      role && typeof role === "string" ? role : "employee";
+    // ================================================================
+    // PUBLIC REGISTER = ADMIN
+    // ================================================================
+
+    const mongoRole = "admin";
 
     const newUser = new User({
       firebaseUid,
@@ -145,10 +139,11 @@ export const registerController = async (
       lastName,
 
       // ================================================================
-      // NEW FIELDS
+      // USER DATA
       // ================================================================
 
       role: mongoRole,
+
       image: image || "",
 
       address: {
@@ -165,11 +160,15 @@ export const registerController = async (
       // ================================================================
 
       plan: "free",
+
       isVerified: false,
+
       isActive: true,
 
       subscriptionStart: now,
+
       subscriptionEnd,
+
       subscriptionPaid: false,
     });
 
@@ -186,7 +185,9 @@ export const registerController = async (
         user: newUser,
       },
     });
+
   } catch (error: any) {
+
     console.error("Register error:", error);
 
     return res.status(500).json({
@@ -194,22 +195,24 @@ export const registerController = async (
       message: "Error registering user",
       error: error.message,
     });
+
   }
 };
 
-/**
- * GET /api/users/:id
- * Get user by ID (Admin/SuperAdmin only)
- * Requires: Firebase Authentication + Admin Role
- */
-export const getUserByIdController = async (
+// ============================================================================
+// CREATE EMPLOYEE
+// Admin/Superadmin can create employees
+// ============================================================================
+
+export const createEmployeeController = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
-    // ===================================================================
-    // VALIDATION
-    // ===================================================================
+
+    // ================================================================
+    // AUTH VALIDATION
+    // ================================================================
 
     if (!req.dbUser) {
       return res.status(401).json({
@@ -219,8 +222,153 @@ export const getUserByIdController = async (
       });
     }
 
-    // Check if user is admin or superadmin
-    if (!["admin", "superadmin"].includes(req.dbUser.role)) {
+    // ================================================================
+    // ONLY ADMIN OR SUPERADMIN
+    // ================================================================
+
+    if (
+      !["admin", "superadmin"].includes(
+        req.dbUser.role
+      )
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
+        error: "FORBIDDEN",
+      });
+    }
+
+    // ================================================================
+    // DATA
+    // ================================================================
+
+    const {
+      firebaseUid,
+      email,
+      name,
+      lastName,
+      image,
+      address,
+    } = req.body;
+
+    // ================================================================
+    // VALIDATION
+    // ================================================================
+
+    if (
+      !firebaseUid ||
+      !email ||
+      !name ||
+      !lastName
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+        error: "INVALID_INPUT",
+      });
+    }
+
+    // ================================================================
+    // CHECK EXISTING USER
+    // ================================================================
+
+    const existingUser = await User.findOne({
+      $or: [
+        { email },
+        { firebaseUid }
+      ],
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
+        error: "USER_EXISTS",
+      });
+    }
+
+    // ================================================================
+    // CREATE EMPLOYEE
+    // ================================================================
+
+    const employee = new User({
+      firebaseUid,
+      email,
+      name,
+      lastName,
+
+      role: "employee",
+
+      image: image || "",
+
+      address: {
+        street: address?.street || "",
+        number: address?.number || "",
+        city: address?.city || "",
+        state: address?.state || "",
+        country: address?.country || "Argentina",
+        postalCode: address?.postalCode || "",
+      },
+
+      isVerified: true,
+
+      isActive: true,
+
+      plan: "free",
+
+      createdBy: req.dbUser._id,
+    });
+
+    await employee.save();
+
+    // ================================================================
+    // RESPONSE
+    // ================================================================
+
+    return res.status(201).json({
+      success: true,
+      message: "Employee created successfully",
+      data: {
+        user: employee,
+      },
+    });
+
+  } catch (error: any) {
+
+    console.error("Create employee error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error creating employee",
+      error: error.message,
+    });
+
+  }
+};
+
+/**
+ * GET /api/users/:id
+ * Get user by ID (Admin/SuperAdmin only)
+ */
+export const getUserByIdController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH",
+      });
+    }
+
+    if (
+      !["admin", "superadmin"].includes(
+        req.dbUser.role
+      )
+    ) {
       return res.status(403).json({
         success: false,
         message: "Only admins can view other users",
@@ -230,11 +378,8 @@ export const getUserByIdController = async (
 
     const { id } = req.params;
 
-    // ===================================================================
-    // GET USER
-    // ===================================================================
-
-    const user = await User.findById(id).select("-__v");
+    const user = await User.findById(id)
+      .select("-__v");
 
     if (!user) {
       return res.status(404).json({
@@ -244,17 +389,15 @@ export const getUserByIdController = async (
       });
     }
 
-    // ===================================================================
-    // RESPONSE
-    // ===================================================================
-
     return res.status(200).json({
       success: true,
       data: {
         user,
       },
     });
+
   } catch (error: any) {
+
     console.error("Get user error:", error);
 
     return res.status(500).json({
@@ -262,22 +405,19 @@ export const getUserByIdController = async (
       message: "Error fetching user",
       error: error.message,
     });
+
   }
 };
 
 /**
  * GET /api/users
- * List all users (Admin/SuperAdmin only)
- * Requires: Firebase Authentication + Admin Role
+ * List all users
  */
 export const listUsersController = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
-    // ===================================================================
-    // VALIDATION
-    // ===================================================================
 
     if (!req.dbUser) {
       return res.status(401).json({
@@ -287,8 +427,11 @@ export const listUsersController = async (
       });
     }
 
-    // Check if user is admin or superadmin
-    if (!["admin", "superadmin"].includes(req.dbUser.role)) {
+    if (
+      !["admin", "superadmin"].includes(
+        req.dbUser.role
+      )
+    ) {
       return res.status(403).json({
         success: false,
         message: "Only admins can list users",
@@ -296,13 +439,11 @@ export const listUsersController = async (
       });
     }
 
-    // ===================================================================
-    // GET USERS
-    // ===================================================================
+    const page =
+      parseInt(req.query.page as string) || 1;
 
-    const page = parseInt(req.query.page as string) || 1;
-
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit =
+      parseInt(req.query.limit as string) || 10;
 
     const skip = (page - 1) * limit;
 
@@ -313,10 +454,6 @@ export const listUsersController = async (
       .sort({ createdAt: -1 });
 
     const total = await User.countDocuments();
-
-    // ===================================================================
-    // RESPONSE
-    // ===================================================================
 
     return res.status(200).json({
       success: true,
@@ -331,7 +468,9 @@ export const listUsersController = async (
         },
       },
     });
+
   } catch (error: any) {
+
     console.error("List users error:", error);
 
     return res.status(500).json({
@@ -339,22 +478,19 @@ export const listUsersController = async (
       message: "Error listing users",
       error: error.message,
     });
+
   }
 };
 
 /**
  * PATCH /api/users/:id
- * Update user (user can update own profile, admin/superadmin can update any)
- * Requires: Firebase Authentication
+ * Update user
  */
 export const updateUserController = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
-    // ===================================================================
-    // VALIDATION
-    // ===================================================================
 
     if (!req.dbUser) {
       return res.status(401).json({
@@ -368,12 +504,13 @@ export const updateUserController = async (
 
     const updates = req.body;
 
-    // Check authorization
-    const isOwnProfile = req.dbUser._id.toString() === id;
+    const isOwnProfile =
+      req.dbUser._id.toString() === id;
 
-    const isAdmin = ["admin", "superadmin"].includes(
-      req.dbUser.role
-    );
+    const isAdmin =
+      ["admin", "superadmin"].includes(
+        req.dbUser.role
+      );
 
     if (!isOwnProfile && !isAdmin) {
       return res.status(403).json({
@@ -383,17 +520,21 @@ export const updateUserController = async (
       });
     }
 
-    // Don't allow role updates except by superadmin
-    if (updates.role && req.dbUser.role !== "superadmin") {
+    // ================================================================
+    // PROTECTED FIELDS
+    // ================================================================
+
+    if (
+      updates.role &&
+      req.dbUser.role !== "superadmin"
+    ) {
       delete updates.role;
     }
 
-    // Don't allow firebaseUid updates
     if (updates.firebaseUid) {
       delete updates.firebaseUid;
     }
 
-    // Don't allow creating superadmin
     if (
       updates.role === "superadmin" &&
       req.dbUser.role !== "superadmin"
@@ -401,9 +542,9 @@ export const updateUserController = async (
       delete updates.role;
     }
 
-    // ===================================================================
-    // UPDATE USER
-    // ===================================================================
+    // ================================================================
+    // UPDATE
+    // ================================================================
 
     const user = await User.findByIdAndUpdate(
       id,
@@ -437,10 +578,6 @@ export const updateUserController = async (
       });
     }
 
-    // ===================================================================
-    // RESPONSE
-    // ===================================================================
-
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
@@ -448,7 +585,9 @@ export const updateUserController = async (
         user,
       },
     });
+
   } catch (error: any) {
+
     console.error("Update user error:", error);
 
     return res.status(500).json({
@@ -456,31 +595,54 @@ export const updateUserController = async (
       message: "Error updating user",
       error: error.message,
     });
+
   }
 };
 
 // ==========================
-// 💳 PAYMENT SUBSCRIPTION (JWT)
+// 💳 PAYMENT SUBSCRIPTION
 // ==========================
-export const paySubscription = async (req: AuthRequest, res: Response) => {
+
+export const paySubscription = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
+
     const userId = req.dbUser?._id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized"
+      });
+    }
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
 
     const { paymentMethod } = req.body;
 
     const basePrice = 3000;
+
     let total = basePrice;
-    if (paymentMethod === "moncash") total += basePrice * 0.05;
+
+    if (paymentMethod === "moncash") {
+      total += basePrice * 0.05;
+    }
 
     const now = new Date();
 
     user.plan = "basic";
+
     user.subscriptionStart = now;
-    user.subscriptionEnd = new Date(now.setMonth(now.getMonth() + 1));
+
+    user.subscriptionEnd =
+      new Date(now.setMonth(now.getMonth() + 1));
 
     await user.save();
 
@@ -488,48 +650,83 @@ export const paySubscription = async (req: AuthRequest, res: Response) => {
       message: "Subscription updated",
       paymentMethod,
       totalPaid: total,
-      qrCode: paymentMethod === "moncash" ? `QR-${user._id}-${Date.now()}` : null,
+      qrCode:
+        paymentMethod === "moncash"
+          ? `QR-${user._id}-${Date.now()}`
+          : null,
     });
+
   } catch (error: any) {
-    res.status(500).json({ message: "Error updating subscription", error: error.message });
+
+    res.status(500).json({
+      message: "Error updating subscription",
+      error: error.message
+    });
+
   }
 };
 
 // ==========================
-// 💳 CREATE PAYMENT (QR)
+// 💳 CREATE PAYMENT
 // ==========================
-export const createSubscriptionPayment = async (req: AuthRequest, res: Response) => {
+
+export const createSubscriptionPayment = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
+
     const userId = req.dbUser?._id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized"
+      });
+    }
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
 
     const basePrice = 3000;
+
     const fee = basePrice * 0.05;
+
     const total = basePrice + fee;
 
-    const qr = `moncash://pay?amount=${total}&user=${user._id}`;
+    const qr =
+      `moncash://pay?amount=${total}&user=${user._id}`;
 
-    res.json({ basePrice, fee, total, qr });
+    res.json({
+      basePrice,
+      fee,
+      total,
+      qr
+    });
+
   } catch (error: any) {
-    res.status(500).json({ message: "Error creating payment", error: error.message });
+
+    res.status(500).json({
+      message: "Error creating payment",
+      error: error.message
+    });
+
   }
 };
+
 /**
  * DELETE /api/users/:id
- * Delete user (SuperAdmin only, soft delete)
- * Requires: Firebase Authentication + SuperAdmin Role
+ * Superadmin only
  */
 export const deleteUserController = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
-    // ===================================================================
-    // VALIDATION
-    // ===================================================================
 
     if (!req.dbUser) {
       return res.status(401).json({
@@ -548,10 +745,6 @@ export const deleteUserController = async (
     }
 
     const { id } = req.params;
-
-    // ===================================================================
-    // SOFT DELETE
-    // ===================================================================
 
     const user = await User.findByIdAndUpdate(
       id,
@@ -572,10 +765,6 @@ export const deleteUserController = async (
       });
     }
 
-    // ===================================================================
-    // RESPONSE
-    // ===================================================================
-
     return res.status(200).json({
       success: true,
       message: "User deleted successfully",
@@ -583,7 +772,9 @@ export const deleteUserController = async (
         user,
       },
     });
+
   } catch (error: any) {
+
     console.error("Delete user error:", error);
 
     return res.status(500).json({
@@ -591,5 +782,6 @@ export const deleteUserController = async (
       message: "Error deleting user",
       error: error.message,
     });
+
   }
 };

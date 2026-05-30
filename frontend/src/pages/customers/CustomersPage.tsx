@@ -1,173 +1,131 @@
-import { useEffect, useMemo, useState, useRef } from "react";
-import API from "../../services/api";
-import UnifiedSearchFilter from "../../components/dashboard/UnifiedSearchFilter";
-import { Users, UserPlus, Mail, Phone, MoreVertical } from "lucide-react";
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-type Customer = {
-  _id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  createdAt: string;
-};
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCustomers, useDeleteCustomer } from "@/features/customers";
+import { useAuth } from "@/context/AuthContext";
 
 const CustomersPage = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    searchQuery: "",
-    category: "all",
-    dateFrom: "",
-    dateTo: "",
-  });
-  const pageRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { isLoading, isAuthenticated } = useAuth();
+  const { customers, loading, reload } = useCustomers();
+  const { handleDelete: apiDelete } = useDeleteCustomer();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // ==========================
-  // 📦 LOAD CUSTOMERS
-  // ==========================
-  const loadCustomers = async () => {
-    setLoading(true);
+  // Si el contexto de auth aún está cargando el token, no mostramos nada para evitar el 401
+  if (isLoading) return <div className="p-10 text-center">Verificando sesión...</div>;
+  if (!isAuthenticated) return null; // El router debería redirigir, pero esto es seguridad extra.
+
+  const handleDelete = async (id: string) => {
+    if (deletingId) return;
+    const ok = confirm("¿Eliminar cliente?");
+    if (!ok) return;
+
     try {
-      // Asumiendo que el endpoint es /customers según tu estructura
-      const res = await API.get<Customer[]>("/customers");
-      setCustomers(res.data ?? []);
+      setDeletingId(id);
+      await apiDelete(id);
+      reload();
+      setDeletingId(null);
     } catch (err) {
-      console.error("Error loading customers:", err);
-      setCustomers([]);
-    } finally {
-      setLoading(false);
+      console.error("Error deleting customer:", err);
     }
   };
 
-  useEffect(() => {
-    loadCustomers();
-    // Trigger animation
-    const timer = setTimeout(() => {
-      pageRef.current?.classList.add("visible");
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // ==========================
-  // 🔍 FILTER LOGIC
-  // ==========================
-  const filteredCustomers = useMemo(() => {
-    return customers.filter((customer) => {
-      const fullName = `${customer.name} ${customer.lastName}`.toLowerCase();
-      const email = customer.email.toLowerCase();
-      const query = filters.searchQuery.toLowerCase();
-      const registrationDate = new Date(customer.createdAt);
-
-      const matchesSearch = 
-        fullName.includes(query) || 
-        email.includes(query) ||
-        customer._id.toLowerCase().includes(query);
-
-      let matchesDate = true;
-      if (filters.dateFrom) {
-        matchesDate = matchesDate && registrationDate >= new Date(filters.dateFrom);
-      }
-      if (filters.dateTo) {
-        const endDate = new Date(new Date(filters.dateTo).setHours(23, 59, 59, 999));
-        matchesDate = matchesDate && registrationDate <= endDate;
-      }
-
-      return matchesSearch && matchesDate;
-    });
-  }, [customers, filters]);
-
-  // ==========================
-  // 📊 KPI
-  // ==========================
-  const totalCustomers = filteredCustomers.length;
-  const newThisMonth = filteredCustomers.filter(c => {
-    const date = new Date(c.createdAt);
-    const now = new Date();
-    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-  }).length;
-
   return (
-    <div ref={pageRef} className="container py-8 fade-in-up">
+    <div className="container py-8 fade-in-up">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
         <div>
-          <h1 className="page-title title-gradient">Directorio de Clientes</h1>
-          <p className="page-subtitle">Gestiona la relación con tus compradores</p>
+          <h1 className="page-title title-gradient">
+            Directorio de Clientes
+          </h1>
+          <p className="page-subtitle">
+            Gestiona la relación con tus compradores
+          </p>
         </div>
 
-        <button className="btn" style={{ width: 'auto', padding: '10px 24px' }}>
-          <UserPlus size={18} />
+        <button
+          className="btn-primary"
+          onClick={() => navigate("/app/customers/new")}
+        >
           Nuevo Cliente
         </button>
       </div>
 
-      {/* FILTROS AVANZADOS */}
-      <UnifiedSearchFilter onSearch={setFilters} />
-
-      {/* KPI GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div className="summary-card">
-          <div className="flex items-center justify-between mb-4">
-            <div className="brand-icon" style={{ width: '48px', height: '48px' }}>
-              <Users size={20} />
-            </div>
-          </div>
-          <p className="text-muted-xs uppercase tracking-widest font-black">Total Clientes</p>
-          <h2 className="title-md mt-1 font-bold">{totalCustomers}</h2>
-        </div>
-
-        <div className="summary-card">
-          <div className="flex items-center justify-between mb-4">
-            <div className="brand-icon" style={{ width: '48px', height: '48px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25))' }}>
-              <UserPlus size={20} className="text-success" />
-            </div>
-          </div>
-          <p className="text-muted-xs uppercase tracking-widest font-black">Nuevos (Mes)</p>
-          <h2 className="title-md mt-1 font-bold">{newThisMonth}</h2>
-        </div>
-      </div>
-
-      {/* TABLE CARD */}
+      {/* TABLE */}
       <div className="card">
         <div className="table-container">
           {loading ? (
-            <div className="p-10 text-center text-muted">Cargando clientes...</div>
+            <div className="p-10 text-center text-muted">
+              Cargando clientes...
+            </div>
           ) : (
             <table className="table">
               <thead>
                 <tr>
                   <th>Cliente</th>
                   <th>Contacto</th>
-                  <th>Fecha Registro</th>
+                  <th>Fecha</th>
                   <th className="text-right">Acciones</th>
                 </tr>
               </thead>
+
               <tbody>
-                {filteredCustomers.length === 0 ? (
+                {customers.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center p-8 text-muted">No se encontraron clientes</td>
+                    <td colSpan={4} className="text-center p-8 text-muted">
+                      No hay clientes
+                    </td>
                   </tr>
                 ) : (
-                  filteredCustomers.map((customer) => (
-                    <tr key={customer._id} className="hover:bg-white/[0.02] transition-colors">
+                  customers.map((c, index) => (
+                    <tr key={c._id || index}>
+                      {/* CLIENTE */}
                       <td>
-                        <div className="font-bold text-primary">{customer.name} {customer.lastName}</div>
-                        <div className="text-muted-xs font-medium">ID: #{customer._id.slice(-6)}</div>
+                        <div className="font-bold text-primary">
+                          {c.name}
+                        </div>
+
+                        <div className="text-muted-xs">
+                          ID: #{c._id?.slice(-6)}
+                        </div>
                       </td>
+
+                      {/* CONTACTO */}
                       <td>
-                        <div className="flex items-center gap-2 text-sm"><Mail size={14} className="text-muted" /> {customer.email}</div>
-                        {customer.phone && <div className="flex items-center gap-2 text-sm"><Phone size={14} className="text-muted" /> {customer.phone}</div>}
+                        <div>{c.email || "-"}</div>
+                        <div>{c.phone || "-"}</div>
                       </td>
-                      <td className="text-muted-sm italic">{new Date(customer.createdAt).toLocaleDateString()}</td>
+
+                      {/* FECHA */}
+                      <td>
+                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "-"}
+                      </td>
+
+                      {/* ACTIONS */}
                       <td className="text-right">
-                        <button className="text-muted hover:text-white" style={{ background: 'none', boxShadow: 'none', width: 'auto', display: 'inline', padding: 0 }}>
-                          <MoreVertical size={18} />
+                        <button
+                          className="text-blue-600 hover:underline mr-4"
+                          onClick={() =>
+                            navigate(`/app/customers/${c._id}`)
+                          }
+                        >
+                          Ver
+                        </button>
+
+                        <button
+                          className="text-indigo-600 hover:underline mr-4"
+                          onClick={() =>
+                            navigate(`/app/customers/edit/${c._id}`)
+                          }
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          className="text-red-600 hover:underline disabled:opacity-50"
+                          onClick={() => c._id && handleDelete(c._id)}
+                          disabled={deletingId === c._id}
+                        >
+                          {deletingId === c._id ? "..." : "Eliminar"}
                         </button>
                       </td>
                     </tr>

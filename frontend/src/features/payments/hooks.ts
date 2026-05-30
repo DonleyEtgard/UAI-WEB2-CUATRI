@@ -1,68 +1,275 @@
-import { useState } from "react";
 import {
-  paySubscription,
-  createMoncashPayment,
-  getSubscriptionStatus
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  fetchPaymentMethods,
+  fetchPaymentMethodById,
+  createPaymentMethodAction,
+  updatePaymentMethodAction,
+  deletePaymentMethodAction,
+  paySubscriptionAction,
+  createSubscriptionPaymentAction,
 } from "./api";
 
-export const usePayment = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+import type {
+  PaymentMethod,
+} from "./api";
 
-  const [qr, setQR] = useState<string | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
+export const usePaymentMethods = () => {
 
-  // 🔥 GENERAR QR
-  const generateQR = async () => {
+  const [methods, setMethods] =
+    useState<PaymentMethod[]>([]);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const loadMethods = async () => {
+
     try {
+
       setLoading(true);
-      const data = await createMoncashPayment();
-      setQR(data.qr);
+
+      setError(null);
+
+      const data =
+        await fetchPaymentMethods();
+
+      setMethods(data);
+
     } catch (err: any) {
-      setError(err.message);
+
+      setError(
+        err.message ||
+        "Error loading payment methods"
+      );
+
     } finally {
+
       setLoading(false);
     }
   };
 
-  // 💳 PAGAR SUSCRIPCIÓN
-  const pay = async (method: "cash" | "transfer" | "moncash") => {
+  useEffect(() => {
+    loadMethods();
+  }, []);
+
+  return {
+    methods,
+    loading,
+    error,
+    reload: loadMethods,
+  };
+};
+
+// ============================================================================
+// GET PAYMENT METHOD
+// ============================================================================
+
+export const usePaymentMethod = (
+  id?: string
+) => {
+
+  const [method, setMethod] =
+    useState<PaymentMethod | null>(null);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const loadMethod = async () => {
+
+    if (!id) return;
+
     try {
+
       setLoading(true);
-      const res = await paySubscription(method);
 
-      // 🔄 limpiar QR si pagó
-      setQR(null);
+      const data =
+        await fetchPaymentMethodById(id);
 
-      return res;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+      setMethod(data);
+
     } finally {
+
       setLoading(false);
     }
   };
 
-  // 📊 ESTADO SUSCRIPCIÓN
-  const loadSubscription = async () => {
+  useEffect(() => {
+    loadMethod();
+  }, [id]);
+
+  return {
+    method,
+    loading,
+    reload: loadMethod,
+  };
+};
+
+// ============================================================================
+// CREATE PAYMENT METHOD
+// ============================================================================
+
+export const useCreatePaymentMethod = () => {
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const handleCreate = async (
+    data: {
+      name: string;
+      type: "cash" | "card" | "transfer";
+      isActive?: boolean;
+    }
+  ) => {
+
     try {
+
       setLoading(true);
-      const data = await getSubscriptionStatus();
-      setSubscription(data);
-    } catch (err: any) {
-      setError(err.message);
+
+      return await createPaymentMethodAction(
+        data
+      );
+
     } finally {
+
       setLoading(false);
     }
   };
 
   return {
+    handleCreate,
     loading,
-    error,
+  };
+};
+
+// ============================================================================
+// UPDATE PAYMENT METHOD
+// ============================================================================
+
+export const useUpdatePaymentMethod = () => {
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const handleUpdate = async (
+    id: string,
+    data: Partial<PaymentMethod>
+  ) => {
+
+    try {
+
+      setLoading(true);
+
+      return await updatePaymentMethodAction(
+        id,
+        data
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  return {
+    handleUpdate,
+    loading,
+  };
+};
+
+// ============================================================================
+// DELETE PAYMENT METHOD
+// ============================================================================
+
+export const useDeletePaymentMethod = () => {
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const handleDelete = async (
+    id: string
+  ) => {
+
+    try {
+
+      setLoading(true);
+
+      return await deletePaymentMethodAction(
+        id
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  return {
+    handleDelete,
+    loading,
+  };
+};
+
+// ============================================================================
+// SUBSCRIPTION PAYMENT
+// ============================================================================
+
+export const useSubscriptionPayment = () => {
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [qr, setQr] =
+    useState<string | null>(null);
+
+  // 🔥 GENERATE QR
+  const generateQR = async () => {
+
+    try {
+
+      setLoading(true);
+
+      const res =
+        await createSubscriptionPaymentAction();
+
+      setQr(res.qr); // Corregido: res es directamente el objeto de datos, no res.data
+
+      return res;
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  // 💳 CONFIRM PAYMENT
+  const confirmPayment = async (
+    paymentMethod: string
+  ) => {
+
+    try {
+
+      setLoading(true);
+
+      return await paySubscriptionAction(
+        paymentMethod
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  return {
     qr,
-    subscription,
+    loading,
     generateQR,
-    pay,
-    loadSubscription
+    confirmPayment,
   };
 };

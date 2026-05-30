@@ -1,40 +1,40 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSearchContext } from "../../context/GlobalSearchContext";
+import { useGlobalSearch } from "../../hooks/useGlobalSearch";
+import type { SearchGroup } from "../../types/search";
 
 type NavbarProps = {
   title?: string;
   onToggleSidebar?: () => void;
-  userName?: string;
+  Name?: string;
 };
 
 const Navbar: React.FC<NavbarProps> = ({
   title = "Dashboard",
   onToggleSidebar,
-  userName = "Admin",
+  Name = "Admin",
 }) => {
-  const location = useLocation();
+  const navigate = useNavigate();
+  const { query, setQuery, results, isOpen, setIsOpen } = useSearchContext();
+  useGlobalSearch();
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  // ==========================================================================
-  // DYNAMIC PAGE TITLE
-  // ==========================================================================
-
-  const getPageLabel = () => {
-    const path = location.pathname;
-
-    if (path.includes("/sales")) return "Ventas";
-    if (path.includes("/products")) return "Productos";
-    if (path.includes("/customers")) return "Clientes";
-    if (path.includes("/stock")) return "Inventario";
-    if (path.includes("/users")) return "Usuarios";
-    if (path.includes("/reports")) return "Reportes";
-
-    return title;
-  };
+  // Cerrar el buscador si se hace click fuera del componente
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setIsOpen]);
 
   return (
     <header
       className="
-        sticky top-0 z-50
+        sticky top-0 z-30
         flex items-center justify-between
         px-4 md:px-6 py-3
         border-b border-outline-variant/60
@@ -109,12 +109,8 @@ const Navbar: React.FC<NavbarProps> = ({
 
               <div>
                 <h1 className="font-semibold text-on-surface truncate">
-                  {getPageLabel()}
+                  {title}
                 </h1>
-
-                <p className="text-[11px] text-on-surface-variant">
-                  HAITIBIZ ERP Platform
-                </p>
               </div>
             </Link>
           </div>
@@ -155,27 +151,79 @@ const Navbar: React.FC<NavbarProps> = ({
       {/* RIGHT */}
       {/* ================================================================== */}
 
-      <div className="flex items-center gap-3 md:gap-4">
+      <div className="flex items-center gap-3 md:gap-4" ref={searchRef}>
 
         {/* SEARCH */}
-        <div className="hidden lg:flex items-center gap-2">
-          <span className="text-on-surface-variant text-sm">
+        <div className="hidden lg:block relative">
+          <span className="text-on-surface-variant text-sm absolute left-3 top-1/2 -translate-y-1/2">
             🔎
           </span>
 
           <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => query.length >= 2 && setIsOpen(true)}
             placeholder="Buscar ventas, productos…"
             className="
               h-10 w-[260px]
               rounded-xl
               bg-surface-container
               border border-outline-variant/60
-              px-3
+              pl-9 pr-3
               text-sm text-on-surface
               outline-none
               focus:border-primary/60
+              transition-all
             "
           />
+
+          {/* DROPDOWN DE RESULTADOS */}
+          {isOpen && results.length > 0 && (
+            <div className="
+              absolute top-full mt-2 w-[350px] max-h-[400px] 
+              bg-gray-950 border border-white/10 rounded-2xl 
+              shadow-2xl overflow-y-auto z-50 p-2
+              animate-in fade-in slide-in-from-top-2 duration-200
+            ">
+              {results.map((group: SearchGroup) => (
+                <div key={group.category} className="mb-2">
+                  <div className="px-3 py-1 text-[10px] uppercase tracking-widest text-muted font-bold">
+                    {group.label}
+                  </div>
+                  {group.items.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setQuery('');
+                        navigate(item.url);
+                      }}
+                      className="
+                        w-full flex items-center justify-between
+                        px-3 py-2 rounded-xl
+                        hover:bg-white/5 transition-colors
+                        group text-left
+                      "
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-white truncate">
+                          {item.title}
+                        </div>
+                        <div className="text-xs text-on-surface-variant truncate">
+                          {item.subtitle}
+                        </div>
+                      </div>
+                      {item.badge && (
+                        <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* NOTIFICATIONS */}
@@ -213,7 +261,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="text-sm font-medium text-on-surface">
-              {userName}
+              {Name}
             </div>
           </div>
 
@@ -228,7 +276,7 @@ const Navbar: React.FC<NavbarProps> = ({
               border border-outline-variant/60
             "
           >
-            {userName.charAt(0).toUpperCase()}
+            {Name.charAt(0).toUpperCase()}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Request } from "express";
 
-export type UserRole = "employee" | "admin" | "superadmin";
+export type UserRole = "employee" | "admin" | "superadmin" | "manager";
 
 export interface DBUser {
   _id: string;

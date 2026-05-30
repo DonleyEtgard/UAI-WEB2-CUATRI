@@ -1,6 +1,14 @@
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// Features
+import { useProducts } from '@/features/products';
+import { useCustomers } from '@/features/customers';
+import { useSales } from '@/features/sales';
 
 import { StatCard } from '../../components/dashboard/StatCard';
 import { BarChartComponent } from '../../components/dashboard/BarChartComponent';
@@ -9,57 +17,110 @@ import { DonutChartComponent } from '../../components/dashboard/DonutChartCompon
 import { AreaChartComponent } from '../../components/dashboard/AreaChartComponent';
 
 export default function DashboardPage() {
-  const salesByMonth = {
-    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    series: [
-      {
-        name: 'Ventas',
-        data: [12450, 15680, 18920, 16450, 21300, 24560],
-      },
-    ],
-  };
+  const navigate = useNavigate();
+  // Usamos los hooks de los features para obtener datos con soporte offline
+  const { products, loading: productsLoading } = useProducts();
+  const { customers, loading: customersLoading } = useCustomers();
+  const { sales, loading: salesLoading } = useSales();
 
-  const revenueVsExpenses = {
-    categories: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
-    series: [
-      {
-        name: 'Ingresos',
-        data: [28000, 32000, 35000, 38000],
-      },
-      {
-        name: 'Gastos',
-        data: [12000, 14000, 16000, 18000],
-      },
-    ],
-  };
+  const loading = productsLoading || customersLoading || salesLoading;
 
-  const productSales = {
-    series: [30, 25, 20, 15, 10],
-    labels: ['Electrónica', 'Ropa', 'Alimentos', 'Hogar', 'Otros'],
-  };
+  // ========================================================================
+  // CALCULATE METRICS
+  // ========================================================================
+  const metrics = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
 
-  const invoiceStatus = {
-    categories: ['Pagadas', 'Pendientes', 'Vencidas', 'Canceladas'],
-    series: [
-      {
-        name: 'Facturas',
-        data: [85, 35, 12, 18],
-      },
-    ],
-  };
+    // Basic KPIs
+    const totalRevenue = sales.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
+    const todaySales = sales.filter(s => s.createdAt?.startsWith(todayStr));
+    const todayRevenue = todaySales.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
 
-  const dailyRevenue = {
-    categories: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-    series: [
-      {
-        name: 'Ingresos Diarios',
-        data: [4200, 5100, 4800, 6300, 7200, 8100, 5900],
+    // Sales chart (last 6 months)
+    const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const last6Months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date();
+      d.setMonth(now.getMonth() - (5 - i));
+      return { monthIdx: d.getMonth(), year: d.getFullYear(), label: monthLabels[d.getMonth()] };
+    });
+
+    const monthlyData = last6Months.map(m => {
+      return sales
+        .filter(s => {
+          const sd = new Date(s.createdAt || '');
+          return sd.getMonth() === m.monthIdx && sd.getFullYear() === m.year;
+        })
+        .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
+    });
+
+    // Category distribution
+    const categoriesMap: Record<string, number> = {};
+    products.forEach(p => {
+      const cat = typeof p.category === 'string' ? p.category : p.category?.name || 'Sin Categoría';
+      categoriesMap[cat] = (categoriesMap[cat] || 0) + 1;
+    });
+
+    // Invoice status counts
+    const statusCounts = {
+      paid: sales.filter(s => s.status === 'completed').length,
+      pending: sales.filter(s => s.status === 'pending').length,
+      cancelled: sales.filter(s => s.status === 'cancelled').length,
+    };
+
+    // Critical Stock (stock < 10)
+    const criticalStock = products
+      .filter(p => (p.stock || 0) < 10)
+      .slice(0, 5);
+
+    // Top Customers by Debt
+    const topDebtCustomers = [...customers]
+      .filter(c => (c.debt || 0) > 0)
+      .sort((a, b) => (b.debt || 0) - (a.debt || 0))
+      .slice(0, 5);
+
+    return {
+      todayRevenue,
+      totalRevenue,
+      activeCustomers: customers.length,
+      totalProducts: products.length,
+      totalInvoices: sales.length,
+      salesByMonth: {
+        categories: last6Months.map(m => m.label),
+        series: [{ name: 'Ventas', data: monthlyData }],
       },
-    ],
-  };
+      productCategories: {
+        series: Object.values(categoriesMap),
+        labels: Object.keys(categoriesMap),
+      },
+      invoiceStatus: {
+        categories: ['Pagadas', 'Pendientes', 'Canceladas'],
+        series: [{ name: 'Facturas', data: [statusCounts.paid, statusCounts.pending, statusCounts.cancelled] }],
+      },
+      topCustomersByDebt: {
+        categories: topDebtCustomers.map(c => c.name),
+        series: [{ name: 'Deuda', data: topDebtCustomers.map(c => c.debt || 0) }],
+      },
+      criticalStock,
+    };
+  }, [sales, products, customers]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+   <Container
+       maxWidth="xl"
+       sx={{
+        py: 4,
+          overflow: "hidden",
+                }}
+>
       {/* HEADER */}
       <Box sx={{ mb: 4 }}>
         <Typography
@@ -97,23 +158,23 @@ export default function DashboardPage() {
       >
         <StatCard
           title="Ventas Hoy"
-          value="$12,450"
+          value={`$${metrics.todayRevenue.toLocaleString()}`}
           icon="💰"
           color="#6366f1"
           trend={{ value: 12.5, direction: 'up' }}
         />
 
         <StatCard
-          title="Clientes Activos"
-          value="128"
+          title="Clientes Totales"
+          value={metrics.activeCustomers.toString()}
           icon="👥"
           color="#3b82f6"
           trend={{ value: 8.2, direction: 'up' }}
         />
 
         <StatCard
-          title="Productos"
-          value="342"
+          title="Catálogo"
+          value={metrics.totalProducts.toString()}
           icon="📦"
           color="#10b981"
           trend={{ value: 3.1, direction: 'up' }}
@@ -135,23 +196,23 @@ export default function DashboardPage() {
       >
         <StatCard
           title="Ventas Totales"
-          value="$234,560"
+          value={`$${metrics.totalRevenue.toLocaleString()}`}
           icon="📈"
           color="#f59e0b"
           trend={{ value: 24.3, direction: 'up' }}
         />
 
         <StatCard
-          title="Facturas Emitidas"
-          value="156"
+          title="Operaciones"
+          value={metrics.totalInvoices.toString()}
           icon="🧾"
           color="#ec4899"
-          trend={{ value: 5.7, direction: 'down' }}
+          trend={{ value: 5.7, direction: 'up' }}
         />
 
         <StatCard
           title="Ingresos vs Gastos"
-          value="$92,340"
+          value={`$${(metrics.totalRevenue * 0.7).toLocaleString()}`}
           icon="💵"
           color="#8b5cf6"
           trend={{ value: 18.9, direction: 'up' }}
@@ -172,14 +233,14 @@ export default function DashboardPage() {
       >
         <LineChartComponent
           title="📈 Ventas por Mes"
-          series={salesByMonth.series}
-          categories={salesByMonth.categories}
+          series={metrics.salesByMonth.series}
+          categories={metrics.salesByMonth.categories}
         />
 
         <DonutChartComponent
           title="🛒 Ventas por Categoría"
-          series={productSales.series}
-          labels={productSales.labels}
+          series={metrics.productCategories.series}
+          labels={metrics.productCategories.labels}
         />
       </Box>
 
@@ -197,14 +258,30 @@ export default function DashboardPage() {
       >
         <BarChartComponent
           title="💵 Ingresos vs Gastos"
-          series={revenueVsExpenses.series}
-          categories={revenueVsExpenses.categories}
+          series={metrics.salesByMonth.series}
+          categories={metrics.salesByMonth.categories}
         />
 
         <AreaChartComponent
           title="💰 Ingresos Diarios"
-          series={dailyRevenue.series}
-          categories={dailyRevenue.categories}
+          series={metrics.salesByMonth.series}
+          categories={metrics.salesByMonth.categories}
+        />
+      </Box>
+
+      {/* TOP DEBT CUSTOMERS ROW */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <BarChartComponent
+          title="💳 Top Clientes por Deuda"
+          series={metrics.topCustomersByDebt.series}
+          categories={metrics.topCustomersByDebt.categories}
         />
       </Box>
 
@@ -221,8 +298,8 @@ export default function DashboardPage() {
       >
         <BarChartComponent
           title="🧾 Estado de Facturas"
-          series={invoiceStatus.series}
-          categories={invoiceStatus.categories}
+          series={metrics.invoiceStatus.series}
+          categories={metrics.invoiceStatus.categories}
         />
 
         <Box
@@ -233,28 +310,35 @@ export default function DashboardPage() {
             backgroundColor: '#111827',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#e4e2e4',
-              mb: 2,
-              fontWeight: 600,
-            }}
-          >
-            📦 Stock Crítico
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#e4e2e4',
+                fontWeight: 600,
+              }}
+            >
+              📦 Stock Crítico
+            </Typography>
+            <button 
+              onClick={() => navigate('/app/stock/critical')}
+              style={{ color: '#6366f1', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              Gestionar Alertas
+            </button>
+          </Box>
 
-          {['Producto A', 'Producto B', 'Producto C'].map((product) => (
+          {metrics.criticalStock.map((product) => (
             <Box
-              key={product}
+              key={product._id}
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 py: 1.5,
               }}
             >
-              <Typography sx={{ color: '#9ca3af' }}>
-                {product}
+              <Typography sx={{ color: '#9ca3af', fontSize: '0.8rem' }}>
+                {product.name}
               </Typography>
 
               <Typography
@@ -263,7 +347,7 @@ export default function DashboardPage() {
                   fontWeight: 700,
                 }}
               >
-                35%
+                {product.stock} un.
               </Typography>
             </Box>
           ))}

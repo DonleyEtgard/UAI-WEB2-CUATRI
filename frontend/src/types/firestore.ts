@@ -1,37 +1,54 @@
 export type UserRole = "superadmin" | "admin" | "employee";
+export type Currency = "ARS" | "USD" | "EUR";
 
 export interface AppUser {
-  uid: string;
+  _id: string;
+  firebaseUid: string;
   email: string;
-  displayName?: string;
+  name: string;
+  lastName?: string;
   role: UserRole;
-  organizationId: string;
-  isActive: boolean;
+  organizationId?: string;
+  createdBy?: string;
   plan?: "free" | "basic" | "active" | "suspended";
+  subscriptionStart?: string;
+  subscriptionEnd?: string;
+  address?: {
+    street?: string;
+    number?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    postalCode?: string;
+  };
+  isActive: boolean;
+  isVerified: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface Product {
-  id: string;
-  organizationId: string;
+  _id: string;
   name: string;
   sku?: string;
   description?: string;
   category?: string;
+  organizationId: string;
+  createdBy: string;
   price: number;
   cost?: number;
   stock: number;
-  active: boolean;
-  metadata?: Record<string, unknown>;
+  currency?: Currency;
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface Customer {
-  id: string;
-  organizationId: string;
+  _id: string;
   name: string;
+  organizationId: string;
+  createdBy: string;
   email?: string;
   phone?: string;
   address?: {
@@ -42,47 +59,53 @@ export interface Customer {
     country?: string;
     postalCode?: string;
   };
-  metadata?: Record<string, unknown>;
+  debt?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface SaleItem {
-  id: string;
-  saleId: string;
-  productId: string;
+  _id: string;
+  sale: string;
+  product: string;
   productName?: string;
   quantity: number;
   price: number;
-  total: number;
+  organizationId: string;
+  createdBy: string;
+  subtotal: number;
 }
 
 export interface Sale {
-  id: string;
-  organizationId: string;
-  customerId: string;
-  createdBy: string;
-  status: "pending" | "completed" | "cancelled";
+  _id: string;
+  customer?: string;
+  user: string;
+  status: "pending" | "paid" | "cancelled";
   total: number;
-  items?: SaleItem[];
+  organizationId: string;
+  createdBy: string;
+  amountPaid?: number;
+  change?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface StockMovement {
-  id: string;
-  organizationId: string;
-  productId: string;
-  changedBy: string;
+  _id: string;
+  product: string;
+  type: "in" | "out";
   quantity: number;
-  reason: "sale" | "inventory" | "adjustment" | "return";
-  note?: string;
+  user: string;
+  reason: string;
+  organizationId: string;
+  createdBy: string;
+  sale?: string;
+  stockAfter: number;
   createdAt?: string;
 }
 
 export interface Report {
-  id: string;
-  organizationId: string;
+  _id: string;
   type: "sales" | "inventory" | "users" | "custom";
   generatedBy: string;
   period: string;

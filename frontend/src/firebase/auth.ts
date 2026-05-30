@@ -1,4 +1,4 @@
-﻿// ============================================================================
+﻿﻿﻿﻿// ============================================================================
 // FIREBASE AUTH FUNCTIONS - Professional Authentication
 // ============================================================================
 
@@ -9,6 +9,8 @@ import {
   signInWithEmailAndPassword,
   type User as FirebaseUser,
   getIdToken,
+  sendEmailVerification,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 import { auth } from "./config";
@@ -43,6 +45,30 @@ export const registerUser = async (email: string, password: string) => {
       password
     );
     return credential;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Send email verification to current user
+ * @param user - Firebase User
+ */
+export const sendEmailVerificationEmail = async (user: FirebaseUser) => {
+  try {
+    await sendEmailVerification(user);
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Send password reset email
+ * @param email - User email
+ */
+export const forgotPassword = async (email: string) => {
+  try {
+    await sendPasswordResetEmail(requireAuth(), email);
   } catch (error) {
     throw error;
   }

@@ -77,6 +77,7 @@ export const AreaChartComponent = ({ title, series, categories }: AreaChartProps
         boxShadow: 'none',
       }}
     >
+      
       <Typography
         variant="h6"
         sx={{

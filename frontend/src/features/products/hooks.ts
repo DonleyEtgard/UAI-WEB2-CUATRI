@@ -1,131 +1,179 @@
-import { useEffect, useState } from "react";
+import { 
+  useEffect, 
+  useState, 
+  useCallback 
+} from "react";
 import {
-  getProducts,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  updateStock,
-  getProductStats
+  fetchProducts,
+  fetchProductById,
+  createProductAction,
+  updateProductAction,
+  deleteProductAction,
+  updateStockAction,
+  fetchProductStats,
 } from "./api";
+import type { Product, ProductStats } from "./types";
 
-type Product = {
-  _id: string;
-  name: string;
-  price: number;
-  cost: number;
-  stock: number;
-  description?: string;
-  category?: string;
-  isActive: boolean;
-};
-
+// ============================================================================
+// HOOK: useProducts
+// ============================================================================
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const [stats, setStats] = useState<any>(null);
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔄 CARGAR PRODUCTOS
-  const loadProducts = async () => {
+  const reload = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      const data = await getProducts();
+      const data = await fetchProducts();
       setProducts(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Error loading products.");
     } finally {
       setLoading(false);
     }
-  };
-
-  // 🔥 CREAR
-  const addProduct = async (data: Omit<Product, "_id" | "isActive">) => {
-    try {
-      setLoading(true);
-      await createProduct(data);
-      await loadProducts();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✏️ EDITAR
-  const editProduct = async (id: string, data: Partial<Product>) => {
-    try {
-      setLoading(true);
-      await updateProduct(id, data);
-      await loadProducts();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ❌ ELIMINAR (soft delete)
-  const removeProduct = async (id: string) => {
-    try {
-      setLoading(true);
-      await deleteProduct(id);
-      await loadProducts();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 📦 ACTUALIZAR STOCK
-  const changeStock = async (id: string, quantity: number) => {
-    try {
-      setLoading(true);
-      await updateStock(id, quantity);
-      await loadProducts();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 📊 STATS
-  const loadStats = async (id: string) => {
-    try {
-      setLoading(true);
-      const data = await getProductStats(id);
-      setStats(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔁 INIT
-  useEffect(() => {
-    loadProducts();
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   return {
     products,
-    selectedProduct,
-    setSelectedProduct,
-
-    stats,
-
     loading,
     error,
-
-    loadProducts,
-    addProduct,
-    editProduct,
-    removeProduct,
-    changeStock,
-    loadStats
+    reload,
   };
+};
+
+// ============================================================================
+// HOOK: useProduct
+// ============================================================================
+export const useProduct = (id?: string) => {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const reload = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchProductById(id);
+      setProduct(data);
+    } catch (err: any) {
+      setError(err.message || "Error loading product.");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  return {
+    product,
+    loading,
+    error,
+    reload,
+  };
+};
+
+// ============================================================================
+// HOOK: useCreateProduct
+// ============================================================================
+export const useCreateProduct = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleCreate = async (data: Omit<Product, "_id" | "isActive">) => {
+    try {
+      setLoading(true);
+      return await createProductAction(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleCreate, loading };
+};
+
+// ============================================================================
+// HOOK: useUpdateProduct
+// ============================================================================
+export const useUpdateProduct = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleUpdate = async (id: string, data: Partial<Product>) => {
+    try {
+      setLoading(true);
+      return await updateProductAction(id, data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleUpdate, loading };
+};
+
+// ============================================================================
+// HOOK: useDeleteProduct
+// ============================================================================
+export const useDeleteProduct = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleDelete = async (id: string) => {
+    try {
+      setLoading(true);
+      return await deleteProductAction(id);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleDelete, loading };
+};
+
+// ============================================================================
+// HOOK: useUpdateStock
+// ============================================================================
+export const useUpdateStock = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleUpdateStock = async (id: string, quantity: number) => {
+    try {
+      setLoading(true);
+      return await updateStockAction(id, quantity);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleUpdateStock, loading };
+};
+
+// ============================================================================
+// HOOK: useProductStats
+// ============================================================================
+export const useProductStats = (id?: string) => {
+  const [stats, setStats] = useState<ProductStats | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const reload = useCallback(async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const data = await fetchProductStats(id);
+      setStats(data);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  return { stats, loading, reload };
 };

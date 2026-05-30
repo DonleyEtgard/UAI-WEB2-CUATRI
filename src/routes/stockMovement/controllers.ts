@@ -4,6 +4,137 @@ import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
 
 
+// 📌 Crear producto
+export const createProduct = async (req: Request, res: Response) => {
+  try {
+    const {
+      name,
+      price,
+      stock,
+      category,
+      user
+    } = req.body;
+
+    const product = await Product.create({
+      name,
+      price,
+      stock,
+      category,
+      active: true
+    });
+
+    // ✅ Registrar movimiento inicial
+    if (stock > 0) {
+      await StockMovement.create({
+        product: product._id,
+        type: "in",
+        quantity: stock,
+        user,
+        reason: "initial_stock",
+        stockAfter: stock
+      });
+    }
+
+    res.status(201).json(product);
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error creating product",
+      error: error.message
+    });
+  }
+};
+// 📌 Actualizar producto
+export const updateProduct = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true
+      }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    res.json(updatedProduct);
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+// 📌 Actualizar stock manualmente
+export const updateProductStock = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      quantity,
+      type,
+      user,
+      reason
+    } = req.body;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    let newStock = product.stock;
+
+    if (type === "in") {
+      newStock += quantity;
+    }
+
+    if (type === "out") {
+      if (product.stock < quantity) {
+        return res.status(400).json({
+          message: "Not enough stock"
+        });
+      }
+
+      newStock -= quantity;
+    }
+
+    product.stock = newStock;
+
+    await product.save();
+
+    // ✅ Registrar movimiento
+    await StockMovement.create({
+      product: product._id,
+      type,
+      quantity,
+      user,
+      reason,
+      stockAfter: newStock
+    });
+
+    res.json(product);
+
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 // 📌 Crear movimiento manual de stock
 export const createStockMovement = async (req: Request, res: Response) => {
   try {
@@ -142,7 +273,6 @@ export const getStockSummary = async (_req: Request, res: Response) => {
 // ======================================================
 // 🧠 INTEGRACIÓN CON VENTAS (LO IMPORTANTE)
 // ======================================================
-
 // 🔥 Registrar salida de stock cuando se vende
 export const registerSaleMovement = async (
   saleId: string,
@@ -152,13 +282,10 @@ export const registerSaleMovement = async (
 
   for (const item of items) {
     const product = await Product.findById(item.product);
+
     if (!product) continue;
 
-    const newStock = product.stock - item.quantity;
-
-    product.stock = newStock;
-    await product.save();
-
+    // ✅ SOLO REGISTRAR MOVIMIENTO
     await StockMovement.create({
       product: product._id,
       type: "out",
@@ -166,12 +293,10 @@ export const registerSaleMovement = async (
       user,
       reason: "sale",
       sale: saleId,
-      stockAfter: newStock
+      stockAfter: product.stock
     });
   }
 };
-
-
 
 // 🔥 Registrar devolución de stock cuando se cancela venta
 export const registerCancelMovement = async (

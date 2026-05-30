@@ -1,7 +1,5 @@
 export interface Customer {
-  
-  
-  id?: string;
+  _id?: string; // 🔥 MongoDB standard
 
   personalInfo: PersonalInfo;
 
@@ -10,10 +8,10 @@ export interface Customer {
   address?: Address;
 
   // 💰 deuda actual
-  debt?: number;
+  debt: number;
 
   // 📅 historial de pagos
-  payments?: Payment[];
+  payments: Payment[];
 
   createdAt?: string;
   updatedAt?: string;
@@ -25,19 +23,29 @@ export interface PersonalInfo {
 }
 
 export interface ContactInfo {
-  email: string;
+  email?: string;
   phone?: string;
 }
 
 export interface Address {
   street?: string;
   city?: string;
+  state?: string;
   country?: string;
   postalCode?: string;
 }
 
-// 💳 pagos
+// 💳 pagos reales (mejorado)
 export interface Payment {
+  _id?: string;
+
   amount: number;
+
   date: string;
+
+  method?: "cash" | "card" | "transfer";
+
+  saleId?: string; // 🔥 link con ventas
+
+  createdBy?: string; // usuario que registró pago
 }

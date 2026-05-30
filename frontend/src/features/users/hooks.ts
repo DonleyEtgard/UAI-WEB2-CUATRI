@@ -1,43 +1,108 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { useState, useEffect, useCallback } from "react";
+import { 
+  fetchMe, 
+  fetchUsers, 
+  fetchUserById, 
+  updateUserAction, 
+  createEmployeeAction 
+} from "./api";
+import type { User, UpdateUserData, CreateEmployeeData } from "./types";
 
-export interface CounterState {
-  value: number
-  step: number
-}
+// ==========================
+// HOOK: useMe (Perfil actual)
+// ==========================
+export const useMe = () => {
+  const [me, setMe] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const initialState: CounterState = {
-  value: 0,
-  step: 1,
-}
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchMe();
+      setMe(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-export const counterSlice = createSlice({
-  name: 'counter',
-  initialState,
-  reducers: {
-    increment: (state) => {
-      // Podemos "mutar" el estado de forma segura
-      state.value += state.step
-    },
-    decrement: (state) => {
-      state.value -= state.step
-    },
-    incrementByAmount: (state, action: PayloadAction<number>) => {
-      state.value += action.payload
-    },
-    reset: (state) => {
-      state.value = initialState.value
-    },
-    setStep: (state, action: PayloadAction<number>) => {
-      state.step = action.payload
-    },
-  },
-})
+  useEffect(() => { reload(); }, [reload]);
 
-export const { increment, decrement, incrementByAmount, reset, setStep } = counterSlice.actions
+  return { me, loading, error, reload };
+};
 
-// Selectores: funciones para extraer datos del estado
-export const selectCount = (state: { counter: CounterState }) => state.counter.value
-export const selectStep = (state: { counter: CounterState }) => state.counter.step
+// ==========================
+// HOOK: useUsers (Listado)
+// ==========================
+export const useUsers = (page = 1, limit = 10) => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
 
-// Exportar el reducer para agregarlo al store
-export default counterSlice.reducer
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUsers(page, limit);
+      setUsers(data.users || []);
+      setTotal(data.total || 0);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, limit]);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  return { users, total, loading, reload };
+};
+
+// ==========================
+// HOOK: useUser (Individual)
+// ==========================
+export const useUser = (id?: string) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const reload = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const data = await fetchUserById(id);
+      setUser(data);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  return { user, loading, reload };
+};
+
+// ==========================
+// HOOK: useUserActions
+// ==========================
+export const useUserActions = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleUpdate = async (id: string, data: UpdateUserData) => {
+    setLoading(true);
+    try {
+      return await updateUserAction(id, data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateEmployee = async (data: CreateEmployeeData) => {
+    setLoading(true);
+    try {
+      return await createEmployeeAction(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { handleUpdate, handleCreateEmployee, loading };
+};
