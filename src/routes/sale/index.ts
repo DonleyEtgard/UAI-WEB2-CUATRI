@@ -4,6 +4,7 @@ import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 
 import {
   createSale,
+  getSales,
   updateSaleStatus,
   getDailySales,
   getMonthlySales,
@@ -11,6 +12,7 @@ import {
   getSaleItems,
   getItemsBySale,
   getSaleItemById,
+  getSummary,
   deleteSaleItem
 } from "./controllers";
 
@@ -56,6 +58,11 @@ router.get(
   getTicket
 );
 
+router.get(
+  "/summary",
+  authenticateFirebase,
+  getSummary
+);
 
 // ======================================================
 // 📲 SHARE TICKET
@@ -90,7 +97,6 @@ router.patch(
   updateSaleStatus
 );
 
-
 // ======================================================
 // 📦 ITEMS
 // ======================================================
@@ -99,6 +105,12 @@ router.get(
   "/items",
   authenticateFirebase,
   getSaleItems
+);
+
+router.get(
+  "/",
+  authenticateFirebase,
+  getSales
 );
 
 router.get(

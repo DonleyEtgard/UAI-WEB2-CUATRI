@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
-import { getSaleItems } from "./api"; // 🔥 ajusta ruta si hace falta
+import { fetchSaleItems, type SaleItem } from "./api"; // 🔥 ajusta ruta si hace falta
 
-type SaleItem = {
+/**
+ * We extend the base SaleItem because the statistics logic requires
+ * DB-specific fields (_id, createdAt) and calculated fields (subtotal)
+ * that might not be present in the base interface.
+ */
+type SalesStatsItem = SaleItem & {
   _id: string;
-  quantity: number;
   subtotal: number;
   createdAt: string;
 };
 
 const SalesStats = () => {
-  const [items, setItems] = useState<SaleItem[]>([]);
+  const [items, setItems] = useState<SalesStatsItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 📦 cargar items
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await getSaleItems();
-      setItems(data);
+      const data = await fetchSaleItems();
+      setItems(data as SalesStatsItem[]);
     } catch (err) {
       console.error(err);
     } finally {

@@ -11,7 +11,7 @@ const UserDetailPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await API.get(`/users/${id}`);
+       const res = await API.get(`/users/${id}`);
         setUser(res.data);
       } catch (err) {
         console.error(err);

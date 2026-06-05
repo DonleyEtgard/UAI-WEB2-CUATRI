@@ -27,10 +27,10 @@ const UserTable = () => {
   }, []);
 
   // 🔄 activar / desactivar
-  const handleToggle = async (id: string) => {
+  const handleToggle = async (id: string, isActive: boolean) => {
     try {
       setActionLoading(id);
-      await toggleUserStatus(id);
+      await toggleUserStatus(id, isActive);
       await loadUsers();
     } catch (err: any) {
       alert(err.message);
@@ -116,7 +116,7 @@ const UserTable = () => {
                 {/* ACTION */}
                 <td className="p-3">
                   <button
-                    onClick={() => handleToggle(user._id)}
+                    onClick={() => handleToggle(user._id, user.isActive)}
                     disabled={actionLoading === user._id}
                     className={`px-3 py-1 rounded text-white text-xs transition ${
                       user.isActive

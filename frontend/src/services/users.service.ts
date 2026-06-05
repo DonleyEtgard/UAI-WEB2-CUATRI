@@ -75,6 +75,13 @@ export const createEmployee = async (data: CreateEmployeeData) => {
   return await requestOrQueue("POST", "/users/employees", data);
 };
 
+export const deleteUser = async (id: string) => {
+  return await requestOrQueue(
+    "DELETE",
+    `/users/${id}`
+  );
+};
+
 // ==========================
 // PAYMENTS
 // ==========================

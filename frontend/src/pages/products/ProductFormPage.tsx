@@ -1,206 +1,147 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import {
-  createProduct,
-  updateProduct,
-  getProductById
-} from "../../services/products.service";
-import type { AppUser, Currency } from "../../types/firestore";
-
-const emptyProduct: {
-  name: string;
-  description: string;
-  price: number;
-  cost: number;
-  stock: number;
-  currency: Currency;
-  category: string;
-} = {
-  name: "",
-  description: "",
-  price: 0,
-  cost: 0,
-  stock: 0,
-  currency: "ARS",
-  category: "",
-};
+import API from "../../services/api";
 
 const ProductFormPage = () => {
-  const { user: currentUser } = useAuth() as { user: AppUser | null };
-  const [form, setForm] = useState(emptyProduct);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
-  // ==========================
-  // LOAD PRODUCT (edit mode)
-  // ==========================
+  const [form, setForm] = useState({
+    name: "",
+    sku: "",
+    description: "",
+    price: 0,
+    stock: 0,
+    category: "general",
+    isActive: true,
+  });
+
   useEffect(() => {
     if (!id) return;
-
-    const load = async () => {
-      setLoading(true);
+    const loadProduct = async () => {
       try {
-        const data = await getProductById(id);
-        setForm({
-          name: data.name,
-          description: data.description || "",
-          price: data.price,
-          cost: data.cost || 0,
-          stock: data.stock,
-          currency: (data.currency as Currency) || "ARS",
-          category: (typeof data.category === "string" ? data.category : (data.category as any)?.name) || "",
-        });
+        setFetching(true);
+        const res = await API.get(`/products/${id}`);
+        const p = res.data.data.product;
+        setForm({ ...p });
       } catch (err) {
-        console.error("Error loading product:", err);
+        console.error(err);
+        alert("Error cargando producto");
       } finally {
-        setLoading(false);
+        setFetching(false);
       }
     };
-
-    load();
+    loadProduct();
   }, [id]);
 
-  // ==========================
-  // HANDLE CHANGE
-  // ==========================
-  const handleChange = (
-    field: keyof typeof form,
-    value: string | number
-  ) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // ==========================
-  // SUBMIT (CREATE / UPDATE)
-  // ==========================
-  const validate = () => {
-    if (!form.name || form.price <= 0) {
-      alert("Nombre y precio son obligatorios");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    if (saving || !validate()) return;
-
-    setSaving(true);
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      if (isEdit && id) {
-        await updateProduct(id, form as any);
+      setLoading(true);
+      if (isEdit) {
+        await API.patch(`/products/${id}`, form);
       } else {
-        // Inyectamos los campos de auditoría y organización
-        const newProductData = {
-          ...form,
-          organizationId: currentUser!.organizationId!,
-          createdBy: currentUser!._id,
-        };
-        await createProduct(newProductData as any);
+        await API.post("/products", form);
       }
-
-      navigate("/products");
+      navigate("/app/products");
     } catch (err) {
-      console.error("Error saving product:", err);
-      alert("Error al guardar el producto");
+      console.error(err);
+      alert("Error al guardar producto");
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
-  // ==========================
-  // CANCEL SAFE BUTTON
-  // ==========================
-  const handleCancel = () => {
-    if (saving) return;
-    navigate("/products");
-  };
-
-  if (loading) {
-    return <p>Cargando producto...</p>;
+  if (fetching) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-zinc-500">
+        <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+        <p className="font-medium">Cargando datos del producto...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="container py-8">
-      <h1>{isEdit ? "Editar Producto" : "Nuevo Producto"}</h1>
+    <div className="max-w-3xl mx-auto p-4 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <form onSubmit={handleSubmit} className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
+        <div className="p-6 border-b border-zinc-800 bg-zinc-900/30">
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {isEdit ? "Editar Producto" : "Nuevo Producto"}
+          </h1>
+          <p className="text-sm text-zinc-500 mt-1">Ingresa los detalles técnicos y comerciales del artículo.</p>
+        </div>
 
-      {/* FORM */}
-      <div className="card">
-        <input
-          placeholder="Nombre"
-          value={form.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Nombre del Producto</label>
+              <input
+                required
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white placeholder:text-zinc-600"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Ej. MacBook Pro M3"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">SKU / Código</label>
+              <input
+                required
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white placeholder:text-zinc-600 font-mono"
+                value={form.sku}
+                onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                placeholder="MBP-M3-2024"
+              />
+            </div>
+          </div>
 
-        <input
-          placeholder="Descripción"
-          value={form.description}
-          onChange={(e) =>
-            handleChange("description", e.target.value)
-          }
-        />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Precio (USD)</label>
+              <input
+                type="number"
+                step="0.01"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Stock Inicial</label>
+              <input
+                type="number"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white"
+                value={form.stock}
+                onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Categoría</label>
+              <select
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white appearance-none cursor-pointer"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+              >
+                <option value="general">General</option>
+                <option value="electronics">Electrónica</option>
+                <option value="office">Oficina</option>
+                <option value="services">Servicios</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-        <input
-          type="number"
-          placeholder="Precio"
-          value={form.price}
-          onChange={(e) =>
-            handleChange("price", Number(e.target.value))
-          }
-        />
-
-        <input
-          type="number"
-          placeholder="Costo"
-          value={form.cost}
-          onChange={(e) =>
-            handleChange("cost", Number(e.target.value))
-          }
-        />
-
-        <input
-          type="number"
-          placeholder="Stock"
-          value={form.stock}
-          onChange={(e) =>
-            handleChange("stock", Number(e.target.value))
-          }
-        />
-
-        <select
-          value={form.currency}
-          onChange={(e) =>
-            handleChange("currency", e.target.value)
-          }
-        >
-          <option value="ARS">ARS</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
-
-      {/* BUTTONS */}
-      <div className="flex gap-4">
-        <button onClick={handleCancel} disabled={saving}>
-          Cancelar
-        </button>
-
-        <button onClick={handleSubmit} disabled={saving}>
-          {saving
-            ? "Guardando..."
-            : isEdit
-            ? "Actualizar"
-            : "Crear Producto"}
-        </button>
-      </div>
+        <div className="p-6 bg-zinc-900/30 border-t border-zinc-800 flex justify-end gap-3">
+          <button type="button" onClick={() => navigate("/app/products")} className="px-5 py-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Cancelar</button>
+          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/10 transition-all active:scale-95 flex items-center gap-2">
+            {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>}
+            {loading ? "Guardando..." : isEdit ? "Actualizar Producto" : "Crear Producto"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

@@ -23,20 +23,26 @@ import ProductsPage from "../pages/products/ProductsPage";
 import ProductDetailPage from "../pages/products/ProductDetailPage";
 import SalesPage from "../pages/sales/SalesPage";
 import SaleDetailPage from "../pages/sales/SaleDetailPage";
-import ReportsPage from "../pages/reports/ReportsPage";
 import CustomersPage from "../pages/customers/CustomersPage";
 import CustomerDetail from "../pages/customers/CustomerDetail";
 import CustomerForm from "../pages/customers/CustomerForm";
-import StockPage from "../pages/stock/StockMovement";
+import StockMovement from "../pages/stock/StockMovement";
 import CriticalStockPage from "../pages/stock/CriticalStockPage";
 import UserPage from "../pages/users/UserPage";
-import UserRolePage from "../pages/users/UserRolePage";
 import UserDetailPage from "../pages/users/UserDetailPage";
+import UserRolePage from "../pages/users/UserRolePage";
 import PaymentPage from "../pages/payment/PaymentPage";
+import ReportsPage from "../pages/reports/ReportsPage";
+import SaleFormPage from "../pages/sales/SaleFormPage";
+import POSPage from "../features/sales/POSPage";
+import TicketPage from "../pages/sales/TicketPage";
+
 
 // COMMON
 import NotFound from "../components/common/NotFound";
 import ProductFormPage from "@/pages/products/ProductFormPage";
+import UserForm from "@/pages/users/UserForm";
+import StockMovementForm from "@/pages/stock/StockMovementForm";
 
 // ============================================================================
 // LOADING
@@ -112,15 +118,6 @@ export const AppRouter: React.FC = () => {
           />
 
           <Route
-            path="products/edit/:id"
-            element={
-              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
-                <ProductFormPage />
-              </RoleGuard>
-            }
-          />
-
-          <Route
             path="products/:id"
             element={
               <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
@@ -138,6 +135,8 @@ export const AppRouter: React.FC = () => {
               </RoleGuard>
             }
           />
+           
+          <Route path="pos" element={<POSPage />} />
 
           <Route
             path="sales/:id"
@@ -148,7 +147,38 @@ export const AppRouter: React.FC = () => {
             }
           />
 
+          <Route
+           path="sales/ticket/:id"
+           element={
+           <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+           <TicketPage />
+           </RoleGuard>
+          }
+          />
+
+          <Route
+            path="sales/new"
+            element={
+              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                <SaleFormPage />
+              </RoleGuard>
+            }
+          />
+
+          <Route
+            path="pos"
+            element={
+              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                <POSPage />
+              </RoleGuard>
+            }
+          />
+
           {/* REPORTS */}
+          <Route 
+            path="reports" 
+            element={<Navigate to="/app/reports/sales" replace />} 
+          />
           <Route
             path="reports/sales"
             element={
@@ -183,26 +213,13 @@ export const AppRouter: React.FC = () => {
               </RoleGuard>
             }
           />
-          <Route
-            path="customers/edit/:id"
-            element={
-              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
-                <CustomerForm />
-              </RoleGuard>
-            }
-          />
 
-          <Route
-            path="clients"
-            element={<Navigate to="/app/customers" replace />}
-          />
-
-          {/* STOCK (solo admin + superadmin) */}
+          {/* STOCK (admin + superadmin + employee) */}
           <Route
             path="stock"
             element={
               <RoleGuard requiredRoles={["superadmin", "admin"]}>
-                <StockPage />
+                <StockMovement />
               </RoleGuard>
             }
           />
@@ -210,8 +227,17 @@ export const AppRouter: React.FC = () => {
           <Route
             path="stock/critical"
             element={
-              <RoleGuard requiredRoles={["superadmin", "admin", "manager", "employee"]}>
+              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
                 <CriticalStockPage />
+              </RoleGuard>
+            }
+          />
+
+          <Route
+            path="stock/movement/new"
+            element={
+              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+                <StockMovementForm />
               </RoleGuard>
             }
           />
@@ -225,24 +251,40 @@ export const AppRouter: React.FC = () => {
               </RoleGuard>
             }
           />
+           <Route
+  path="users/:id"
+  element={
+    <RoleGuard requiredRoles={["superadmin", "admin"]}>
+      <UserDetailPage />
+    </RoleGuard>
+  }
+/>
 
+<Route
+  path="users/roles/:id"
+  element={
+    <RoleGuard requiredRoles={["superadmin", "admin"]}>
+      <UserRolePage />
+    </RoleGuard>
+  }
+/>
           <Route
-            path="users/:id"
+            path="users/new"
             element={
               <RoleGuard requiredRoles={["superadmin", "admin"]}>
-                <UserDetailPage />
+                <UserForm />
               </RoleGuard>
             }
           />
 
           <Route
-            path="users/roles"
-            element={
-              <RoleGuard requiredRoles={["superadmin", "admin"]}>
-                <UserRolePage />
-              </RoleGuard>
-            }
-          />
+           path="users/roles/:id"
+           element={
+           <RoleGuard requiredRoles={["superadmin", "admin"]}>
+           <UserRolePage />
+          </RoleGuard>
+           }
+           />
 
           {/* SUBSCRIPTION */}
           <Route
@@ -257,7 +299,7 @@ export const AppRouter: React.FC = () => {
 
         {/* ================= GLOBAL 404 ================= */}
         <Route path="/404" element={<NotFound />} />
-        <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
 
       </Routes>
     </Suspense>

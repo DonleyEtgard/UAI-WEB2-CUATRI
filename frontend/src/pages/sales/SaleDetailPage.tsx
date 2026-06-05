@@ -61,7 +61,7 @@ const SaleDetailPage = () => {
     try {
       setDeleting(true);
       await API.delete(`/sales/${id}`);
-      navigate("/sales");
+      navigate("/app/sales");
     } finally {
       setDeleting(false);
     }
@@ -219,7 +219,7 @@ const SaleDetailPage = () => {
       {/* ACTIONS */}
       {/* ===================== */}
       <div className="flex gap-4 mt-6">
-        <button onClick={() => navigate("/sales")}>
+        <button onClick={() => navigate("/app/sales")}>
           Volver
         </button>
 

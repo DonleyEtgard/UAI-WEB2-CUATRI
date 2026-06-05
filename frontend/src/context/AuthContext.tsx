@@ -116,19 +116,12 @@ export const AuthProvider: React.FC<
           );
 
           setUser(null);
-
           setIsAuthenticated(false);
-
-          localStorage.removeItem(
-            "firebaseToken"
-          );
-
+          localStorage.removeItem("firebaseToken");
           localStorage.removeItem(
             "user"
           );
-
           setIsLoading(false);
-
           return;
         }
 
@@ -201,12 +194,10 @@ export const AuthProvider: React.FC<
               "❌ Mongo user not found"
             );
 
+          localStorage.removeItem("firebaseToken");
             setUser(null);
-
             setIsAuthenticated(false);
-
             setIsLoading(false);
-
             return;
           }
 
@@ -235,10 +226,10 @@ export const AuthProvider: React.FC<
 
           setIsLoading(false);
         } catch (err) {
-          console.error(
-            "❌ AUTH ERROR:",
-            err
-          );
+          // Solo loguear si no es un error de cancelación por requestId
+          if (currentRequest === requestId) {
+            console.error("❌ AUTH ERROR:", err);
+          }
 
           // Ignore old requests
           if (
@@ -292,9 +283,9 @@ export const AuthProvider: React.FC<
       );
 
       const idToken = await getFirebaseIdToken(credential.user);
+      // Guardar token antes de llamar a /me
       localStorage.setItem("firebaseToken", idToken);
 
-      // Fetch Mongo user immediately to resolve the login flow
       const response = await apiClient.get<{
         success: boolean;
         data: { user: DBUser | null };
@@ -311,10 +302,14 @@ export const AuthProvider: React.FC<
 
       setUser(appUser);
       setFirebaseUser(credential.user);
-      setIsAuthenticated(MUST_VERIFY_EMAIL ? (credential.user.emailVerified || mongoUser.role === "superadmin") : true);
+      
+      const isAuth = MUST_VERIFY_EMAIL 
+        ? (credential.user.emailVerified || mongoUser.role === "superadmin") 
+        : true;
+      
+      setIsAuthenticated(isAuth);
       
       localStorage.setItem("user", JSON.stringify(appUser));
-      
     } catch (err: any) {
       console.error(
         "❌ LOGIN ERROR:",
@@ -368,10 +363,8 @@ export const AuthProvider: React.FC<
           credential.user
         );
 
-      localStorage.setItem(
-        "firebaseToken",
-        idToken
-      );
+      // Guardar token antes de registrar en Mongo
+      localStorage.setItem("firebaseToken", idToken);
 
       // ================================================================
       // CREATE USER IN MONGO
@@ -417,11 +410,13 @@ export const AuthProvider: React.FC<
 
       setIsAuthenticated(MUST_VERIFY_EMAIL ? (credential.user.emailVerified || mongoUser.role === "superadmin") : true);
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(appUser)
-      );
+      localStorage.setItem("user", JSON.stringify(appUser));
+
     } catch (err: any) {
+      // Limpiar en caso de fallo en el registro de Mongo
+      localStorage.removeItem("firebaseToken");
+      localStorage.removeItem("user");
+      
       console.error(
         "❌ REGISTER ERROR:",
         err

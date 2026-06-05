@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { createStockMovement } from "../../services/stock.service.ts";
+import { Container, Box, Typography, Card, CardContent, TextField, MenuItem, Button, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 type FormState = {
   product: string;
@@ -12,6 +14,7 @@ type FormState = {
 };
 
 export default function StockMovementForm() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [form, setForm] = useState<FormState>({
     product: "",
@@ -24,7 +27,7 @@ export default function StockMovementForm() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setForm({
       ...form,
@@ -64,49 +67,62 @@ export default function StockMovementForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 500 }}>
-      <h2>Crear Movimiento de Stock</h2>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#0f1115', py: 4 }}>
+      <Container maxWidth="md">
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: '#e4e2e4', mb: 1 }}>
+            📦 Registrar Movimiento
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#9ca3af' }}>
+            Actualiza el inventario registrando entradas o salidas manuales.
+          </Typography>
+        </Box>
 
-      <input
-        name="product"
-        placeholder="Product ID"
-        value={form.product}
-        onChange={handleChange}
-      />
+        <Card sx={{ bgcolor: '#111827', border: '1px solid #2b2d31', borderRadius: 4, overflow: 'hidden' }}>
+          <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+            <form onSubmit={handleSubmit}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box>
+                  <Typography variant="overline" sx={{ color: '#9ca3af', fontWeight: 700, mb: 1, display: 'block' }}>ID del Producto</Typography>
+                  <TextField fullWidth name="product" placeholder="Escriba o pegue el ID del producto" value={form.product} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { color: 'white', bgcolor: '#0f1115', borderRadius: 3 } }} />
+                </Box>
 
-      <select name="type" value={form.type} onChange={handleChange}>
-        <option value="in">Ingreso</option>
-        <option value="out">Salida</option>
-      </select>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+                  <Box>
+                    <Typography variant="overline" sx={{ color: '#9ca3af', fontWeight: 700, mb: 1, display: 'block' }}>Tipo de Operación</Typography>
+                    <TextField select fullWidth name="type" value={form.type} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { color: 'white', bgcolor: '#0f1115', borderRadius: 3 } }}>
+                      <MenuItem value="in">Entrada (+)</MenuItem>
+                      <MenuItem value="out">Salida (-)</MenuItem>
+                    </TextField>
+                  </Box>
+                  <Box>
+                    <Typography variant="overline" sx={{ color: '#9ca3af', fontWeight: 700, mb: 1, display: 'block' }}>Cantidad</Typography>
+                    <TextField fullWidth name="quantity" type="number" value={form.quantity} onChange={handleChange} slotProps={{ htmlInput: { min: 1 } }} sx={{ '& .MuiOutlinedInput-root': { color: 'white', bgcolor: '#0f1115', borderRadius: 3 } }} />
+                  </Box>
+                </Box>
 
-      <input
-        name="quantity"
-        type="number"
-        min={1}
-        value={form.quantity}
-        onChange={handleChange}
-      />
+                <Box>
+                  <Typography variant="overline" sx={{ color: '#9ca3af', fontWeight: 700, mb: 1, display: 'block' }}>Motivo</Typography>
+                  <TextField select fullWidth name="reason" value={form.reason} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { color: 'white', bgcolor: '#0f1115', borderRadius: 3 } }}>
+                    <MenuItem value="adjustment">Ajuste Manual</MenuItem>
+                    <MenuItem value="sale">Venta</MenuItem>
+                    <MenuItem value="purchase">Compra / Abastecimiento</MenuItem>
+                  </TextField>
+                </Box>
 
-      <input
-        name="user"
-        placeholder="User ID"
-        value={form.user}
-        onChange={handleChange}
-      />
-
-      <select name="reason" value={form.reason} onChange={handleChange}>
-        <option value="sale">Sale</option>
-        <option value="purchase">Purchase</option>
-        <option value="return">Return</option>
-        <option value="initial_stock">Initial Stock</option>
-        <option value="adjustment">Adjustment</option>
-        <option value="damage">Damage</option>
-        <option value="loss">Loss</option>
-      </select>
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Creando..." : "Crear Movimiento"}
-      </button>
-    </form>
+                <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                  <Button fullWidth variant="contained" type="submit" disabled={loading} sx={{ py: 2, borderRadius: 3, bgcolor: '#6366f1', '&:hover': { bgcolor: '#4f46e5' }, fontWeight: 700 }}>
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Guardar Movimiento"}
+                  </Button>
+                  <Button fullWidth variant="outlined" onClick={() => navigate("/app/stock")} sx={{ py: 2, borderRadius: 3, borderColor: '#2b2d31', color: '#9ca3af', '&:hover': { borderColor: '#e4e2e4', color: 'white' } }}>
+                    Cancelar
+                  </Button>
+                </Box>
+              </Box>
+            </form>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 }

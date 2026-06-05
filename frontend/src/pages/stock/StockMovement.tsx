@@ -1,19 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
-import StockMovementForm from "./StockMovementForm";
 import StockFilterForm from "./StockFilterForm";
 import StockSummaryPanel from "./StockSummaryPanel";
 
 import {
   getStockMovements,
   getMovementsByProduct,
-} from "../../services/stock.service.ts";
+} from "../../services/stock.service";
+
+import { LineChartComponent } from "../../components/dashboard/LineChartComponent";
 
 export default function StockMovement() {
   const [movements, setMovements] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 📦 cargar datos
+  const navigate = useNavigate();
+
+  // =========================
+  // LOAD DATA
+  // =========================
   const loadMovements = async (productId?: string) => {
     try {
       setLoading(true);
@@ -22,9 +28,10 @@ export default function StockMovement() {
         ? await getMovementsByProduct(productId)
         : await getStockMovements();
 
-      setMovements(data);
+      setMovements(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error loading stock movements:", error);
+      setMovements([]);
     } finally {
       setLoading(false);
     }
@@ -34,126 +41,203 @@ export default function StockMovement() {
     loadMovements();
   }, []);
 
-  // 🔎 filtro
   const handleFilter = (productId?: string) => {
     loadMovements(productId);
   };
 
-  // 📊 data para gráfico
-  const chartData = movements.reduce((acc: any[], mov: any) => {
-    const date = new Date(mov.createdAt).toLocaleDateString();
+  const handleNewStock = () => {
+    navigate("/app/stock/movement/new");
+  };
 
-    const existing = acc.find((x) => x.date === date);
+  // =========================
+  // KPIs
+  // =========================
+  const totalEntries = useMemo(
+    () =>
+      movements
+        .filter((m) => m.type === "in")
+        .reduce((acc, m) => acc + Number(m.quantity || 0), 0),
+    [movements]
+  );
 
-    if (existing) {
-      if (mov.type === "in") existing.in += mov.quantity;
-      else existing.out += mov.quantity;
-    } else {
-      acc.push({
-        date,
-        in: mov.type === "in" ? mov.quantity : 0,
-        out: mov.type === "out" ? mov.quantity : 0,
-      });
+  const totalExits = useMemo(
+    () =>
+      movements
+        .filter((m) => m.type === "out")
+        .reduce((acc, m) => acc + Number(m.quantity || 0), 0),
+    [movements]
+  );
+
+  const netBalance = totalEntries - totalExits;
+
+  const todayMovements = useMemo(() => {
+    const today = new Date().toDateString();
+    return movements.filter(
+      (m) => new Date(m.createdAt).toDateString() === today
+    ).length;
+  }, [movements]);
+
+  // =========================
+  // CHART
+  // =========================
+  const chartData = useMemo(() => {
+    if (!movements.length) return [];
+
+    return movements.reduce((acc: any[], mov: any) => {
+      if (!mov.createdAt) return acc;
+
+      const date = new Date(mov.createdAt).toLocaleDateString();
+
+      const existing = acc.find((x) => x.date === date);
+
+      if (existing) {
+        if (mov.type === "in") existing.in += Number(mov.quantity || 0);
+        else existing.out += Number(mov.quantity || 0);
+      } else {
+        acc.push({
+          date,
+          in: mov.type === "in" ? Number(mov.quantity || 0) : 0,
+          out: mov.type === "out" ? Number(mov.quantity || 0) : 0,
+        });
+      }
+
+      return acc;
+    }, []);
+  }, [movements]);
+
+  const stockTrendData = useMemo(() => {
+    if (!chartData.length) {
+      return {
+        categories: ["Sin datos"],
+        series: [
+          { name: "Ingresos", data: [0] },
+          { name: "Salidas", data: [0] },
+        ],
+      };
     }
 
-    return acc;
-  }, []);
+    return {
+      categories: chartData.map((c) => c.date),
+      series: [
+        { name: "Ingresos", data: chartData.map((c) => c.in) },
+        { name: "Salidas", data: chartData.map((c) => c.out) },
+      ],
+    };
+  }, [chartData]);
 
+  // =========================
+  // UI
+  // =========================
   return (
-    <div className="p-6 space-y-6 min-h-screen fade-in-up">
+    <div className="p-6 space-y-6 min-h-screen bg-[#0f1115] text-white">
+
       {/* HEADER */}
-      <div>
-        <h1 className="text-2xl font-bold">
-          📦 Stock Movement
-        </h1>
-        <p className="text-muted-xs text-sm">
-          Gestión de entradas y salidas de inventario
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+
+        <div>
+          <h1 className="text-2xl font-bold">📦 Stock Movement</h1>
+          <p className="text-sm text-gray-400">
+            Gestión de entradas y salidas de inventario
+          </p>
+        </div>
+      </div>
+
+      {/* FILTER (ARRIBA COMO PEDISTE) */} 
+      <div className="bg-gray-900 p-4 rounded-lg"> 
+           <StockFilterForm onFilter={handleFilter} 
+             onReload={loadMovements} /> 
+        </div>
+
+      {/* KPI ROW (UNA SOLA FILA + BALANCE) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+        <div className="p-4 bg-gray-900 rounded-lg">
+          <p className="text-xs text-gray-400">Entradas</p>
+          <h2 className="text-xl text-green-400 font-bold">{totalEntries}</h2>
+        </div>
+
+        <div className="p-4 bg-gray-900 rounded-lg">
+          <p className="text-xs text-gray-400">Salidas</p>
+          <h2 className="text-xl text-red-400 font-bold">{totalExits}</h2>
+        </div>
+
+        <div className="p-4 bg-gray-900 rounded-lg">
+          <p className="text-xs text-gray-400">Hoy</p>
+          <h2 className="text-xl text-blue-400 font-bold">{todayMovements}</h2>
+        </div>
+
+        <div className="p-4 bg-gray-900 rounded-lg">
+          <p className="text-xs text-gray-400">Balance Neto</p>
+          <h2 className={`text-xl font-bold ${netBalance >= 0 ? "text-green-400" : "text-red-400"}`}>
+            {netBalance}
+          </h2>
+        </div>
+
       </div>
 
       {/* SUMMARY */}
-      <div className="card">
+      <div className="bg-gray-900 p-4 rounded-lg">
         <StockSummaryPanel />
       </div>
 
-      {/* GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* FORM */}
-        <div className="card">
-          <h2 className="text-lg font-bold mb-4">
-            ➕ Nuevo movimiento
-          </h2>
-          <StockMovementForm />
-        </div>
+      {/* BUTTON SOLO (SIN FORM) */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleNewStock}
+          className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700"
+        >
+          ➕ Registrar movimiento
+        </button>
+      </div>
 
-        {/* FILTER */}
-        <div className="card">
-          <h2 className="text-lg font-bold mb-4">
-            🔎 Filtros
-          </h2>
-          <StockFilterForm onFilter={handleFilter} />
-        </div>
+      {/* CHART */}
+      <div className="bg-gray-900 p-4 rounded-lg">
+        <LineChartComponent
+          title="📊 Tendencia de Stock"
+          series={stockTrendData.series}
+          categories={stockTrendData.categories}
+        />
       </div>
 
       {/* TABLE */}
-      <div className="card">
-        <h2 className="text-lg font-bold mb-4">
-          📋 Movimientos de stock
-        </h2>
+      <div className="bg-gray-900 p-4 rounded-lg">
+
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="font-bold">📋 Movimientos</h2>
+
+          <button
+            onClick={() => loadMovements()}
+            className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded"
+          >
+            Recargar
+          </button>
+        </div>
 
         {loading ? (
-          <div className="p-10 text-center text-muted">Cargando movimientos...</div>
+          <div className="text-gray-400 text-center py-10">
+            Cargando...
+          </div>
         ) : (
-          <div className="table-container">
-            <table className="table">
-              <thead>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-gray-400 border-b border-gray-700">
                 <tr>
                   <th>Producto</th>
                   <th>Tipo</th>
                   <th>Cantidad</th>
-                  <th>Razón</th>
-                  <th>Stock After</th>
                   <th>Fecha</th>
                 </tr>
               </thead>
 
               <tbody>
-                {movements.map((m: any, i: number) => (
-                  <tr
-                    key={m.id || m._id || i}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="font-medium text-primary">
-                      {m.productId || m.product?._id}
+                {movements.map((m, i) => (
+                  <tr key={m._id || i} className="border-b border-gray-800">
+                    <td>{m?.product?.name || m.productId}</td>
+                    <td className={m.type === "in" ? "text-green-400" : "text-red-400"}>
+                      {m.type}
                     </td>
-
-                    <td>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          m.type === "in"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {m.type}
-                      </span>
-                    </td>
-
-                    <td className="font-bold">
-                      {m.quantity}
-                    </td>
-
-                    <td className="text-muted-xs capitalize">
-                      {m.reason}
-                    </td>
-
-                    <td className="font-mono">
-                      {m.stockAfter ?? "-"}
-                    </td>
-
-                    <td className="text-muted-xs">
-                      {new Date(m.createdAt).toLocaleString()}
-                    </td>
+                    <td>{m.quantity}</td>
+                    <td>{new Date(m.createdAt).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -162,42 +246,6 @@ export default function StockMovement() {
         )}
       </div>
 
-      {/* CHART */}
-      <div className="bg-white p-4 rounded-xl shadow">
-        <h2 className="text-lg font-semibold mb-4">
-          📊 Tendencia de stock
-        </h2>
-
-        <div className="h-72 flex items-center justify-center text-gray-400">
-          <pre className="text-xs overflow-auto w-full">
-            {JSON.stringify(
-              {
-                chartType: "line",
-                meta: {
-                  title: "Stock In vs Out",
-                  description: "Movimiento diario de inventario",
-                },
-                xKey: "date",
-                series: [
-                  {
-                    dataKey: "in",
-                    label: "Ingresos",
-                    valueFormat: "integer",
-                  },
-                  {
-                    dataKey: "out",
-                    label: "Salidas",
-                    valueFormat: "integer",
-                  },
-                ],
-                data: chartData,
-              },
-              null,
-              2
-            )}
-          </pre>
-        </div>
-      </div>
     </div>
   );
 }

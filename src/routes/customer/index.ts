@@ -5,7 +5,8 @@ import {
   getCustomers,
   getCustomerById,
   updateCustomer,
-  deleteCustomer
+  deleteCustomer, 
+  addPayment
 } from "./controllers";
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.get("/", authenticateFirebase, getCustomers);
 router.get("/:id", authenticateFirebase, getCustomerById);
 router.put("/:id", authenticateFirebase, updateCustomer);
 router.delete("/:id", authenticateFirebase, deleteCustomer);
+router.post("/:id/payment", authenticateFirebase, addPayment);
 
 export default router;

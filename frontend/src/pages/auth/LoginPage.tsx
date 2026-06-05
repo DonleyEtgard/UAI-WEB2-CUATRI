@@ -1,6 +1,6 @@
 import React, { useState,useEffect,} from "react";
 
-import { useNavigate, useLocation,} from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
 
@@ -178,6 +178,14 @@ const LoginPage: React.FC = () => {
                 disabled={isLoading}
                 required
               />
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-[11px] font-bold text-blue-400 hover:text-blue-300 transition-colors tracking-wide"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </label>
 
             <button type="submit" disabled={isLoading} className="mt-4">

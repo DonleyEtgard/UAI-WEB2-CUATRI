@@ -1,7 +1,3 @@
-// ============================================================================
-// AUTHENTICATE FIREBASE MIDDLEWARE - Token Verification
-// ============================================================================
-
 import { Response, NextFunction } from "express";
 import admin from "../firebase";
 import User from "../models/User";
@@ -94,6 +90,13 @@ export const authenticateFirebase = async (
       );
 
       if (found) {
+        // Sincronización automática de verificación de email
+        if (decodedToken.email_verified && !found.isVerified) {
+          found.isVerified = true;
+          await found.save();
+          console.log(`Sync: User ${found.email} updated to verified in DB.`);
+        }
+
         // cast mongoose doc to DBUser shape
         dbUser = {
           _id: String(found._id),
@@ -103,6 +106,7 @@ export const authenticateFirebase = async (
           lastName: found.lastName,
           firebaseUid: found.firebaseUid,
           isActive: found.isActive,
+          isVerified: found.isVerified || false,
         } as DBUser;
       }
     } catch (error) {

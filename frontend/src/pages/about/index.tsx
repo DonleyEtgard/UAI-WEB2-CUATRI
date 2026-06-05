@@ -4,9 +4,7 @@ const AboutPage = () => {
 
       {/* ================= HEADER ================= */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-on-surface">
-          HaitiBiz ERP
-        </h1>
+        <h1> HAITIBIZ  ERP </h1>
 
         <p className="text-on-surface-variant max-w-2xl">
           HAITIBIZ ERP is a business management platform designed to centralize sales,

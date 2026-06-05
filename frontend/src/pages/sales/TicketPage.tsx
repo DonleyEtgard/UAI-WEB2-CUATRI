@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getTicket } from "./api"; // 🔥 ajusta ruta si hace falta
+import { fetchTicket, type TicketData, type SaleItem } from "./api";
+import API from "../../services/api";
 
 const TicketPage = () => {
   const { id } = useParams();
 
-  const [ticket, setTicket] = useState<any>(null);
+  const [ticket, setTicket] = useState<TicketData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const loadTicket = async () => {
     try {
       setLoading(true);
-      const data = await getTicket(id!);
+      const data = await fetchTicket(id!);
       setTicket(data);
     } catch (err) {
       console.error(err);
@@ -19,6 +20,51 @@ const TicketPage = () => {
       setLoading(false);
     }
   };
+
+  const sendWhatsApp = async () => {
+  try {
+    if (!ticket?.sale) return;
+    const { sale } = ticket;
+
+    const res = await API.post(
+      "/sales/ticket/send-whatsapp",
+      {
+        saleId: sale._id,
+        phone: sale.customer?.phone,
+      }
+    );
+
+    window.open(
+      res.data.whatsappUrl,
+      "_blank"
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Error enviando WhatsApp");
+  }
+};
+
+const sendTelegram = async () => {
+  try {
+    if (!ticket?.sale) return;
+    const { sale } = ticket;
+
+    const res = await API.post(
+      "/sales/ticket/send-telegram",
+      {
+        saleId: sale._id,
+      }
+    );
+
+    window.open(
+      res.data.telegramUrl,
+      "_blank"
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Error enviando Telegram");
+  }
+};
 
   useEffect(() => {
     if (id) loadTicket();
@@ -51,7 +97,7 @@ const TicketPage = () => {
 
       {/* 📦 ITEMS */}
       <div className="border-t border-b py-2 mb-4">
-        {items.map((item: any) => (
+        {items.map((item: SaleItem) => (
           <div key={item._id} className="flex justify-between text-sm py-1">
             <span>
               {item.quantity} x {item.product?.name || item.productName}
@@ -111,6 +157,19 @@ const TicketPage = () => {
       >
         Imprimir
       </button>
+        <button
+    onClick={sendWhatsApp}
+    className="flex-1 bg-green-600 text-white py-2 rounded"
+  >
+    📲 WhatsApp
+  </button>
+
+  <button
+    onClick={sendTelegram}
+    className="flex-1 bg-sky-500 text-white py-2 rounded"
+  >
+    📨 Telegram
+  </button>
 
     </div>
   );

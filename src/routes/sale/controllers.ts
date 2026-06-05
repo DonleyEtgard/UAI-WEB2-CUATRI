@@ -6,6 +6,14 @@ import Product from "../../models/Product";
 import Sale from "../../models/Sale";
 import StockMovement from "../../models/StockMovement";
 
+interface AuthRequest extends Request {
+  dbUser?: {
+    _id: string;
+    [key: string]: any;
+  };
+  firebaseUser?: any;
+}
+
 
 // ======================================================
 // 🛒 CREAR VENTA
@@ -111,6 +119,28 @@ export const createSale = async (
       ],
       { session }
     );
+    
+    const categories = await SaleItem.aggregate([
+  {
+    $lookup: {
+      from: "products",
+      localField: "product",
+      foreignField: "_id",
+      as: "productData"
+    }
+  },
+  {
+    $unwind: "$productData"
+  },
+  {
+    $group: {
+      _id: "$productData.category",
+      value: {
+        $sum: "$subtotal"
+      }
+    }
+  }
+]);
 
     // ======================================================
     // ✅ CREAR ITEMS + DESCONTAR STOCK
@@ -185,6 +215,27 @@ export const createSale = async (
   }
 };
 
+// ======================================================
+// 🔄 OBTENER VENTAS
+// ======================================================
+
+export const getSales = async (
+  _req: Request,
+  res: Response
+) => {
+  try {
+    const sales = await Sale.find()
+      .populate("customer")
+      .populate("user")
+      .sort({ createdAt: -1 });
+
+    res.json(sales);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 
 // ======================================================
 // 📊 STATS
@@ -392,6 +443,139 @@ export const getSaleItemById = async (
   }
 };
 
+export const getSummary = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+     
+    const userId = req.dbUser?._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Missing user identification"
+      });
+    }
+     
+    // Ventas del usuario
+    const sales = await Sale.find({
+      user: userId,
+      status: "paid"
+    });
+
+    const revenue = sales.reduce(
+      (acc, sale) => acc + sale.total,
+      0
+    );
+
+    const salesCount = sales.length;
+
+    const avgTicket =
+      salesCount > 0
+        ? revenue / salesCount
+        : 0;
+
+    // ==========================
+    // TOP PRODUCTOS
+    // ==========================
+
+    const topProducts = await SaleItem.aggregate([
+      {
+        $lookup: {
+          from: "sales",
+          localField: "sale",
+          foreignField: "_id",
+          as: "saleData"
+        }
+      },
+      {
+        $unwind: "$saleData"
+      },
+      {
+        $match: {
+          "saleData.user":
+            new mongoose.Types.ObjectId(userId)
+        }
+      },
+      {
+        $group: {
+          _id: "$productName",
+          quantity: {
+            $sum: "$quantity"
+          },
+          revenue: {
+            $sum: "$subtotal"
+          }
+        }
+      },
+      {
+        $sort: {
+          quantity: -1
+        }
+      },
+      {
+        $limit: 10
+      }
+    ]);
+
+    // ==========================
+    // VENTAS POR MES
+    // ==========================
+
+    const monthlySales =
+      await Sale.aggregate([
+        {
+          $match: {
+            user:
+              new mongoose.Types.ObjectId(
+                userId
+              )
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: {
+                $year: "$createdAt"
+              },
+              month: {
+                $month: "$createdAt"
+              }
+            },
+            totalRevenue: {
+              $sum: "$total"
+            },
+            salesCount: {
+              $sum: 1
+            }
+          }
+        },
+        {
+          $sort: {
+            "_id.year": 1,
+            "_id.month": 1
+          }
+        }
+      ]);
+
+    res.json({
+      success: true,
+      data: {
+        revenue,
+        salesCount,
+        avgTicket,
+        topProducts,
+        monthlySales
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 // ======================================================
 // ❌ ELIMINAR ITEM

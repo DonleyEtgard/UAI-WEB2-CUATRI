@@ -10,6 +10,8 @@ import productRoutes from "./routes/product";
 import customerRoutes from "./routes/customer";
 import saleRoutes from "./routes/sale";
 import stockRoutes from "./routes/stockMovement";
+import saleItem from "./routes/saleItem"; 
+
 
 // ================= MIDDLEWARES =================
 import { authenticateFirebase } from "./middlewares/authenticateFirebase";
@@ -117,6 +119,15 @@ app.use(
   saleRoutes
 );
 
+// 🔐 SALE ITEMS
+app.use(
+  "/api/sale-items",
+  authenticateFirebase,
+  checkSubscription,
+  saleItem
+);
+
+
 // 🔐 STOCK (solo admin/superadmin)
 app.use(
   "/api/stock",
@@ -125,6 +136,7 @@ app.use(
   checkSubscription,
   stockRoutes
 );
+
 
 // ============================================================================
 // START SERVER

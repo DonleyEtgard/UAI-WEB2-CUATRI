@@ -61,9 +61,8 @@ export const registerUser = async (data: RegisterData) => {
 export const loginUser = async (data: LoginData) => {
   const res = await API.post("/users/login", data);
 
-  // ✅ FIX: coincide con interceptor (auth_token)
   if (res.data.idToken) {
-    localStorage.setItem("auth_token", res.data.idToken);
+    localStorage.setItem("firebaseToken", res.data.idToken);
   }
 
   return res.data;
@@ -72,6 +71,7 @@ export const loginUser = async (data: LoginData) => {
 
 // TOGGLE USER STATUS
 export const toggleUserStatus = async (id: string) => {
+  if (!id || id === "undefined") throw new Error("User ID is required");
   const res = await API.patch(`/users/${id}/toggle-status`);
   return res.data;
 };
@@ -103,6 +103,7 @@ export const getSales = async (): Promise<Sale[]> => {
 
 // CREATE SALE
 export const createSale = async (data: CreateSaleData): Promise<Sale> => {
+  if (!data.user) throw new Error("User ID is required to create a sale");
   // Fallback para creación offline
   const fallbackSale: Sale = {
     _id: `off_sale_${Date.now()}`,
@@ -132,33 +133,33 @@ export const createSale = async (data: CreateSaleData): Promise<Sale> => {
 
 // GET ALL ITEMS
 export const getSaleItems = async (): Promise<SaleItem[]> => {
-  return await getWithCache<SaleItem[]>("/sales/items");
+  return await getWithCache<SaleItem[]>("/sale-items");
 };
-
 
 // GET ITEM BY ID
 export const getSaleItemById = async (id: string): Promise<SaleItem> => {
-  return await getWithCache<SaleItem>(`/sales/items/${id}`);
+  if (!id || id === "undefined") throw new Error("Item ID is required");
+  return await getWithCache<SaleItem>(`/sale-items/${id}`);
 };
 
 
 // GET ITEMS BY SALE
 export const getItemsBySale = async (saleId: string): Promise<SaleItem[]> => {
-  return await getWithCache<SaleItem[]>(`/sales/items/sale/${saleId}`);
+  if (!saleId || saleId === "undefined") throw new Error("Sale ID is required");
+  return await getWithCache<SaleItem[]>(`/sale-items/sale/${saleId}`);
 };
 
 
 // DELETE ITEM
 export const deleteSaleItem = async (id: string): Promise<{ message: string }> => {
-  return await requestOrQueue<{ message: string }>("DELETE", `/sales/items/${id}`);
+  if (!id || id === "undefined") throw new Error("Item ID is required");
+  return await requestOrQueue<{ message: string }>("DELETE", `/sale-items/${id}`);
 };
 
 
 // ======================================================
 // 🎟️ TICKET
 // ======================================================
-// Nota: El tipo de retorno para getTicket no está definido en los modelos proporcionados.
-// Asumo que devuelve un objeto con la información del ticket.
 export type TicketInfo = {
   sale: Sale;
   customer: any; // Tipo Customer si se necesita
@@ -169,6 +170,7 @@ export type TicketInfo = {
 
 // GET TICKET
 export const getTicket = async (id: string): Promise<TicketInfo> => {
+  if (!id || id === "undefined") throw new Error("Ticket ID is required");
   return await getWithCache<TicketInfo>(`/sales/ticket/${id}`);
 };
 
@@ -178,6 +180,7 @@ export const sendTicketWhatsApp = async (
   saleId: string,
   phone: string
 ): Promise<{ message: string }> => {
+  if (!saleId) throw new Error("Sale ID is required");
   return await requestOrQueue<{ message: string }>(
     "POST",
     "/sales/ticket/send-whatsapp",
@@ -194,6 +197,7 @@ export const sendTicketWhatsApp = async (
 export const sendTicketTelegram = async (
   saleId: string
 ): Promise<{ message: string }> => {
+  if (!saleId) throw new Error("Sale ID is required");
   return await requestOrQueue<{ message: string }>(
     "POST",
     "/sales/ticket/send-telegram",

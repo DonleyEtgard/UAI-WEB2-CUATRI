@@ -68,8 +68,9 @@ export const sendTicketWhatsApp = async (
     }
 
     // ✅ URL DEL TICKET
-    const url = `https://tuapp.com/ticket/${saleId}`;
-
+    const url =
+         `http://localhost:5173/app/sales/ticket/${saleId}`;
+         
     // ✅ MENSAJE
     const message = `
 🧾 Ticket de compra

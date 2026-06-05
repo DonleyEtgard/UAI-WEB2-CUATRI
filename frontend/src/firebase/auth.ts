@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// ============================================================================
+﻿﻿﻿﻿﻿﻿// ============================================================================
 // FIREBASE AUTH FUNCTIONS - Professional Authentication
 // ============================================================================
 
@@ -27,6 +27,11 @@ const requireAuth = () => {
   return auth;
 };
 
+const actionCodeSettings = {
+  url: 'https://midominio.com/verify-email',
+  handleCodeInApp: true,
+};
+
 // ============================================================================
 // AUTHENTICATION FUNCTIONS
 // ============================================================================
@@ -44,6 +49,7 @@ export const registerUser = async (email: string, password: string) => {
       email,
       password
     );
+    await sendEmailVerification(credential.user, actionCodeSettings);
     return credential;
   } catch (error) {
     throw error;
@@ -54,9 +60,10 @@ export const registerUser = async (email: string, password: string) => {
  * Send email verification to current user
  * @param user - Firebase User
  */
-export const sendEmailVerificationEmail = async (user: FirebaseUser) => {
+export const sendEmailVerificationEmail = async (user: FirebaseUser | null) => {
+  if (!user) return;
   try {
-    await sendEmailVerification(user);
+    await sendEmailVerification(user, actionCodeSettings);
   } catch (error) {
     throw error;
   }

@@ -1,11 +1,10 @@
-import API from "./api";
 import { getWithCache, requestOrQueue } from "./offlineApi";
 // ==========================
 // TYPES
 // ==========================
 
 export type Currency = "ARS" | "USD" | "EUR";
-
+ 
 export type Category = {
   _id: string;
   name: string;
@@ -52,6 +51,7 @@ export const getProducts = async (): Promise<Product[]> => {
 
 // 🔍 GET ONE
 export const getProductById = async (id: string): Promise<Product> => {
+  if (!id || id === "undefined") throw new Error("Product ID is required");
   return await getWithCache<Product>(`/products/${id}`);
 };
 
@@ -80,6 +80,7 @@ export const updateProduct = async (
   id: string,
   data: Partial<Product>
 ): Promise<Product> => {
+  if (!id || id === "undefined") throw new Error("Product ID is required");
   // Fallback para actualización offline (asume que el producto ya existe en caché)
   const fallbackProduct: Partial<Product> = {
     ...data,
@@ -97,6 +98,7 @@ export const updateProduct = async (
 export const deleteProduct = async (
   id: string
 ): Promise<{ message: string }> => {
+  if (!id || id === "undefined") throw new Error("Product ID is required");
   return await requestOrQueue<{ message: string }>("DELETE", `/products/${id}`);
 };
 
@@ -105,6 +107,7 @@ export const updateStock = async (
   id: string,
   quantity: number
 ): Promise<Product> => {
+  if (!id || id === "undefined") throw new Error("Product ID is required");
   // Fallback para actualización de stock offline
   const fallbackStockUpdate: Partial<Product> = { stock: quantity, updatedAt: new Date().toISOString() };
   return await requestOrQueue<Product>("PATCH", `/products/${id}/stock`, { quantity }, fallbackStockUpdate as Product);
@@ -114,5 +117,6 @@ export const updateStock = async (
 export const getProductStats = async (
   id: string
 ): Promise<ProductStats> => {
+  if (!id || id === "undefined") throw new Error("Product ID is required");
   return await getWithCache<ProductStats>(`/products/${id}/stats`);
 };

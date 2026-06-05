@@ -49,8 +49,8 @@ export const getUserProfile = async (
     return null;
   }
    return {
-    uid: snapshot.id,
-    ...(snapshot.data() as Omit<AppUser, "uid">),
+    firebaseUid: snapshot.id,
+    ...(snapshot.data() as Omit<AppUser, "firebaseUid">),
   };
 };
 
@@ -66,8 +66,8 @@ export const subscribeToUserProfile = (
     callback(
       snapshot.exists()
         ? {
-            uid: snapshot.id,
-            ...(snapshot.data() as Omit<AppUser, "uid">),
+            firebaseUid: snapshot.id,
+            ...(snapshot.data() as Omit<AppUser, "firebaseUid">),
           }
         : null
     );
@@ -78,7 +78,7 @@ export const createOrUpdateUserProfile = async (
 ): Promise<void> => {
   const firestore = requireDb();
 
-  const userRef = doc(firestore, usersCollection, profile.uid);
+  const userRef = doc(firestore, usersCollection, profile.firebaseUid);
 
   await setDoc(userRef, profile, {
     merge: true,
@@ -141,8 +141,8 @@ export const getUsersByOrganization = async (
    const snapshot = await getDocs(q);
 
   return snapshot.docs.map((doc) => ({
-    uid: doc.id,
-    ...(doc.data() as Omit<AppUser, "uid">),
+    firebaseUid: doc.id,
+    ...(doc.data() as Omit<AppUser, "firebaseUid">),
   }));
 };
 
