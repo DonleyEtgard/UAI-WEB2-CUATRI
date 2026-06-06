@@ -8,6 +8,8 @@ import {
   updateUserController,
   deleteUserController,
   paySubscription,
+  getPendingPayments,
+  approvePayment,
   createSubscriptionPayment,
 
   createEmployeeController
@@ -63,6 +65,24 @@ router.get(
   authenticateFirebase,
   authorizeAdminOrSuperadmin,
   listUsersController
+);
+
+router.post(
+  "/pay-subscription",
+  authenticateFirebase,
+  paySubscription
+);
+
+router.get(
+  "/payments/pending",
+  authenticateFirebase,
+  getPendingPayments
+);
+
+router.put(
+  "/payments/:id/approve",
+  authenticateFirebase,
+  approvePayment
 );
 
 /**

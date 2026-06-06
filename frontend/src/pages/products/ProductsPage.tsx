@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
+import UiCard from "../../components/common/UiCard";
+import DataGridWrapper from "../../components/common/DataGridWrapper";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
+import EmptyState from "../../components/common/EmptyState";
+import UiBadge from "../../components/common/UiBadge";
 
 interface Product {
   _id: string;
@@ -101,91 +106,49 @@ const ProductsPage = () => {
         </button>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-zinc-500 border-b border-zinc-800">
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Producto</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Categoría</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Precio</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Stock</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Estado</th>
-                <th className="text-right px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/50">
-              {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="h-10 w-10 bg-zinc-800 rounded-lg inline-block mr-3 align-middle"></div><div className="h-4 bg-zinc-800 rounded w-24 inline-block"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-zinc-800 rounded w-16"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-zinc-800 rounded w-12"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-zinc-800 rounded w-8"></div></td>
-                    <td className="px-6 py-4"><div className="h-6 bg-zinc-800 rounded w-16"></div></td>
-                    <td className="px-6 py-4"><div className="h-8 bg-zinc-800 rounded w-20 float-right"></div></td>
-                  </tr>
-                ))
-              ) : products.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-20 text-zinc-500 font-medium">No hay productos registrados</td>
-                </tr>
-              ) : (
-                products.map((p) => (
-                  <tr key={p._id} className="group hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-500">
+        <div className="p-4">
+          {loading ? (
+            <SkeletonLoader count={6} height={48} />
+          ) : products.length === 0 ? (
+            <div className="p-6">
+              <EmptyState title="No hay productos" description="Crea tu primer producto para comenzar a vender." actionLabel="Crear producto" onAction={() => navigate("/app/products/new")} />
+            </div>
+          ) : (
+            <UiCard sx={{ p: 0 }}>
+              <DataGridWrapper
+                rows={products.map(p => ({ ...p, id: p._id }))}
+                columns={[
+                  { field: 'name', headerName: 'Producto', flex: 1, renderCell: (params: any) => (
+                      <div style={{display:'flex', alignItems:'center', gap:12}}>
+                        <div style={{width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', background:'#0f1724', borderRadius:8, color:'#9ca3af'}}>
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                         </div>
                         <div>
-                          <div className="font-medium text-white group-hover:text-indigo-400 transition-colors">{p.name}</div>
-                          <div className="text-[10px] text-zinc-500 font-mono">SKU: {p.sku}</div>
+                          <div style={{fontWeight:600, color:'#fff'}}>{params.value}</div>
+                          <div style={{fontSize:10, color:'#9ca3af', fontFamily:'ui-monospace'}}>{'SKU: ' + params.row.sku}</div>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-zinc-400 font-medium capitalize">{p.category}</td>
-                    <td className="px-6 py-4 text-white font-semibold">${p.price.toFixed(2)}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${
-                        p.stock < 5 ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : 
-                        p.stock < 15 ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : 
-                        "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      }`}>
-                        {p.stock} unidades
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`h-2 w-2 rounded-full inline-block mr-2 ${p.isActive ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-zinc-600"}`}></span>
-                      <span className="text-xs text-zinc-300">{p.isActive ? "Activo" : "Oculto"}</span>
-                    </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => navigate(`/app/products/edit/${p._id}`)}
-                          className="p-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition-all"
-                          title="Editar"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button
-                          disabled={deletingId === p._id}
-                          onClick={() => handleDelete(p._id)}
-                          className="p-1.5 text-zinc-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all disabled:opacity-30"
-                          title="Eliminar"
-                        >
-                          {deletingId === p._id ? (
-                             <div className="w-4 h-4 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
-                          ) : (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                          )}
-                        </button>
+                  )},
+                  { field: 'category', headerName: 'Categoría', width: 140 },
+                  { field: 'price', headerName: 'Precio', width: 120, valueFormatter: (v: any)=>`$${Number(v.value).toFixed(2)}` },
+                  { field: 'stock', headerName: 'Stock', width: 120, renderCell: (params: any)=> {
+                      const s = params.value;
+                      const style = s < 5 ? {background:'rgba(239,68,68,0.08)', color:'#fb7185', border:'1px solid rgba(239,68,68,0.12)'} : s < 15 ? {background:'rgba(245,158,11,0.08)', color:'#f59e0b', border:'1px solid rgba(245,158,11,0.12)'} : {background:'rgba(16,185,129,0.08)', color:'#10b981', border:'1px solid rgba(16,185,129,0.12)'};
+                      return <div style={{padding:'4px 8px', borderRadius:8, fontWeight:700, fontSize:12, ...style}}>{s + ' unidades'}</div>
+                  }},
+                  { field: 'isActive', headerName: 'Estado', width: 120, renderCell: (params: any)=> params.value ? <UiBadge label='Activo' color='success' /> : <UiBadge label='Oculto' color='default' /> },
+                  { field: 'actions', headerName: 'Acciones', width: 120, sortable: false, renderCell: (params: any)=> (
+                      <div style={{display:'flex', gap:8, justifyContent:'flex-end', width:'100%'}}>
+                        <button onClick={() => navigate(`/app/products/edit/${params.row._id}`)} style={{background:'transparent', border:0, padding:6, borderRadius:8, color:'#9ca3af'}} title="Editar">✏️</button>
+                        <button onClick={() => handleDelete(params.row._id)} disabled={deletingId === params.row._id} style={{background:'transparent', border:0, padding:6, borderRadius:8, color:'#9ca3af'}} title="Eliminar">{deletingId === params.row._id ? '...' : '🗑️'}</button>
                       </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                  )},
+                ]}
+                pageSize={10}
+                onRowClick={(params:any)=> navigate(`/app/products/edit/${params.row._id}`)}
+              />
+            </UiCard>
+          )}
         </div>
       </div>
     </div>

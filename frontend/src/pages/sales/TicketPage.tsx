@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Box, Card, CardContent, CardHeader, Button, Table, TableBody, TableCell, TableContainer, TableRow, Typography, Divider, Container, CircularProgress } from "@mui/material";
+import PrintIcon from "@mui/icons-material/Print";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import TelegramIcon from "@mui/icons-material/Telegram";
 import { fetchTicket, type TicketData, type SaleItem } from "./api";
 import API from "../../services/api";
 
@@ -12,7 +16,8 @@ const TicketPage = () => {
   const loadTicket = async () => {
     try {
       setLoading(true);
-      const data = await fetchTicket(id!);
+      if (!id) return;
+      const data = await fetchTicket(id);
       setTicket(data);
     } catch (err) {
       console.error(err);
@@ -22,156 +27,192 @@ const TicketPage = () => {
   };
 
   const sendWhatsApp = async () => {
-  try {
-    if (!ticket?.sale) return;
-    const { sale } = ticket;
-
-    const res = await API.post(
-      "/sales/ticket/send-whatsapp",
-      {
-        saleId: sale._id,
-        phone: sale.customer?.phone,
+    try {
+      if (!ticket?.sale) return;
+      const phone = ticket.sale.customer?.phone;
+      if (!phone) {
+        alert("El cliente no tiene teléfono");
+        return;
       }
-    );
+      const res = await API.post("/sales/ticket/send-whatsapp", {
+        saleId: ticket.sale._id,
+        phone,
+      });
+      window.open(res.data.whatsappUrl, "_blank");
+    } catch (err) {
+      console.error(err);
+      alert("Error enviando WhatsApp");
+    }
+  };
 
-    window.open(
-      res.data.whatsappUrl,
-      "_blank"
-    );
-  } catch (err) {
-    console.error(err);
-    alert("Error enviando WhatsApp");
-  }
-};
-
-const sendTelegram = async () => {
-  try {
-    if (!ticket?.sale) return;
-    const { sale } = ticket;
-
-    const res = await API.post(
-      "/sales/ticket/send-telegram",
-      {
+  const sendTelegram = async () => {
+    try {
+      if (!ticket?.sale) return;
+      const { sale } = ticket;
+      const res = await API.post("/sales/ticket/send-telegram", {
         saleId: sale._id,
-      }
-    );
-
-    window.open(
-      res.data.telegramUrl,
-      "_blank"
-    );
-  } catch (err) {
-    console.error(err);
-    alert("Error enviando Telegram");
-  }
-};
+      });
+      window.open(res.data.telegramUrl, "_blank");
+    } catch (err) {
+      console.error(err);
+      alert("Error enviando Telegram");
+    }
+  };
 
   useEffect(() => {
     if (id) loadTicket();
   }, [id]);
 
-  if (loading) return <p className="p-4">Cargando ticket...</p>;
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+      <CircularProgress />
+    </Box>
+  );
 
-  if (!ticket) return <p className="p-4">No se encontró el ticket</p>;
+  if (!ticket) return (
+    <Box sx={{ textAlign: 'center', py: 10 }}>
+      <Typography>No se encontró el ticket</Typography>
+    </Box>
+  );
 
   const { sale, items } = ticket;
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 shadow rounded mt-6">
+    <Box sx={{ minHeight: '100vh', py: 4, px: 2, bgcolor: '#f8fafc' }}>
+      <Container maxWidth="sm">
+        <Card sx={{ borderRadius: 3, boxShadow: 3, bgcolor: 'white' }}>
+          <CardContent sx={{ textAlign: 'center', pt: 4 }}>
+            <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>🧾 Ticket de Venta</Typography>
+            <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace', display: 'block', fontSize: 11 }}>ID: {sale._id}</Typography>
+          </CardContent>
 
-      {/* 🧾 HEADER */}
-      <h2 className="text-2xl font-bold mb-2 text-center">
-        🧾 Ticket de Venta
-      </h2>
+          <Divider />
 
-      <p className="text-sm text-gray-500 text-center mb-4">
-        ID: {sale._id}
-      </p>
+          {/* Customer & Seller Info */}
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'grid', gap: 2, fontSize: 14 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography sx={{ color: '#64748b' }}>Cliente:</Typography>
+                <Typography sx={{ fontWeight: 600 }}>{sale.customer?.name || "Consumidor Final"}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography sx={{ color: '#64748b' }}>Vendedor:</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: 12 }}>{sale.user?.email}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography sx={{ color: '#64748b' }}>Fecha:</Typography>
+                <Typography sx={{ fontWeight: 600 }}>{new Date(sale.createdAt).toLocaleString('es-ES')}</Typography>
+              </Box>
+            </Box>
+          </CardContent>
 
-      {/* 👤 INFO */}
-      <div className="mb-4">
-        <p><strong>Cliente:</strong> {sale.customer?.name || "Consumidor Final"}</p>
-        <p><strong>Vendedor:</strong> {sale.user?.email}</p>
-        <p><strong>Fecha:</strong> {new Date(sale.createdAt).toLocaleString()}</p>
-      </div>
+          <Divider />
 
-      {/* 📦 ITEMS */}
-      <div className="border-t border-b py-2 mb-4">
-        {items.map((item: SaleItem) => (
-          <div key={item._id} className="flex justify-between text-sm py-1">
-            <span>
-              {item.quantity} x {item.product?.name || item.productName}
-            </span>
-            <span>${item.subtotal}</span>
-          </div>
-        ))}
-      </div>
+          {/* Items Table */}
+          <CardContent sx={{ py: 2 }}>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                  {items.map((item: SaleItem) => (
+                    <TableRow key={item._id} sx={{ borderBottom: 'none' }}>
+                      <TableCell sx={{ p: 0.5, fontSize: 13 }}>
+                        <Box>
+                          <Typography variant="body2">{item.quantity} x {item.product?.name || item.productName}</Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right" sx={{ p: 0.5, fontSize: 13, fontWeight: 700 }}>
+                        ${item.subtotal}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
 
-      {/* 💰 TOTAL */}
-      <div className="mb-4">
-        <div className="flex justify-between font-bold">
-          <span>Total:</span>
-          <span>${sale.total}</span>
-        </div>
+          <Divider />
 
-        {sale.paymentMethod === "cash" && (
-          <>
-            <div className="flex justify-between text-sm">
-              <span>Pagado:</span>
-              <span>${sale.amountPaid}</span>
-            </div>
+          {/* Total & Payment */}
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'grid', gap: 1.5, fontSize: 14 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                <Typography sx={{ fontWeight: 700 }}>Total:</Typography>
+                <Typography sx={{ fontWeight: 700, color: '#667eea', fontSize: 16 }}>${sale.total}</Typography>
+              </Box>
 
-            <div className="flex justify-between text-sm text-green-600">
-              <span>Cambio:</span>
-              <span>${sale.change}</span>
-            </div>
-          </>
-        )}
-      </div>
+              {sale.paymentMethod === "cash" && (
+                <>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: '#64748b' }}>Pagado:</Typography>
+                    <Typography sx={{ fontWeight: 600 }}>${sale.amountPaid}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', color: '#10b981', fontWeight: 600 }}>
+                    <Typography sx={{ color: '#10b981' }}>Cambio:</Typography>
+                    <Typography sx={{ color: '#10b981', fontWeight: 700 }}>${sale.change}</Typography>
+                  </Box>
+                </>
+              )}
 
-      {/* 💳 MÉTODO */}
-      <div className="mb-4">
-        <p>
-          <strong>Método de pago:</strong>{" "}
-          {sale.paymentMethod}
-        </p>
-        <p>
-          <strong>Estado:</strong>{" "}
-          {sale.status}
-        </p>
-      </div>
+              <Divider sx={{ my: 1 }} />
 
-      {/* 📝 NOTAS */}
-      {sale.notes && (
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            Nota: {sale.notes}
-          </p>
-        </div>
-      )}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <Typography sx={{ color: '#64748b' }}>Método:</Typography>
+                <Typography sx={{ fontWeight: 600, textTransform: 'capitalize' }}>{sale.paymentMethod}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <Typography sx={{ color: '#64748b' }}>Estado:</Typography>
+                <Typography sx={{ fontWeight: 600, textTransform: 'capitalize' }}>{sale.status}</Typography>
+              </Box>
+            </Box>
+          </CardContent>
 
-      {/* 🖨️ BOTÓN IMPRIMIR */}
-      <button
-        onClick={() => window.print()}
-        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-      >
-        Imprimir
-      </button>
-        <button
-    onClick={sendWhatsApp}
-    className="flex-1 bg-green-600 text-white py-2 rounded"
-  >
-    📲 WhatsApp
-  </button>
+          {sale.notes && (
+            <>
+              <Divider />
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>Nota:</Typography>
+                <Typography variant="body2" sx={{ mt: 0.5 }}>{sale.notes}</Typography>
+              </CardContent>
+            </>
+          )}
 
-  <button
-    onClick={sendTelegram}
-    className="flex-1 bg-sky-500 text-white py-2 rounded"
-  >
-    📨 Telegram
-  </button>
+          <Divider />
 
-    </div>
+          {/* Actions */}
+          <CardContent sx={{ display: 'grid', gap: 1.5 }}>
+            <Button 
+              fullWidth 
+              variant="outlined" 
+              startIcon={<PrintIcon />}
+              onClick={() => window.print()}
+              sx={{ textTransform: 'none' }}
+            >
+              Imprimir
+            </Button>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+              <Button 
+                variant="contained" 
+                sx={{ bgcolor: '#25d366', '&:hover': { bgcolor: '#1ea755' } }}
+                startIcon={<WhatsAppIcon />}
+                onClick={sendWhatsApp}
+                size="small"
+              >
+                WhatsApp
+              </Button>
+              <Button 
+                variant="contained" 
+                sx={{ bgcolor: '#0088cc', '&:hover': { bgcolor: '#0070a3' } }}
+                startIcon={<TelegramIcon />}
+                onClick={sendTelegram}
+                size="small"
+              >
+                Telegram
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 };
 

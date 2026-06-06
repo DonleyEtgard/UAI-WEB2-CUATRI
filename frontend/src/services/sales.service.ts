@@ -34,7 +34,7 @@ export type SaleItemInput = {
 export type CreateSaleData = {
   customer?: string;
   user: string;
-  paymentMethod: "cash" | "card" | "transfer";
+  paymentMethod: "cash" | "card" | "transfer" | "moncash" | "mercado-pago";
   items: SaleItemInput[];
   amountPaid?: number;
   notes?: string;
@@ -86,8 +86,8 @@ export const paySubscription = async (paymentMethod: string) => {
   return res.data;
 };
 
-export const createSubscriptionPayment = async () => {
-  const res = await API.post("/users/create-payment");
+export const createSubscriptionPayment = async (paymentMethod: string) => {
+  const res = await API.post("/users/create-payment", { paymentMethod });
   return res.data;
 };
 

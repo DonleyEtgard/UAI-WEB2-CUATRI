@@ -17,16 +17,47 @@ const userSchema = new Schema(
     },
 plan: {
   type: String,
-  enum: ["free", "basic", "active", "suspended"],
+  enum: ["free", "basic", "medium", "premium"],
   default: "free"
 },
-
+subscriptionStatus: {
+  type: String,
+  enum: [
+    "active",
+    "expired",
+    "pending",
+    "suspended"
+  ],
+  default: "expired"
+},
+lastPaymentMethod: {
+  type: String,
+  enum: [
+  "cash",
+  "transfer",
+  "moncash",
+  "mercado pago"
+]
+},
 subscriptionStart: {
   type: Date
 },
 
-lastPaymentQR: {
-  type: String
+lastPaymentAmount: {
+  type: Number,
+  default: 0
+},
+
+lastPaymentDate: {
+  type: Date
+},
+trialUsed: {
+  type: Boolean,
+  default: false
+},
+
+trialEnd: {
+  type: Date
 },
  // 📍 DIRECCIÓN (🔥 NUEVO)
     address: {

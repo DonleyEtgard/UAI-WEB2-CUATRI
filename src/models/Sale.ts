@@ -26,7 +26,7 @@ const saleSchema = new Schema(
     // 💳 Método de pago
     paymentMethod: {
       type: String,
-      enum: ["cash", "card", "transfer"],
+      enum: ["cash", "card", "transfer", "moncash", "mercado-pago"],
       required: true
     },
     currency: {

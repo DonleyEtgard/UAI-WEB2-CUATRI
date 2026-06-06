@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Grid, Card, CardContent, CardHeader, Button } from "@mui/material";
 import API from "../../services/api";
+import UiCard from "../../components/common/UiCard";
+import DataGridWrapper from "../../components/common/DataGridWrapper";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
+import EmptyState from "../../components/common/EmptyState";
+import UiBadge from "../../components/common/UiBadge";
 
 interface Customer {
   _id: string;
@@ -59,135 +65,74 @@ const CustomersPage = () => {
   }).length;
 
   return (
-    <div className="p-4 sm:p-8 space-y-8 min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+    <Box sx={{ p: { xs: 2, sm: 4 }, minHeight: '100vh' }}>
       {/* HEADER */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Clientes</h1>
-          <p className="text-sm text-zinc-400 mt-1">Administra tu cartera de clientes y su información de contacto.</p>
-        </div>
-        <button
-          onClick={() => navigate("/app/customers/new")}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
-        >
-          <span>Nuevo Cliente</span>
-        </button>
-      </div>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 4 }}>
+        <Box>
+          <h1 style={{fontSize: '2rem', fontWeight: 'bold', color: 'white', margin: 0}}>Clientes</h1>
+          <p style={{fontSize: '0.875rem', color: '#94a3b8', marginTop: '0.5rem'}}>Administra tu cartera de clientes y su información de contacto.</p>
+        </Box>
+        <Button variant="contained" color="primary" onClick={() => navigate("/app/customers/new")} sx={{textTransform: 'none', fontSize: 16, boxShadow: 2}}>Nuevo Cliente</Button>
+      </Box>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-sm">
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Total Clientes</p>
-          <h2 className="text-2xl font-bold mt-1 text-white">{totalCustomers}</h2>
-        </div>
-        <div className="p-5 bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-sm">
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Activos</p>
-          <h2 className="text-2xl font-bold mt-1 text-emerald-400">{activeCustomers}</h2>
-        </div>
-        <div className="p-5 bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-sm">
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Nuevos este mes</p>
-          <h2 className="text-2xl font-bold mt-1 text-indigo-400">+{newThisMonth}</h2>
-        </div>
-      </div>
+      <Grid container spacing={2} sx={{mb: 4}}>
+        {[{label: 'Total Clientes', value: totalCustomers}, {label: 'Activos', value: activeCustomers}, {label: 'Nuevos este mes', value: '+' + newThisMonth}].map((kpi, i) => (
+          <Grid item xs={12} sm={4} key={i}>
+            <Card>
+              <CardContent>
+                <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', margin: 0}}>{kpi.label}</p>
+                <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginTop: '0.5rem', margin: 0}}>{kpi.value}</h2>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* TABLE */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/30">
-          <h2 className="font-semibold text-lg text-white">Directorio de Clientes</h2>
-          <button
-             onClick={loadCustomers}
-             className="w-8 h-8 flex items-center justify-center rounded-lg
-             hover:bg-zinc-800 transition-colors
-             text-zinc-400 hover:text-white"
-             title="Recargar"
-          >
-          🔄
-           </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-zinc-500 border-b border-zinc-800 bg-zinc-900/10">
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Cliente</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Email</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Teléfono</th>
-                <th className="text-left px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Estado</th>
-                <th className="text-right px-6 py-4 font-medium uppercase tracking-wider text-[11px]">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/50">
-              {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="flex items-center gap-3"><div className="h-9 w-9 bg-zinc-800 rounded-full"></div><div className="h-4 bg-zinc-800 rounded w-24"></div></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-zinc-800 rounded w-32"></div></td>
-                    <td className="px-6 py-4"><div className="h-4 bg-zinc-800 rounded w-20"></div></td>
-                    <td className="px-6 py-4"><div className="h-6 bg-zinc-800 rounded w-16"></div></td>
-                    <td className="px-6 py-4 text-right"><div className="h-8 bg-zinc-800 rounded w-20 float-right"></div></td>
-                  </tr>
-                ))
-              ) : customers.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-20 text-zinc-500 font-medium italic">No se encontraron clientes registrados</td>
-                </tr>
-              ) : (
-                customers.map((c) => (
-                  <tr key={c._id} className="group hover:bg-zinc-800/30 transition-all border-b border-zinc-800/50 last:border-0">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 font-bold text-xs uppercase tracking-tighter">
-                          {c.name[0]}{c.lastName[0]}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-white group-hover:text-indigo-400 transition-colors">{c.name} {c.lastName}</div>
-                          <div className="text-[10px] text-zinc-500 font-mono">#{c._id.slice(-6).toUpperCase()}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-zinc-400">{c.email}</td>
-                    <td className="px-6 py-4 text-zinc-400 font-medium">{c.phone || 'N/A'}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
-                        c.isActive 
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      }`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${c.isActive ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></span>
-                        {c.isActive ? "Activo" : "Inactivo"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => navigate(`/app/customers/edit/${c._id}`)}
-                          className="p-1.5 text-zinc-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition-all"
-                          title="Editar"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button
-                          disabled={deletingId === c._id}
-                          onClick={() => handleDelete(c._id)}
-                          className="p-1.5 text-zinc-400 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all disabled:opacity-30"
-                          title="Eliminar"
-                        >
-                          {deletingId === c._id ? (
-                             <div className="w-4 h-4 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
-                          ) : (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                          )}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardHeader title="Directorio de Clientes" action={<Button onClick={loadCustomers} size="small">🔄</Button>} />
+        <CardContent sx={{p: 0}}>
+          {loading ? (
+            <Box sx={{p: 2}}>
+              <SkeletonLoader count={6} height={48} />
+            </Box>
+          ) : customers.length === 0 ? (
+            <Box sx={{p: 4}}>
+              <EmptyState title="No hay clientes" description="Crea tu primer cliente para comenzar." actionLabel="Crear cliente" onAction={() => navigate("/app/customers/new")} />
+            </Box>
+          ) : (
+            <DataGridWrapper
+              rows={customers.map(c => ({ ...c, id: c._id }))}
+              columns={[
+                {field: 'name', headerName: 'Cliente', flex: 1, renderCell: (params: any)=> (
+                  <Box style={{display:'flex', alignItems:'center', gap:12}}>
+                    <Box style={{width:36, height:36, borderRadius:'50%', background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:700, fontSize:12, textTransform:'uppercase'}}>
+                      {params.row.name[0]}{params.row.lastName[0]}
+                    </Box>
+                    <Box>
+                      <div style={{fontWeight:600, color:'#fff'}}>{params.row.name} {params.row.lastName}</div>
+                      <div style={{fontSize:10, color:'#9ca3af', fontFamily:'monospace'}}>#{params.row._id.slice(-6).toUpperCase()}</div>
+                    </Box>
+                  </Box>
+                )},
+                {field: 'email', headerName: 'Email', flex: 1},
+                {field: 'phone', headerName: 'Teléfono', width: 140, valueFormatter: (v: any)=> v.value || 'N/A'},
+                {field: 'isActive', headerName: 'Estado', width: 140, renderCell: (params: any)=> params.value ? <UiBadge label='Activo' color='success' /> : <UiBadge label='Inactivo' color='error' />},
+                {field: 'actions', headerName: 'Acciones', width: 120, sortable: false, renderCell: (params: any)=> (
+                  <Box style={{display:'flex', gap:8, justifyContent:'flex-end', width:'100%'}}>
+                    <button onClick={() => navigate(`/app/customers/edit/${params.row._id}`)} style={{background:'transparent', border:0, padding:6, borderRadius:8, color:'#9ca3af'}} title="Editar">✏️</button>
+                    <button onClick={() => handleDelete(params.row._id)} disabled={deletingId === params.row._id} style={{background:'transparent', border:0, padding:6, borderRadius:8, color:'#9ca3af'}} title="Eliminar">{deletingId === params.row._id ? '...' : '🗑️'}</button>
+                  </Box>
+                )},
+              ]}
+              pageSize={10}
+              onRowClick={(params:any)=> navigate(`/app/customers/edit/${params.row._id}`)}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

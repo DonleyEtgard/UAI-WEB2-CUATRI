@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/DonleyEtgard/UAI-WEB2-CUATRI#readme",
   "dependencies": {
+    "@mui/x-data-grid": "^9.4.0",
     "@reduxjs/toolkit": "^2.11.2",
     "apexcharts": "^5.13.0",
     "axios": "^1.12.2",
@@ -34,6 +35,7 @@
     "lucide-react": "^1.17.0",
     "mongodb": "^6.20.0",
     "mongoose": "^8.18.2",
+    "qrcode.react": "^4.2.0",
     "react-apexcharts": "^2.1.0",
     "react-dom": "^19.2.6",
     "react-redux": "^9.2.0",

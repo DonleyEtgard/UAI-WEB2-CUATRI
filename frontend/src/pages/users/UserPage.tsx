@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Grid, Card, CardContent, CardHeader, Button, Chip } from "@mui/material";
 import API from "../../services/api";
+import DataGridWrapper from "../../components/common/DataGridWrapper";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
+import EmptyState from "../../components/common/EmptyState";
+import UiBadge from "../../components/common/UiBadge";
 
 interface User {
   _id: string;
@@ -8,7 +13,12 @@ interface User {
   lastName: string;
   email: string;
   role: string;
+
   plan?: string;
+  subscriptionStatus?: string;
+  subscriptionPaid?: boolean;
+  subscriptionEnd?: string;
+
   isActive: boolean;
   createdAt?: string;
 }
@@ -100,281 +110,77 @@ const UserPage = () => {
   ).length;
 
   return (
-    <div className="p-6 space-y-6 min-h-screen bg-[#0f1115] text-white">
-
+    <Box sx={{ p: { xs: 2, sm: 4 }, minHeight: '100vh' }}>
       {/* HEADER */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-
-        <div>
-          <h1 className="text-2xl font-bold">
-            👥 Usuarios
-          </h1>
-
-          <p className="text-sm text-gray-400">
-            Administración de usuarios,
-            permisos y suscripciones
-          </p>
-        </div>
-
-        <button
-          onClick={() =>
-            navigate("/app/users/new")
-          }
-          className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition"
-        >
-          ➕ Nuevo Usuario
-        </button>
-
-      </div>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 4 }}>
+        <Box>
+          <h1 style={{fontSize: '2rem', fontWeight: 'bold', color: 'white', margin: 0}}>👥 Usuarios</h1>
+          <p style={{fontSize: '0.875rem', color: '#94a3b8', marginTop: '0.5rem'}}>Administración de usuarios, permisos y suscripciones.</p>
+        </Box>
+        <Button variant="contained" color="primary" onClick={() => navigate("/app/users/new")} sx={{textTransform: 'none', fontSize: 16, boxShadow: 2}}>Nuevo Usuario</Button>
+      </Box>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">
-            Total Usuarios
-          </p>
-
-          <h2 className="text-xl text-blue-400 font-bold">
-            {totalUsers}
-          </h2>
-        </div>
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">
-            Activos
-          </p>
-
-          <h2 className="text-xl text-green-400 font-bold">
-            {activeUsers}
-          </h2>
-        </div>
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">
-            Admins
-          </p>
-
-          <h2 className="text-xl text-yellow-400 font-bold">
-            {admins}
-          </h2>
-        </div>
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">
-            Empleados
-          </p>
-
-          <h2 className="text-xl text-indigo-400 font-bold">
-            {employees}
-          </h2>
-        </div>
-
-      </div>
+      <Grid container spacing={2} sx={{mb: 4}}>
+        {[{label: 'Total Usuarios', value: totalUsers}, {label: 'Activos', value: activeUsers}, {label: 'Admins', value: admins}, {label: 'Empleados', value: employees}].map((kpi, i) => (
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <Card>
+              <CardContent>
+                <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', margin: 0}}>{kpi.label}</p>
+                <h2 style={{fontSize: '1.875rem', fontWeight: 'bold', marginTop: '0.5rem', margin: 0}}>{kpi.value}</h2>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {/* TABLE */}
-      <div className="bg-gray-900 p-4 rounded-lg">
-
-        <div className="flex justify-between items-center mb-4">
-
-          <h2 className="font-bold text-lg">
-            📋 Lista de Usuarios
-          </h2>
-
-          <button
-            onClick={loadUsers}
-             className="px-3 py-2 rounded-lg
-             hover:bg-zinc-800 transition-colors
-             text-zinc-400 hover:text-white text-sm"
-             >
-             🔄 Recargar
-             </button>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-10 text-gray-400">
-            Cargando usuarios...
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-
-            <table className="w-full text-sm">
-
-              <thead className="border-b border-gray-700 text-gray-400">
-                <tr>
-                  <th className="text-left py-3">
-                    Usuario
-                  </th>
-
-                  <th className="text-left py-3">
-                    Email
-                  </th>
-
-                  <th className="text-left py-3">
-                    Rol
-                  </th>
-
-                  <th className="text-left py-3">
-                    Plan
-                  </th>
-
-                  <th className="text-left py-3">
-                    Estado
-                  </th>
-
-                  <th className="text-right py-3">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {users.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-10 text-gray-400"
-                    >
-                      No hay usuarios registrados
-                    </td>
-                  </tr>
-                ) : (
-                  users.map((u) => (
-                    <tr
-                      key={u._id}
-                      className="border-b border-gray-800"
-                    >
-                      {/* USER */}
-                      <td className="py-4">
-
-                        <div className="font-semibold">
-                          {u.name} {u.lastName}
-                        </div>
-
-                        <div className="text-xs text-gray-500">
-                          ID #{u._id.slice(-6)}
-                        </div>
-
-                      </td>
-
-                      {/* EMAIL */}
-                      <td>
-                        {u.email}
-                      </td>
-
-                      {/* ROLE */}
-                      <td>
-                        <span className="capitalize">
-                          {u.role}
-                        </span>
-                      </td>
-
-                      {/* PLAN */}
-                      <td>
-                        <span className="capitalize">
-                          {u.plan || "free"}
-                        </span>
-                      </td>
-
-                      {/* STATUS */}
-                      <td>
-                        <span
-                          className={`px-2 py-1 rounded text-xs ${
-                            u.isActive
-                              ? "bg-green-600/20 text-green-400"
-                              : "bg-red-600/20 text-red-400"
-                          }`}
-                        >
-                          {u.isActive
-                            ? "Activo"
-                            : "Inactivo"}
-                        </span>
-                      </td>
-
-                      {/* ACTIONS */}
-                      <td className="text-right">
-
-                        <button
-                          className="text-blue-400 hover:text-blue-300 mr-4"
-                          onClick={() =>
-                            navigate(
-                              `/app/users/${u._id}`
-                            )
-                          }
-                        >
-                          Ver
-                        </button>
-
-                        <button
-                          className="text-purple-400 hover:text-purple-300 mr-4"
-                          onClick={() =>
-                            navigate(
-                              `/app/users/roles/${u._id}`
-                            )
-                          }
-                        >
-                          Rol
-                        </button>
-
-                        <button
-                          className="text-indigo-400 hover:text-indigo-300 mr-4"
-                          onClick={() =>
-                            navigate(
-                              `/app/users/edit/${u._id}`
-                            )
-                          }
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          disabled={
-                            deletingId === u._id
-                          }
-                          className="text-red-400 hover:text-red-300 disabled:opacity-50"
-                          onClick={() =>
-                            handleDelete(u._id)
-                          }
-                        >
-                          {deletingId === u._id
-                            ? "..."
-                            : "Eliminar"}
-                        </button>
-                        <button
-  className={
-    u.isActive
-      ? "text-red-400 hover:text-red-300 mr-4"
-      : "text-green-400 hover:text-green-300 mr-4"
-  }
-  onClick={() =>
-    handleToggleActive(
-      u._id,
-      u.isActive
-    )
-  }
->
-  {u.isActive
-    ? "Desactivar"
-    : "Activar"}
-</button>
-
-                      </td>
-
-                    </tr>
-                  ))
-                )}
-
-              </tbody>
-
-            </table>
-
-          </div>
-        )}
-
-      </div>
-
-    </div>
+      <Card>
+        <CardHeader title="Lista de Usuarios" action={<Button onClick={loadUsers} size="small">🔄 Recargar</Button>} />
+        <CardContent sx={{p: 0}}>
+          {loading ? (
+            <Box sx={{p: 2}}>
+              <SkeletonLoader count={6} height={48} />
+            </Box>
+          ) : users.length === 0 ? (
+            <Box sx={{p: 4}}>
+              <EmptyState title="No hay usuarios" description="Crea tu primer usuario para comenzar." actionLabel="Crear usuario" onAction={() => navigate("/app/users/new")} />
+            </Box>
+          ) : (
+            <DataGridWrapper
+              rows={users.map(u => ({ ...u, id: u._id }))}
+              columns={[
+                {field: 'name', headerName: 'Usuario', flex: 1, renderCell: (params: any)=> (
+                  <Box style={{display:'flex', alignItems:'center', gap:12}}>
+                    <Box style={{width:40, height:40, borderRadius:'50%', background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:700, fontSize:12, textTransform:'uppercase'}}>
+                      {params.row.name[0]}
+                    </Box>
+                    <Box>
+                      <div style={{fontWeight:600, color:'#fff'}}>{params.row.name} {params.row.lastName}</div>
+                      <div style={{fontSize:10, color:'#9ca3af', fontFamily:'monospace'}}>ID: {params.row._id.slice(-6)}</div>
+                    </Box>
+                  </Box>
+                )},
+                {field: 'email', headerName: 'Email', flex: 1},
+                {field: 'role', headerName: 'Rol', width: 140, renderCell: (params: any)=> <Chip label={params.value || 'N/A'} size="small" variant="outlined" />},
+                {field: 'plan', headerName: 'Plan', width: 120, renderCell: (params: any)=> <Chip label={params.value || 'free'} size="small" />},
+                {field: 'isActive', headerName: 'Estado', width: 140, renderCell: (params: any)=> params.value ? <UiBadge label='Activo' color='success' /> : <UiBadge label='Inactivo' color='error' />},
+                {field: 'actions', headerName: 'Acciones', width: 200, sortable: false, renderCell: (params: any)=> (
+                  <Box style={{display:'flex', gap:6, justifyContent:'flex-end', width:'100%', fontSize:12}}>
+                    <button onClick={() => navigate(`/app/users/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#6366f1', cursor:'pointer', textDecoration:'underline'}}>Ver</button>
+                    <button onClick={() => navigate(`/app/users/edit/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#8b5cf6', cursor:'pointer', textDecoration:'underline'}}>Editar</button>
+                    <button onClick={() => handleToggleActive(params.row._id, params.row.isActive)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#f59e0b', cursor:'pointer', textDecoration:'underline'}}>{params.row.isActive ? 'Desactivar' : 'Activar'}</button>
+                    <button onClick={() => handleDelete(params.row._id)} disabled={deletingId === params.row._id} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#ef4444', cursor:'pointer', textDecoration:'underline'}}>{deletingId === params.row._id ? '...' : 'Eliminar'}</button>
+                  </Box>
+                )},
+              ]}
+              pageSize={10}
+              onRowClick={(params:any)=> navigate(`/app/users/${params.row._id}`)}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

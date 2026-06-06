@@ -86,10 +86,28 @@ export const deleteUser = async (id: string) => {
 // PAYMENTS
 // ==========================
 
-export const paySubscription = async (paymentMethod: string) => {
-  return await requestOrQueue("POST", "/users/pay-subscription", { paymentMethod });
+export const paySubscription = async (
+  plan: "basic" | "medium" | "premium",
+  paymentMethod: string
+) => {
+  return await requestOrQueue(
+    "POST",
+    "/users/pay-subscription",
+    {
+      plan,
+      paymentMethod,
+    }
+  );
 };
 
-export const createSubscriptionPayment = async () => {
-  return await requestOrQueue("POST", "/users/create-payment");
+export const createSubscriptionPayment = async (
+  plan: "basic" | "medium" | "premium"
+) => {
+  return await requestOrQueue(
+    "POST",
+    "/users/create-payment",
+    {
+      plan,
+    }
+  );
 };

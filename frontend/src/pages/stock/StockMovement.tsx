@@ -1,5 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Container, Card, CardContent, CardHeader, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Typography, CircularProgress } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 import StockFilterForm from "./StockFilterForm";
 import StockSummaryPanel from "./StockSummaryPanel";
@@ -17,9 +20,6 @@ export default function StockMovement() {
 
   const navigate = useNavigate();
 
-  // =========================
-  // LOAD DATA
-  // =========================
   const loadMovements = async (productId?: string) => {
     try {
       setLoading(true);
@@ -49,9 +49,6 @@ export default function StockMovement() {
     navigate("/app/stock/movement/new");
   };
 
-  // =========================
-  // KPIs
-  // =========================
   const totalEntries = useMemo(
     () =>
       movements
@@ -77,9 +74,6 @@ export default function StockMovement() {
     ).length;
   }, [movements]);
 
-  // =========================
-  // CHART
-  // =========================
   const chartData = useMemo(() => {
     if (!movements.length) return [];
 
@@ -125,127 +119,126 @@ export default function StockMovement() {
     };
   }, [chartData]);
 
-  // =========================
-  // UI
-  // =========================
   return (
-    <div className="p-6 space-y-6 min-h-screen bg-[#0f1115] text-white">
+    <Box sx={{ minHeight: '100vh', py: { xs: 2, md: 4 }, px: { xs: 2, md: 0 } }}>
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box sx={{ mb: 4, pb: 3, borderBottom: '2px solid #e0e7ff' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: 0 }}>📦 Movimientos de Stock</h1>
+          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem', fontWeight: 600 }}>Gestión de entradas y salidas de inventario</p>
+        </Box>
 
-      {/* HEADER */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        {/* Filter Card */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 4 }}>
+          <CardContent sx={{ p: 3 }}>
+            <StockFilterForm onFilter={handleFilter} onReload={loadMovements} />
+          </CardContent>
+        </Card>
 
-        <div>
-          <h1 className="text-2xl font-bold">📦 Stock Movement</h1>
-          <p className="text-sm text-gray-400">
-            Gestión de entradas y salidas de inventario
-          </p>
-        </div>
-      </div>
+        {/* KPI Cards */}
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+          {[
+            { label: "Entradas", value: totalEntries, color: "success" },
+            { label: "Salidas", value: totalExits, color: "error" },
+            { label: "Hoy", value: todayMovements, color: "info" },
+            { label: "Balance Neto", value: netBalance, color: netBalance >= 0 ? "success" : "error" },
+          ].map((kpi, i) => (
+            <Grid item xs={12} sm={6} md={3} key={i}>
+              <Card sx={{ borderRadius: 2, boxShadow: 1 }}>
+                <CardContent>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>{kpi.label}</p>
+                  <h3 style={{ margin: '0.5rem 0 0', fontSize: '1.875rem', fontWeight: 900 }}>{kpi.value}</h3>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-      {/* FILTER (ARRIBA COMO PEDISTE) */} 
-      <div className="bg-gray-900 p-4 rounded-lg"> 
-           <StockFilterForm onFilter={handleFilter} 
-             onReload={loadMovements} /> 
-        </div>
+        {/* Summary Panel */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 4 }}>
+          <CardContent>
+            <StockSummaryPanel />
+          </CardContent>
+        </Card>
 
-      {/* KPI ROW (UNA SOLA FILA + BALANCE) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Chart */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 4 }}>
+          <CardHeader title="Tendencia de Stock" />
+          <CardContent>
+            <LineChartComponent
+              title="Ingresos vs Salidas"
+              series={stockTrendData.series}
+              categories={stockTrendData.categories}
+            />
+          </CardContent>
+        </Card>
 
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">Entradas</p>
-          <h2 className="text-xl text-green-400 font-bold">{totalEntries}</h2>
-        </div>
+        {/* Movements Table */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 4 }}>
+          <CardHeader 
+            title="Movimientos Registrados" 
+            action={
+              <Button 
+                startIcon={<RefreshIcon />}
+                onClick={() => loadMovements()}
+                disabled={loading}
+                size="small"
+              >
+                Actualizar
+              </Button>
+            }
+          />
+          <CardContent>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                      <TableCell><strong>Producto</strong></TableCell>
+                      <TableCell align="center"><strong>Tipo</strong></TableCell>
+                      <TableCell align="center"><strong>Cantidad</strong></TableCell>
+                      <TableCell><strong>Fecha</strong></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {movements.map((m, i) => (
+                      <TableRow key={m._id || i} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableCell>{m?.product?.name || m.productId}</TableCell>
+                        <TableCell align="center">
+                          <Chip 
+                            label={m.type === "in" ? "Entrada" : "Salida"} 
+                            color={m.type === "in" ? "success" : "error"} 
+                            size="small" 
+                          />
+                        </TableCell>
+                        <TableCell align="center"><strong>{m.quantity}</strong></TableCell>
+                        <TableCell>{new Date(m.createdAt).toLocaleString('es-ES')}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
 
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">Salidas</p>
-          <h2 className="text-xl text-red-400 font-bold">{totalExits}</h2>
-        </div>
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">Hoy</p>
-          <h2 className="text-xl text-blue-400 font-bold">{todayMovements}</h2>
-        </div>
-
-        <div className="p-4 bg-gray-900 rounded-lg">
-          <p className="text-xs text-gray-400">Balance Neto</p>
-          <h2 className={`text-xl font-bold ${netBalance >= 0 ? "text-green-400" : "text-red-400"}`}>
-            {netBalance}
-          </h2>
-        </div>
-
-      </div>
-
-      {/* SUMMARY */}
-      <div className="bg-gray-900 p-4 rounded-lg">
-        <StockSummaryPanel />
-      </div>
-
-      {/* BUTTON SOLO (SIN FORM) */}
-      <div className="flex justify-end">
-        <button
-          onClick={handleNewStock}
-          className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700"
-        >
-          ➕ Registrar movimiento
-        </button>
-      </div>
-
-      {/* CHART */}
-      <div className="bg-gray-900 p-4 rounded-lg">
-        <LineChartComponent
-          title="📊 Tendencia de Stock"
-          series={stockTrendData.series}
-          categories={stockTrendData.categories}
-        />
-      </div>
-
-      {/* TABLE */}
-      <div className="bg-gray-900 p-4 rounded-lg">
-
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="font-bold">📋 Movimientos</h2>
-
-          <button
-            onClick={() => loadMovements()}
-            className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded"
+        {/* Action Button */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button 
+            variant="contained" 
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleNewStock}
+            sx={{ textTransform: 'none', fontSize: 14, fontWeight: 700 }}
           >
-            Recargar
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="text-gray-400 text-center py-10">
-            Cargando...
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-gray-400 border-b border-gray-700">
-                <tr>
-                  <th>Producto</th>
-                  <th>Tipo</th>
-                  <th>Cantidad</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {movements.map((m, i) => (
-                  <tr key={m._id || i} className="border-b border-gray-800">
-                    <td>{m?.product?.name || m.productId}</td>
-                    <td className={m.type === "in" ? "text-green-400" : "text-red-400"}>
-                      {m.type}
-                    </td>
-                    <td>{m.quantity}</td>
-                    <td>{new Date(m.createdAt).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-    </div>
+            Registrar Movimiento
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 }

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Box, Card, CardContent, CardHeader, TextField, Button, Select, MenuItem, FormControl, InputLabel, Grid, Alert } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import API from "../../services/api";
+import UiCard from "../../components/common/UiCard";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
 
 const ProductFormPage = () => {
   const { id } = useParams();
@@ -57,92 +62,132 @@ const ProductFormPage = () => {
 
   if (fetching) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-zinc-500">
-        <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-        <p className="font-medium">Cargando datos del producto...</p>
-      </div>
+      <Box sx={{ maxWidth: 800, mx: 'auto', p: { xs: 2, sm: 4 } }}>
+        <SkeletonLoader count={5} height={40} />
+      </Box>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <form onSubmit={handleSubmit} className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-zinc-800 bg-zinc-900/30">
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            {isEdit ? "Editar Producto" : "Nuevo Producto"}
-          </h1>
-          <p className="text-sm text-zinc-500 mt-1">Ingresa los detalles técnicos y comerciales del artículo.</p>
-        </div>
+    <Box sx={{ maxWidth: 800, mx: 'auto', p: { xs: 2, sm: 4 }, animation: 'fadeIn 0.5s ease-in-out' }}>
+      <Card sx={{ borderRadius: 3, boxShadow: 4 }}>
+        <CardHeader 
+          title={isEdit ? "Editar Producto" : "Nuevo Producto"}
+          subheader="Ingresa los detalles técnicos y comerciales del artículo."
+          sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
+        />
+        
+        <CardContent sx={{ pt: 4 }}>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              {/* Nombre y SKU */}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Nombre del Producto"
+                  placeholder="Ej. MacBook Pro M3"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  variant="outlined"
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  label="SKU / Código"
+                  placeholder="MBP-M3-2024"
+                  value={form.sku}
+                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                  variant="outlined"
+                  size="medium"
+                  inputProps={{ style: { fontFamily: 'monospace' } }}
+                />
+              </Grid>
 
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Nombre del Producto</label>
-              <input
-                required
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white placeholder:text-zinc-600"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ej. MacBook Pro M3"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">SKU / Código</label>
-              <input
-                required
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white placeholder:text-zinc-600 font-mono"
-                value={form.sku}
-                onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                placeholder="MBP-M3-2024"
-              />
-            </div>
-          </div>
+              {/* Precio, Stock, Categoría */}
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Precio (USD)"
+                  inputProps={{ step: "0.01" }}
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                  variant="outlined"
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Stock Inicial"
+                  value={form.stock}
+                  onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+                  variant="outlined"
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Categoría</InputLabel>
+                  <Select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    label="Categoría"
+                  >
+                    <MenuItem value="general">General</MenuItem>
+                    <MenuItem value="electronics">Electrónica</MenuItem>
+                    <MenuItem value="office">Oficina</MenuItem>
+                    <MenuItem value="services">Servicios</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Precio (USD)</label>
-              <input
-                type="number"
-                step="0.01"
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Stock Inicial</label>
-              <input
-                type="number"
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white"
-                value={form.stock}
-                onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Categoría</label>
-              <select
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white appearance-none cursor-pointer"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-              >
-                <option value="general">General</option>
-                <option value="electronics">Electrónica</option>
-                <option value="office">Oficina</option>
-                <option value="services">Servicios</option>
-              </select>
-            </div>
-          </div>
-        </div>
+              {/* Descripción */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Descripción"
+                  placeholder="Detalles adicionales del producto..."
+                  value={form.description || ""}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                />
+              </Grid>
 
-        <div className="p-6 bg-zinc-900/30 border-t border-zinc-800 flex justify-end gap-3">
-          <button type="button" onClick={() => navigate("/app/products")} className="px-5 py-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Cancelar</button>
-          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/10 transition-all active:scale-95 flex items-center gap-2">
-            {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>}
-            {loading ? "Guardando..." : isEdit ? "Actualizar Producto" : "Crear Producto"}
-          </button>
-        </div>
-      </form>
-    </div>
+              {/* Botones */}
+              <Grid item xs={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+                <Button 
+                  variant="outlined" 
+                  color="inherit" 
+                  startIcon={<CancelIcon />}
+                  onClick={() => navigate("/app/products")}
+                  sx={{ textTransform: 'none', fontSize: 16 }}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="contained" 
+                  color="primary" 
+                  disabled={loading}
+                  startIcon={<SaveIcon />}
+                  sx={{ textTransform: 'none', fontSize: 16, boxShadow: 2 }}
+                >
+                  {loading ? "Guardando..." : isEdit ? "Actualizar Producto" : "Crear Producto"}
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

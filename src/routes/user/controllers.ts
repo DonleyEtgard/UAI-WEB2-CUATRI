@@ -2,6 +2,7 @@ import axios from "axios";
 import type { Response } from "express";
 import admin from "../../firebase";
 import User from "../../models/User";
+import Payment from "../../models/Payment";
 import type { AuthRequest } from "../../types/auth";
 
 // ============================================================================
@@ -121,10 +122,10 @@ export const registerController = async (
 
     const now = new Date();
 
-    const subscriptionEnd = new Date();
-    subscriptionEnd.setMonth(
-      subscriptionEnd.getMonth() + 3
-    );
+    const trialEnd = new Date(now);
+     trialEnd.setMonth(
+     trialEnd.getMonth() + 1
+     );
 
     // ================================================================
     // PUBLIC REGISTER = ADMIN
@@ -161,15 +162,21 @@ export const registerController = async (
 
       plan: "free",
 
-      isVerified: false,
+      subscriptionStatus: "active",
 
-      isActive: true,
+      trialUsed: true,
+
+      trialEnd,
 
       subscriptionStart: now,
 
-      subscriptionEnd,
+     subscriptionEnd: trialEnd,
 
-      subscriptionPaid: false,
+     subscriptionPaid: false,
+
+     isVerified: false,
+
+      isActive: true,
     });
 
     await newUser.save();
@@ -599,6 +606,51 @@ export const updateUserController = async (
   }
 };
 
+/**
+ * DELETE /api/users/:id
+ * Delete user (Superadmin only)
+ */
+export const deleteUserController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+
+    const { id } = req.params;
+
+    // ================================================================
+    // DELETE FROM DATABASE
+    // ================================================================
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: "NOT_FOUND",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: { id }
+    });
+
+  } catch (error: any) {
+
+    console.error("Delete user error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting user",
+      error: error.message,
+    });
+
+  }
+};
+
 // ==========================
 // 💳 PAYMENT SUBSCRIPTION
 // ==========================
@@ -625,42 +677,222 @@ export const paySubscription = async (
       });
     }
 
-    const { paymentMethod } = req.body;
-
-    const basePrice = 3000;
-
-    let total = basePrice;
-
-    if (paymentMethod === "moncash") {
-      total += basePrice * 0.05;
+    if (user.role !== "admin") {
+      return res.status(403).json({
+        message:
+          "Only admins can purchase subscriptions"
+      });
     }
 
-    const now = new Date();
+    const {
+      plan,
+      paymentMethod
+    } = req.body;
 
-    user.plan = "basic";
+    const plans = {
+      basic: {
+        months: 1,
+        price: 80000
+      },
+      medium: {
+        months: 3,
+        price: 220000
+      },
+      premium: {
+        months: 6,
+        price: 440000
+      }
+    };
 
-    user.subscriptionStart = now;
+    const selectedPlan =
+      plans[plan as keyof typeof plans];
 
-    user.subscriptionEnd =
-      new Date(now.setMonth(now.getMonth() + 1));
+    if (!selectedPlan) {
+      return res.status(400).json({
+        message: "Invalid plan"
+      });
+    }
 
+    let total =
+      selectedPlan.price;
+
+    if (paymentMethod === "moncash") {
+      total += selectedPlan.price * 0.05;
+    }
+
+    const startDate =
+      new Date();
+
+    const endDate =
+      new Date(startDate);
+
+    endDate.setMonth(
+      endDate.getMonth() +
+      selectedPlan.months
+    );
+
+    user.plan = plan;
+
+    user.subscriptionStatus = "pending";
+     user.subscriptionPaid = false;
+
+    user.lastPaymentMethod =
+      paymentMethod;
+
+    user.lastPaymentAmount =
+      selectedPlan.price;
+
+    user.lastPaymentDate =
+      new Date();
+    await Payment.create({
+    user: user._id,
+    plan,
+    amount: total,
+    method: paymentMethod,
+    status: "pending",
+    qrData:
+     paymentMethod === "moncash"
+      ? `QR-${user._id}-${Date.now()}`
+      : undefined
+});
     await user.save();
 
-    res.json({
-      message: "Subscription updated",
+    return res.json({
+      success: true,
+      message:
+        "Subscription activated",
+      plan,
       paymentMethod,
       totalPaid: total,
+      subscriptionEnd: endDate,
       qrCode:
         paymentMethod === "moncash"
           ? `QR-${user._id}-${Date.now()}`
-          : null,
+          : null
     });
 
   } catch (error: any) {
 
-    res.status(500).json({
-      message: "Error updating subscription",
+    console.error(
+      "Subscription payment error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Error updating subscription",
       error: error.message
+    });
+
+  }
+};
+
+export const getPendingPayments = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+
+    const payments =
+      await Payment.find({
+        status: "pending"
+      })
+      .populate(
+        "user",
+        "name lastName email"
+      )
+      .sort({
+        createdAt: -1
+      });
+
+    return res.json(payments);
+
+  } catch (error: any) {
+
+    return res.status(500).json({
+      message: error.message
+    });
+
+  }
+};
+
+// ==========================
+// 💳 APPROVE PAYMENT
+// ==========================
+export const approvePayment = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    if (
+      !req.dbUser ||
+      req.dbUser.role !== "superadmin"
+    ) {
+      return res.status(403).json({
+        message: "Forbidden"
+      });
+    }
+
+    const payment = await Payment.findById(
+      req.params.id
+    );
+
+    if (!payment) {
+      return res.status(404).json({
+        message: "Payment not found"
+      });
+    }
+
+    const user = await User.findById(
+      payment.user
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+    const plans = {
+      basic: 1,
+      medium: 3,
+      premium: 6
+    };
+
+    const months =
+      plans[
+        payment.plan as keyof typeof plans
+      ];
+
+    const startDate = new Date();
+
+    const endDate = new Date(startDate);
+
+    endDate.setMonth(
+      endDate.getMonth() + months
+    );
+
+    payment.status = "paid";
+
+    user.plan = payment.plan;
+    user.subscriptionPaid = true;
+    user.subscriptionStart = startDate;
+    user.subscriptionEnd = endDate;
+    user.subscriptionStatus = "active";
+
+    await payment.save();
+    await user.save();
+
+    return res.json({
+      success: true,
+      message:
+        "Subscription activated"
+    });
+
+  } catch (error: any) {
+
+    return res.status(500).json({
+      message: error.message
     });
 
   }
@@ -684,103 +916,46 @@ export const createSubscriptionPayment = async (
       });
     }
 
-    const user = await User.findById(userId);
+    const {
+      plan
+    } = req.body;
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found"
+    const plans = {
+      basic: 80000,
+      medium: 220000,
+      premium: 440000
+    };
+
+    const price =
+      plans[plan as keyof typeof plans];
+
+    if (!price) {
+      return res.status(400).json({
+        message: "Invalid plan"
       });
     }
 
-    const basePrice = 3000;
+    const fee =
+      price * 0.05;
 
-    const fee = basePrice * 0.05;
+    const total =
+      price + fee;
 
-    const total = basePrice + fee;
-
-    const qr =
-      `moncash://pay?amount=${total}&user=${user._id}`;
-
-    res.json({
-      basePrice,
+    return res.json({
+      plan,
+      basePrice: price,
       fee,
       total,
-      qr
+      qr:
+        `moncash://pay?amount=${total}`
     });
 
   } catch (error: any) {
-
-    res.status(500).json({
-      message: "Error creating payment",
-      error: error.message
-    });
-
-  }
-};
-
-/**
- * DELETE /api/users/:id
- * Superadmin only
- */
-export const deleteUserController = async (
-  req: AuthRequest,
-  res: Response
-) => {
-  try {
-
-    if (!req.dbUser) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-        error: "NO_AUTH",
-      });
-    }
-
-    if (req.dbUser.role !== "superadmin") {
-      return res.status(403).json({
-        success: false,
-        message: "Only superadmins can delete users",
-        error: "FORBIDDEN",
-      });
-    }
-
-    const { id } = req.params;
-
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        isActive: false,
-        updatedAt: new Date(),
-      },
-      {
-        new: true,
-      }
-    ).select("-__v");
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-        error: "NOT_FOUND",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "User deleted successfully",
-      data: {
-        user,
-      },
-    });
-
-  } catch (error: any) {
-
-    console.error("Delete user error:", error);
 
     return res.status(500).json({
-      success: false,
-      message: "Error deleting user",
-      error: error.message,
+      message:
+        "Error creating payment",
+      error: error.message
     });
 
   }

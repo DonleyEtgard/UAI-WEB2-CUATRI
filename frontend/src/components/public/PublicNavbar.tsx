@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import InstallPWAButton from "../InstallPWAButton";
 
 const PublicNavbar = () => {
   return (
@@ -24,25 +25,40 @@ const PublicNavbar = () => {
       </div>
 
 
-      <nav className="text-on-surface-variant">
-        <Link to="/" className="hover:text-white transition">Inicio</Link>
-        <Link to="/about" className="hover:text-white transition">Nosotros</Link>
-        <Link to="/contact" className="hover:text-white transition">Contacto</Link>
-        <Link to="/login" className="hover:text-emerald-300 transition">Login</Link>
-      </nav>
+     <nav className="flex items-center gap-6 text-on-surface-variant">
+       <Link to="/" className="hover:text-white transition">
+        Inicio
+       </Link>
 
-      <div className="text-on-surface-variant">
-        <div className="hidden lg:flex items-center gap-2 bg-surface-container/60 border border-outline-variant/60 rounded-full px-3 py-1 navbar-status">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+      <Link to="/about" className="hover:text-white transition">
+        Nosotros
+      </Link>
+
+       <Link to="/contact" className="hover:text-white transition">
+        Contacto
+       </Link>
+
+       <Link to="/login" className="hover:text-emerald-300 transition">
+         Login
+        </Link>
+
+        <div className="hover:text-white transition">
+         <InstallPWAButton />
+       </div>
+     </nav>
+
+        <div className="text-on-surface-variant">
+         <div className="hidden lg:flex items-center gap-2 bg-surface-container/60 border border-outline-variant/60 rounded-full px-3 py-1 navbar-status">
+         <span className="w-2 h-2 rounded-full bg-emerald-400" />
           Online • Sincronizado
         </div>
-        <Link to="/register" className="hover:text-white transition">
-          🚀 Acceder
-        </Link>
+
+      <Link to="/register" className="hover:text-white transition">
+        🚀 Acceder
+      </Link>
       </div>
     </header>
   );
 };
 
 export default PublicNavbar;
-

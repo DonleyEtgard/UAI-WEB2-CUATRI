@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProduct, useDeleteProduct } from "@/features/products";
+import UiCard from "../../components/common/UiCard";
+import UiBadge from "../../components/common/UiBadge";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
+import EmptyState from "../../components/common/EmptyState";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -26,8 +30,8 @@ const ProductDetailPage = () => {
     }
   };
 
-  if (loading) return <p>Cargando...</p>;
-  if (!product) return <p>No encontrado</p>;
+  if (loading) return <SkeletonLoader count={4} height={28} />;
+  if (!product) return <div className="p-6"><EmptyState title="Producto no encontrado" description="Este producto no existe o fue eliminado." /></div>;
 
   return (
     <div className="container py-8">
@@ -35,8 +39,7 @@ const ProductDetailPage = () => {
         {product.name}
       </h1>
 
-      {/* INFO */}
-      <div className="card mb-8">
+      <UiCard>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-muted-xs uppercase font-bold text-gray-400">Precio</p>
@@ -59,10 +62,10 @@ const ProductDetailPage = () => {
           <p className="text-muted-xs uppercase font-bold text-gray-400">Descripción</p>
           <p className="text-muted">{product.description || "Sin descripción disponible."}</p>
         </div>
-      </div>
+      </UiCard>
 
       {/* ACTIONS */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 mt-4">
         <button className="btn-secondary" onClick={() => navigate("/app/products")}>
           Volver
         </button>
@@ -74,6 +77,10 @@ const ProductDetailPage = () => {
         <button className="text-red-600 font-semibold hover:underline px-4" onClick={handleDelete}>
           Eliminar Producto
         </button>
+
+        <div className="ml-auto flex items-center gap-2">
+          <UiBadge label={product.isActive ? 'Activo' : 'Oculto'} color={product.isActive ? 'success' : 'default'} />
+        </div>
       </div>
     </div>
   );

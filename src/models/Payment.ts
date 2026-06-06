@@ -7,6 +7,12 @@ const paymentSchema = new Schema({
     required: true
   },
 
+  plan: {
+    type: String,
+    enum: ["basic", "medium", "premium"],
+    required: true
+  },
+
   amount: {
     type: Number,
     required: true
@@ -14,7 +20,7 @@ const paymentSchema = new Schema({
 
   method: {
     type: String,
-    enum: ["cash", "transfer", "moncash"],
+    enum: ["cash", "card", "transfer", "moncash", "mercado-pago"],
     required: true
   },
 
@@ -26,7 +32,7 @@ const paymentSchema = new Schema({
 
   qrData: String,
 
-  reference: String // id externo o comprobante
+  reference: String
 }, { timestamps: true });
 
 export default model("Payment", paymentSchema);

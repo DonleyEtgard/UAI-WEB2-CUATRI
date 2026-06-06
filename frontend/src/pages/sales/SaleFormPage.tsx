@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Card, CardContent, CardHeader, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Typography, CircularProgress } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import API from "../../services/api";
 
 interface CartItem {
@@ -20,25 +25,23 @@ const SaleFormPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [prodRes, custRes] = await Promise.all([
-        API.get("/products"),
-        API.get("/customers"),
-      ]);
-
-      const prods = prodRes.data?.data?.products || prodRes.data?.products || prodRes.data || [];
-      const custs = custRes.data?.data?.customers || custRes.data?.customers || custRes.data || [];
-      setProducts(prods);
-      setCustomers(custs);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  fetchData();
-}, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [prodRes, custRes] = await Promise.all([
+          API.get("/products"),
+          API.get("/customers"),
+        ]);
+        const prods = prodRes.data?.data?.products || prodRes.data?.products || prodRes.data || [];
+        const custs = custRes.data?.data?.customers || custRes.data?.customers || custRes.data || [];
+        setProducts(prods);
+        setCustomers(custs);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const addToCart = (product: any) => {
     const exists = cart.find(item => item.productId === product._id);
@@ -89,156 +92,189 @@ const SaleFormPage = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col lg:flex-row gap-8">
-        
-        {/* LEFT: Selection Area */}
-        <div className="flex-1 space-y-6">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-              </span>
-              Nueva Transacción
-            </h2>
+    <Box sx={{ minHeight: '100vh', py: { xs: 2, md: 4 }, px: { xs: 2, md: 0 } }}>
+      <Container maxWidth="lg">
+        <Grid container spacing={4}>
+          {/* Left: Product Selection */}
+          <Grid item xs={12} md={8}>
+            <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+              <CardHeader 
+                title="Nueva Transacción" 
+                subheader="Selecciona cliente y agrega productos al carrito"
+                sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
+              />
+              <CardContent sx={{ pt: 4 }}>
+                {/* Customer Picker */}
+                <Box sx={{ mb: 4 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Cliente</InputLabel>
+                    <Select
+                      value={selectedCustomerId}
+                      onChange={(e) => setSelectedCustomerId(e.target.value)}
+                      label="Cliente"
+                    >
+                      <MenuItem value="">Selecciona un cliente...</MenuItem>
+                      {customers.map(c => (
+                        <MenuItem key={c._id} value={c._id}>{c.name} {c.lastName} ({c.email})</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
 
-            {/* Customer Picker */}
-            <div className="space-y-2 mb-8">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Cliente</label>
-              <select
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl 
-                focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all 
-                text-white appearance-none cursor-pointer"
-                value={selectedCustomerId}
-                onChange={(e) => setSelectedCustomerId(e.target.value)}
-              >
-                <option value="">Selecciona un cliente...</option>
-                {customers.map(c => (
-                  <option key={c._id} value={c._id}>{c.name} {c.lastName} ({c.email})</option>
-                ))}
-              </select>
-            </div>
+                {/* Product Search */}
+                <Box sx={{ mb: 4 }}>
+                  <TextField
+                    fullWidth
+                    label="Buscar Productos"
+                    placeholder="Escribe el nombre del producto..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    variant="outlined"
+                  />
+                </Box>
 
-            {/* Product Search */}
-            <div className="space-y-4">
-              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Buscador de Productos</label>
-              <div className="relative">
-                <input
-                  className="w-full pl-11 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-white placeholder:text-zinc-600"
-                  placeholder="Escribe el nombre del producto..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <svg className="w-5 h-5 absolute left-4 top-3.5 text-zinc-600" fill="none" 
-                stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round"
-                 strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              </div>
+                {/* Product Grid */}
+                <Grid container spacing={2}>
+                  {searchQuery && filteredProducts.length > 0 ? (
+                    filteredProducts.map(p => (
+                      <Grid item xs={12} sm={6} key={p._id}>
+                        <Card 
+                          sx={{ 
+                            cursor: 'pointer', 
+                            transition: 'all 0.3s ease',
+                            '&:hover': { 
+                              boxShadow: 3, 
+                              transform: 'translateY(-4px)',
+                              borderColor: '#667eea'
+                            },
+                            border: '1px solid #e0e7ff'
+                          }}
+                          onClick={() => addToCart(p)}
+                        >
+                          <CardContent>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                              <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{p.name}</Typography>
+                                <Typography variant="caption" sx={{ color: '#64748b' }}>Stock: {p.stock}</Typography>
+                              </Box>
+                              <Chip label={`$${p.price}`} color="primary" variant="outlined" />
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))
+                  ) : searchQuery ? (
+                    <Grid item xs={12}>
+                      <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 4 }}>No hay productos que coincidan</Typography>
+                    </Grid>
+                  ) : (
+                    <Grid item xs={12}>
+                      <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 4 }}>Escribe para buscar productos</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 
-              scrollbar-thin scrollbar-thumb-zinc-800">
-                {searchQuery && filteredProducts.map(p => (
-                  <button
-                    key={p._id}
-                    onClick={() => addToCart(p)}
-                    className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-800
-                     rounded-xl hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-left group"
-                  >
-                    <div>
-                      <div className="font-medium text-zinc-200 group-hover:text-white">{p.name}</div>
-                      <div className="text-xs text-zinc-500">${p.price} • Stock: {p.stock}</div>
-                    </div>
-                    <span className="text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: Summary & Cart */}
-        <div className="lg:w-[400px] space-y-6">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-xl flex flex-col h-full overflow-hidden">
-            <div className="p-6 border-b border-zinc-800 bg-zinc-900/30">
-              <h3 className="font-bold text-white">Resumen de Venta</h3>
-              <p className="text-xs text-zinc-500 mt-1">{cart.length} articulos seleccionados</p>
-            </div>
-
-            <div className="p-6 flex-1 overflow-y-auto max-h-[400px] space-y-4">
-              {cart.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-4xl mb-3 opacity-20">🛒</div>
-                  <p className="text-zinc-500 text-sm">El carrito está vacío</p>
-                </div>
-              ) : (
-                cart.map(item => (
-                  <div key={item.productId} className="flex justify-between items-start group">
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold text-zinc-200">{item.name}</div>
-                      <div className="text-xs text-zinc-500">
-                        {item.quantity} x ${item.price.toFixed(2)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="text-sm font-bold text-white">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </div>
-                      <button 
-                        onClick={() => removeFromCart(item.productId)}
-                        className="text-[10px] text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity font-bold uppercase tracking-wider"
-                      >
-                        Quitar
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="p-6 bg-zinc-900/30 border-t border-zinc-800 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500 font-medium">Subtotal</span>
-                <span className="text-zinc-300">${total.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500 font-medium">Impuestos (0%)</span>
-                <span className="text-zinc-300">$0.00</span>
-              </div>
-              <div className="flex justify-between items-end pt-3 border-t border-zinc-800">
-                <span className="text-lg font-bold text-white">Total</span>
-                <span className="text-2xl font-black text-indigo-400">
-                  ${total.toFixed(2)}
-                </span>
-              </div>
-
-              <button
-                onClick={handleSubmit}
-                disabled={loading || cart.length === 0 || !selectedCustomerId}
-                className="w-full mt-6 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/10 active:scale-[0.98] flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+          {/* Right: Cart Summary */}
+          <Grid item xs={12} md={4}>
+            <Card sx={{ borderRadius: 3, boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardHeader 
+                title="Resumen de Venta"
+                subheader={`${cart.length} artículos`}
+                sx={{ pb: 2 }}
+              />
+              <CardContent sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: '400px' }}>
+                {cart.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4, color: '#94a3b8' }}>
+                    <ShoppingCartIcon sx={{ fontSize: 48, opacity: 0.3, mb: 2 }} />
+                    <Typography>El carrito está vacío</Typography>
+                  </Box>
                 ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
-                    Finalizar Venta
-                  </>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableBody>
+                        {cart.map(item => (
+                          <TableRow key={item.productId} sx={{ '&:hover': { bgcolor: '#f1f5f9' } }}>
+                            <TableCell>
+                              <Box>
+                                <Typography variant="subtitle2">{item.name}</Typography>
+                                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                                  {item.quantity} x ${item.price.toFixed(2)}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right">
+                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                  ${(item.price * item.quantity).toFixed(2)}
+                                </Typography>
+                                <Button 
+                                  size="small" 
+                                  color="error"
+                                  onClick={() => removeFromCart(item.productId)}
+                                  startIcon={<DeleteIcon />}
+                                  sx={{ fontSize: 10 }}
+                                >
+                                  Quitar
+                                </Button>
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 )}
-              </button>
+              </CardContent>
 
-              <button
-                type="button"
-                onClick={() => navigate("/app/sales")}
-                className="w-full py-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-widest"
-              >
-                Cancelar Operación
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              {/* Totals & Actions */}
+              <Box sx={{ p: 2, borderTop: '1px solid #e0e7ff', bgcolor: '#f8fafc' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>Subtotal:</Typography>
+                  <Typography variant="body2">${total.toFixed(2)}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>Impuestos:</Typography>
+                  <Typography variant="body2">$0.00</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, pt: 1, borderTop: '1px solid #e0e7ff' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Total:</Typography>
+                  <Typography variant="h6" sx={{ color: '#6366f1', fontWeight: 900 }}>
+                    ${total.toFixed(2)}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                  <Button 
+                    fullWidth
+                    variant="contained" 
+                    color="primary"
+                    size="large"
+                    disabled={loading || cart.length === 0 || !selectedCustomerId}
+                    onClick={handleSubmit}
+                    startIcon={<SaveIcon />}
+                    sx={{ textTransform: 'none', fontSize: 16, fontWeight: 700 }}
+                  >
+                    {loading ? <CircularProgress size={24} /> : 'Finalizar Venta'}
+                  </Button>
+                  <Button 
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => navigate("/app/sales")}
+                    startIcon={<CancelIcon />}
+                    sx={{ textTransform: 'none', fontSize: 14 }}
+                  >
+                    Cancelar
+                  </Button>
+                </Box>
+              </Box>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
