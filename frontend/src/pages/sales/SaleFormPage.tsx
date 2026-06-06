@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Card, CardContent, CardHeader, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Typography, CircularProgress } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Container, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Button, Table, TableBody, TableCell, TableContainer, TableRow, Chip, Typography, CircularProgress } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -96,7 +96,7 @@ const SaleFormPage = () => {
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           {/* Left: Product Selection */}
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
               <CardHeader 
                 title="Nueva Transacción" 
@@ -137,7 +137,7 @@ const SaleFormPage = () => {
                 <Grid container spacing={2}>
                   {searchQuery && filteredProducts.length > 0 ? (
                     filteredProducts.map(p => (
-                      <Grid item xs={12} sm={6} key={p._id}>
+                      <Grid size={{ xs: 12, sm: 6 }} key={p._id}>
                         <Card 
                           sx={{ 
                             cursor: 'pointer', 
@@ -164,11 +164,11 @@ const SaleFormPage = () => {
                       </Grid>
                     ))
                   ) : searchQuery ? (
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 4 }}>No hay productos que coincidan</Typography>
                     </Grid>
                   ) : (
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 4 }}>Escribe para buscar productos</Typography>
                     </Grid>
                   )}
@@ -178,7 +178,7 @@ const SaleFormPage = () => {
           </Grid>
 
           {/* Right: Cart Summary */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ borderRadius: 3, boxShadow: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
               <CardHeader 
                 title="Resumen de Venta"

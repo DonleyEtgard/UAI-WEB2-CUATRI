@@ -1,8 +1,17 @@
 import { useEffect } from "react";
+import {
+  Box,
+  Container,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  Typography,
+  Button,
+  Chip,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProduct, useDeleteProduct } from "@/features/products";
-import UiCard from "../../components/common/UiCard";
-import UiBadge from "../../components/common/UiBadge";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
 
@@ -34,56 +43,206 @@ const ProductDetailPage = () => {
   if (!product) return <div className="p-6"><EmptyState title="Producto no encontrado" description="Este producto no existe o fue eliminado." /></div>;
 
   return (
-    <div className="container py-8">
-      <h1 className="page-title">
-        {product.name}
-      </h1>
+  <Box sx={{ minHeight: "100vh", py: { xs: 2, md: 4 } }}>
+    <Container maxWidth="lg">
 
-      <UiCard>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-muted-xs uppercase font-bold text-gray-400">Precio</p>
-            <p className="text-xl text-primary font-bold">${product.price}</p>
-          </div>
-          <div>
-            <p className="text-muted-xs uppercase font-bold text-gray-400">Costo</p>
-            <p className="text-xl">${product.cost || "-"}</p>
-          </div>
-          <div>
-            <p className="text-muted-xs uppercase font-bold text-gray-400">Stock Disponible</p>
-            <p className="text-xl">{product.stock} unidades</p>
-          </div>
-          <div>
-            <p className="text-muted-xs uppercase font-bold text-gray-400">Categoría</p>
-            <p className="text-xl">{product.category?.name || "Sin categoría"}</p>
-          </div>
-        </div>
-        <div className="mt-6">
-          <p className="text-muted-xs uppercase font-bold text-gray-400">Descripción</p>
-          <p className="text-muted">{product.description || "Sin descripción disponible."}</p>
-        </div>
-      </UiCard>
+      {/* HEADER */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          mb: 4,
+          pb: 3,
+          borderBottom: "2px solid #e0e7ff",
+        }}
+      >
+        <Box>
+          <h1
+            style={{
+              fontSize: "2.25rem",
+              fontWeight: 900,
+              margin: 0,
+              color: "#fff",
+            }}
+          >
+            {product.name}
+          </h1>
+
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "#64748b",
+              marginTop: "0.5rem",
+              fontWeight: 600,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+            }}
+          >
+            Información completa del producto
+          </p>
+        </Box>
+
+        <Chip
+          label={product.isActive ? "Activo" : "Oculto"}
+          color={product.isActive ? "success" : "default"}
+        />
+      </Box>
+
+      {/* KPI CARDS */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Precio de Venta
+              </Typography>
+
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 900, color: 'primary.main' }}
+              >
+                ${product.price}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Costo
+              </Typography>
+
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 900 }}
+              >
+                ${product.cost || 0}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Stock Disponible
+              </Typography>
+
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 900, color: product.stock > 0 ? "success.main" : "error.main" }}
+              >
+                {product.stock}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* DETALLE */}
+      <Card sx={{ mb: 4 }}>
+        <CardHeader
+          title="Información General"
+          subheader="Datos principales del producto"
+        />
+
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="overline">
+                Categoría
+              </Typography>
+
+              <Typography variant="h6">
+                {product.category?.name ||
+                  "Sin categoría"}
+              </Typography>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="overline">
+                Estado
+              </Typography>
+
+              <Box sx={{ mt: 1 }}>
+                <Chip
+                  label={
+                    product.isActive
+                      ? "Activo"
+                      : "Oculto"
+                  }
+                  color={
+                    product.isActive
+                      ? "success"
+                      : "default"
+                  }
+                />
+              </Box>
+            </Grid>
+
+            <Grid size={12}>
+              <Typography variant="overline">
+                Descripción
+              </Typography>
+
+              <Typography
+                variant="body1"
+                sx={{
+                  mt: 1,
+                  color: "text.secondary",
+                }}
+              >
+                {product.description ||
+                  "Sin descripción disponible."}
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
       {/* ACTIONS */}
-      <div className="flex gap-4 mt-4">
-        <button className="btn-secondary" onClick={() => navigate("/app/products")}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: "wrap",
+        }}
+      >
+        <Button
+          variant="outlined"
+          onClick={() =>
+            navigate("/app/products")
+          }
+        >
           Volver
-        </button>
+        </Button>
 
-        <button className="btn-primary" onClick={() => navigate(`/app/products/edit/${id}`)}>
+        <Button
+          variant="contained"
+          onClick={() =>
+            navigate(
+              `/app/products/edit/${id}`
+            )
+          }
+        >
           Editar
-        </button>
+        </Button>
 
-        <button className="text-red-600 font-semibold hover:underline px-4" onClick={handleDelete}>
-          Eliminar Producto
-        </button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDelete}
+        >
+          Eliminar
+        </Button>
+      </Box>
 
-        <div className="ml-auto flex items-center gap-2">
-          <UiBadge label={product.isActive ? 'Activo' : 'Oculto'} color={product.isActive ? 'success' : 'default'} />
-        </div>
-      </div>
-    </div>
-  );
+    </Container>
+  </Box>
+);
 };
-
 export default ProductDetailPage;

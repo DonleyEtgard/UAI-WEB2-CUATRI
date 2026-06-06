@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../services/api";
-import { Container, Box, Typography, Card, CardContent, Button, Avatar, Chip } from "@mui/material";
+import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip } from "@mui/material";
 
 const CustomerDetail = () => {
   const { id } = useParams();

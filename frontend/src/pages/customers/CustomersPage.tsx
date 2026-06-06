@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid, Card, CardContent, CardHeader, Button } from "@mui/material";
 import API from "../../services/api";
-import UiCard from "../../components/common/UiCard";
 import DataGridWrapper from "../../components/common/DataGridWrapper";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
@@ -78,7 +77,7 @@ const CustomersPage = () => {
       {/* KPIs */}
       <Grid container spacing={2} sx={{mb: 4}}>
         {[{label: 'Total Clientes', value: totalCustomers}, {label: 'Activos', value: activeCustomers}, {label: 'Nuevos este mes', value: '+' + newThisMonth}].map((kpi, i) => (
-          <Grid item xs={12} sm={4} key={i}>
+          <Grid size={{ xs: 12, sm: 4 }} key={i}>
             <Card>
               <CardContent>
                 <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', margin: 0}}>{kpi.label}</p>

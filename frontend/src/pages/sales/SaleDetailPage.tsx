@@ -108,30 +108,30 @@ const SaleDetailPage = () => {
         {/* Info Grid */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {/* Sale Summary */}
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
               <CardHeader title="Información de la Venta" />
               <CardContent>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>Total</Typography>
                       <Typography variant="h5" sx={{ fontWeight: 700, color: '#667eea' }}>${sale.totalAmount.toFixed(2)}</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>Pagado</Typography>
                       <Typography variant="h5" sx={{ fontWeight: 700, color: '#10b981' }}>${sale.amountPaid.toFixed(2)}</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>Vuelto</Typography>
                       <Typography variant="h5" sx={{ fontWeight: 700, color: metrics.change > 0 ? '#f59e0b' : '#64748b' }}>${Math.abs(metrics.change).toFixed(2)}</Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>Cliente</Typography>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>{sale.customerId}</Typography>
@@ -143,7 +143,7 @@ const SaleDetailPage = () => {
           </Grid>
 
           {/* KPI Cards */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 2 }}>
               <CardContent>
                 <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Subtotal</Typography>

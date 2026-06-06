@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Card, CardContent, CardHeader, TextField, Button, Select, MenuItem, FormControl, InputLabel, Grid, Alert } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Container,
+  Typography,
+  Chip,
+} from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import API from "../../services/api";
-import UiCard from "../../components/common/UiCard";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 
 const ProductFormPage = () => {
@@ -68,127 +82,297 @@ const ProductFormPage = () => {
     );
   }
 
-  return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: { xs: 2, sm: 4 }, animation: 'fadeIn 0.5s ease-in-out' }}>
-      <Card sx={{ borderRadius: 3, boxShadow: 4 }}>
-        <CardHeader 
-          title={isEdit ? "Editar Producto" : "Nuevo Producto"}
-          subheader="Ingresa los detalles técnicos y comerciales del artículo."
-          sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}
-        />
-        
-        <CardContent sx={{ pt: 4 }}>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              {/* Nombre y SKU */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  required
-                  label="Nombre del Producto"
-                  placeholder="Ej. MacBook Pro M3"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  variant="outlined"
-                  size="medium"
+ return (
+  <Box
+    sx={{
+      minHeight: "100vh",
+      py: { xs: 2, md: 4 },
+      px: { xs: 2, md: 0 },
+    }}
+  >
+    <Container maxWidth="lg">
+
+      {/* HEADER */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          mb: 4,
+          pb: 3,
+          borderBottom: "2px solid #e0e7ff",
+        }}
+      >
+        <Box>
+          <h1
+            style={{
+              fontSize: "2.25rem",
+              fontWeight: 900,
+              margin: 0,
+              color: "#fff",
+            }}
+          >
+            {isEdit ? (
+              <>
+                Editar <span style={{ color: "#6366f1" }}>Producto</span>
+              </>
+            ) : (
+              <>
+                Nuevo <span style={{ color: "#6366f1" }}>Producto</span>
+              </>
+            )}
+          </h1>
+
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "#64748b",
+              marginTop: "0.5rem",
+              fontWeight: 600,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+            }}
+          >
+            Gestión de catálogo e inventario
+          </p>
+        </Box>
+      </Box>
+
+      {/* KPI PREVIEW */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Precio Actual
+              </Typography>
+
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 900, color: 'primary.main' }}
+              >
+                ${form.price || 0}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Stock
+              </Typography>
+
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 900 }}
+              >
+                {form.stock}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="overline">
+                Estado
+              </Typography>
+
+              <Box sx={{ mt: 1 }}>
+                <Chip
+                  label={
+                    form.isActive
+                      ? "Activo"
+                      : "Inactivo"
+                  }
+                  color={
+                    form.isActive
+                      ? "success"
+                      : "default"
+                  }
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <form onSubmit={handleSubmit}>
+
+        {/* INFORMACIÓN GENERAL */}
+        <Card sx={{ mb: 4 }}>
+          <CardHeader
+            title="Información General"
+            subheader="Datos básicos del producto"
+          />
+
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   required
-                  label="SKU / Código"
-                  placeholder="MBP-M3-2024"
-                  value={form.sku}
-                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                  variant="outlined"
-                  size="medium"
-                  inputProps={{ style: { fontFamily: 'monospace' } }}
+                  label="Nombre"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
                 />
               </Grid>
 
-              {/* Precio, Stock, Categoría */}
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  fullWidth
+                  required
+                  label="SKU"
+                  value={form.sku}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      sku: e.target.value,
+                    })
+                  }
+                />
+              </Grid>
+
+              <Grid size={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="Descripción"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
+        {/* INFORMACIÓN COMERCIAL */}
+        <Card sx={{ mb: 4 }}>
+          <CardHeader
+            title="Información Comercial"
+            subheader="Precios, stock y categoría"
+          />
+
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
                   fullWidth
                   type="number"
-                  label="Precio (USD)"
-                  inputProps={{ step: "0.01" }}
+                  label="Precio"
                   value={form.price}
-                  onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                  variant="outlined"
-                  size="medium"
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      price: Number(e.target.value),
+                    })
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+
+              <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
                   fullWidth
                   type="number"
-                  label="Stock Inicial"
+                  label="Stock"
                   value={form.stock}
-                  onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
-                  variant="outlined"
-                  size="medium"
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      stock: Number(e.target.value),
+                    })
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+
+              <Grid size={{ xs: 12, md: 4 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Categoría</InputLabel>
+                  <InputLabel>
+                    Categoría
+                  </InputLabel>
+
                   <Select
                     value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
                     label="Categoría"
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        category:
+                          e.target.value,
+                      })
+                    }
                   >
-                    <MenuItem value="general">General</MenuItem>
-                    <MenuItem value="electronics">Electrónica</MenuItem>
-                    <MenuItem value="office">Oficina</MenuItem>
-                    <MenuItem value="services">Servicios</MenuItem>
+                    <MenuItem value="general">
+                      General
+                    </MenuItem>
+
+                    <MenuItem value="electronics">
+                      Electrónica
+                    </MenuItem>
+
+                    <MenuItem value="office">
+                      Oficina
+                    </MenuItem>
+
+                    <MenuItem value="services">
+                      Servicios
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Descripción */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Descripción"
-                  placeholder="Detalles adicionales del producto..."
-                  value={form.description || ""}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  variant="outlined"
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-
-              {/* Botones */}
-              <Grid item xs={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
-                <Button 
-                  variant="outlined" 
-                  color="inherit" 
-                  startIcon={<CancelIcon />}
-                  onClick={() => navigate("/app/products")}
-                  sx={{ textTransform: 'none', fontSize: 16 }}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
-                  color="primary" 
-                  disabled={loading}
-                  startIcon={<SaveIcon />}
-                  sx={{ textTransform: 'none', fontSize: 16, boxShadow: 2 }}
-                >
-                  {loading ? "Guardando..." : isEdit ? "Actualizar Producto" : "Crear Producto"}
-                </Button>
-              </Grid>
             </Grid>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
-  );
-};
+          </CardContent>
+        </Card>
 
+        {/* ACTIONS */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            startIcon={<CancelIcon />}
+            onClick={() =>
+              navigate("/app/products")
+            }
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={<SaveIcon />}
+            disabled={loading}
+          >
+            {loading
+              ? "Guardando..."
+              : isEdit
+              ? "Actualizar Producto"
+              : "Crear Producto"}
+          </Button>
+        </Box>
+
+      </form>
+    </Container>
+  </Box>
+);
+};
 export default ProductFormPage;

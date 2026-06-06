@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Card, CardContent, CardHeader, TextField, Button, Grid, FormControlLabel, Switch, FormControl, InputLabel, Select, MenuItem, Alert } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, TextField, Button, Grid, FormControlLabel, Switch, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuth } from "../../context/AuthContext";
@@ -220,7 +220,7 @@ const UserForm = () => {
           <Box component="form" onSubmit={(e: any) => { e.preventDefault(); handleSubmit(); }}>
             <Grid container spacing={3}>
               {/* Nombre y Apellido */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   required
@@ -232,7 +232,7 @@ const UserForm = () => {
                   size="medium"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   required
@@ -246,7 +246,7 @@ const UserForm = () => {
               </Grid>
 
               {/* Email */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TextField
                   fullWidth
                   type="email"
@@ -262,7 +262,7 @@ const UserForm = () => {
 
               {/* Contraseña (solo crear) */}
               {!isEdit && (
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     fullWidth
                     type="password"
@@ -278,7 +278,7 @@ const UserForm = () => {
               )}
 
               {/* Rol y Plan */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Rol Administrativo</InputLabel>
                   <Select
@@ -295,7 +295,7 @@ const UserForm = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Plan de Suscripción</InputLabel>
                   <Select
@@ -312,7 +312,7 @@ const UserForm = () => {
               </Grid>
 
               {/* Estado Activo */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -326,7 +326,7 @@ const UserForm = () => {
               </Grid>
 
               {/* Botones */}
-              <Grid item xs={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+              <Grid size={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
                 <Button 
                   variant="outlined" 
                   color="inherit" 

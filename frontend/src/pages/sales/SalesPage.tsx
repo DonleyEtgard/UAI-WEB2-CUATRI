@@ -127,7 +127,7 @@ const SalesPage = () => {
             { label: "Pendientes", value: pendingCount, color: "warning" },
             { label: "Ticket Promedio", value: `$${averageTicket.toFixed(2)}`, color: "primary" },
           ].map((kpi, i) => (
-            <Grid item xs={12} sm={6} md={3} key={i}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
               <Card sx={{ borderRadius: 2, boxShadow: 1 }}>
                 <CardContent>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>{kpi.label}</p>

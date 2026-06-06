@@ -123,7 +123,7 @@ const UserPage = () => {
       {/* KPIs */}
       <Grid container spacing={2} sx={{mb: 4}}>
         {[{label: 'Total Usuarios', value: totalUsers}, {label: 'Activos', value: activeUsers}, {label: 'Admins', value: admins}, {label: 'Empleados', value: employees}].map((kpi, i) => (
-          <Grid item xs={12} sm={6} md={3} key={i}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
             <Card>
               <CardContent>
                 <p style={{fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', margin: 0}}>{kpi.label}</p>

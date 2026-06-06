@@ -80,7 +80,7 @@ const CustomerForm = () => {
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               {/* Nombre y Apellido */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   required
@@ -92,7 +92,7 @@ const CustomerForm = () => {
                   size="medium"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   required
@@ -106,7 +106,7 @@ const CustomerForm = () => {
               </Grid>
 
               {/* Email y Teléfono */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   type="email"
@@ -119,7 +119,7 @@ const CustomerForm = () => {
                   size="medium"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Teléfono"
@@ -132,7 +132,7 @@ const CustomerForm = () => {
               </Grid>
 
               {/* Dirección */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Dirección / Notas"
@@ -146,7 +146,7 @@ const CustomerForm = () => {
               </Grid>
 
               {/* Estado Activo */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -160,7 +160,7 @@ const CustomerForm = () => {
               </Grid>
 
               {/* Botones */}
-              <Grid item xs={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+              <Grid size={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
                 <Button 
                   variant="outlined" 
                   color="inherit" 
