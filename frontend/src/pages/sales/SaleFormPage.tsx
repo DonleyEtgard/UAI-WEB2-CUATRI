@@ -74,11 +74,16 @@ const SaleFormPage = () => {
     
     try {
       setLoading(true);
-      await API.post("/sales", {
-        customerId: selectedCustomerId,
-        items: cart.map(i => ({ product: i.productId, quantity: i.quantity, price: i.price })),
-        total
-      });
+     await API.post("/sales", {
+      customer: selectedCustomerId,
+      paymentMethod: "cash",
+      items: cart.map(i => ({
+       product: i.productId,
+       quantity: i.quantity
+      })),
+       amountPaid: total,
+       notes: ""
+    });
       navigate("/app/sales");
     } catch (err) {
       alert("Error al procesar la venta");

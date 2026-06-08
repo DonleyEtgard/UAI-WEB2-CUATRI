@@ -27,7 +27,10 @@ const customerSchema = new Schema({
   phone: {
     type: String
   },
-
+address: {
+  type: String,
+  default: ""
+},
   // 🔥 MULTI-USUARIO
   user: {
     type: Schema.Types.ObjectId,

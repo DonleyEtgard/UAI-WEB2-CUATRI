@@ -5,102 +5,77 @@ import SaleItem from "../../models/SaleItem";
 import Product from "../../models/Product";
 import Sale from "../../models/Sale";
 import StockMovement from "../../models/StockMovement";
-
-interface AuthRequest extends Request {
-  dbUser?: {
-    _id: string;
-    [key: string]: any;
-  };
-  firebaseUser?: any;
-}
-
+import type { AuthRequest } from "../../types/auth";
 
 // ======================================================
 // 🛒 CREAR VENTA
 // ======================================================
 
 export const createSale = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   const session = await mongoose.startSession();
-
   session.startTransaction();
 
   try {
     const {
       customer,
-      user,
       paymentMethod,
       items,
       amountPaid = 0,
       notes
     } = req.body;
 
-    // ✅ VALIDACIONES
+    const user = req.dbUser?._id;
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
     if (
-      !user ||
       !paymentMethod ||
       !items ||
       !Array.isArray(items) ||
       items.length === 0
     ) {
-      return res.status(400).json({
-        message: "Missing required fields"
-      });
+      throw new Error("Missing required fields");
     }
 
     let total = 0;
-
     const productMap: any = {};
 
-    // ======================================================
-    // ✅ VALIDAR PRODUCTOS Y STOCK
-    // ======================================================
-
+    // =========================
+    // VALIDAR PRODUCTOS
+    // =========================
     for (const item of items) {
-      const product = await Product.findById(item.product)
-        .session(session);
+      const product = await Product.findById(item.product).session(session);
 
-      if (!product) {
-        throw new Error("Product not found");
-      }
+      if (!product) throw new Error("Product not found");
 
       if (product.stock < item.quantity) {
-        throw new Error(
-          `No stock available for ${product.name}`
-        );
+        throw new Error(`No stock for ${product.name}`);
       }
 
       productMap[item.product] = product;
-
       total += product.price * item.quantity;
     }
 
-    // ======================================================
-    // ✅ EFECTIVO
-    // ======================================================
-
+    // =========================
+    // CASH LOGIC
+    // =========================
     let change = 0;
 
     if (paymentMethod === "cash") {
       if (amountPaid < total) {
         throw new Error("Insufficient payment");
       }
-
       change = amountPaid - total;
     }
 
-    // ======================================================
-    // ✅ ESTADO
-    // ======================================================
-
-    const status: "pending" | "paid" | "cancelled" = "paid";
-
-    // ======================================================
-    // ✅ CREAR VENTA
-    // ======================================================
-
+    // =========================
+    // CREATE SALE
+    // =========================
     const sale = await Sale.create(
       [
         {
@@ -108,72 +83,41 @@ export const createSale = async (
           user,
           paymentMethod,
           total,
-          amountPaid:
-            paymentMethod === "cash"
-              ? amountPaid
-              : 0,
+          amountPaid: paymentMethod === "cash" ? amountPaid : 0,
           change,
-          status,
+          status: "paid",
           notes
         }
       ],
       { session }
     );
-    
-    const categories = await SaleItem.aggregate([
-  {
-    $lookup: {
-      from: "products",
-      localField: "product",
-      foreignField: "_id",
-      as: "productData"
-    }
-  },
-  {
-    $unwind: "$productData"
-  },
-  {
-    $group: {
-      _id: "$productData.category",
-      value: {
-        $sum: "$subtotal"
-      }
-    }
-  }
-]);
 
-    // ======================================================
-    // ✅ CREAR ITEMS + DESCONTAR STOCK
-    // ✅ + REGISTRAR MOVIMIENTOS
-    // ======================================================
+    const saleId = sale[0]._id;
 
+    // =========================
+    // ITEMS + STOCK
+    // =========================
     for (const item of items) {
       const product = productMap[item.product];
-
       if (!product) continue;
 
-      // ✅ CREAR ITEM
       await SaleItem.create(
         [
           {
-            sale: sale[0]._id,
+            sale: saleId,
             product: product._id,
             quantity: item.quantity,
             price: product.price,
-            subtotal:
-              product.price * item.quantity,
+            subtotal: product.price * item.quantity,
             productName: product.name
           }
         ],
         { session }
       );
 
-      // ✅ DESCONTAR STOCK
       product.stock -= item.quantity;
-
       await product.save({ session });
 
-      // ✅ REGISTRAR MOVIMIENTO
       await StockMovement.create(
         [
           {
@@ -182,7 +126,7 @@ export const createSale = async (
             quantity: item.quantity,
             user,
             reason: "sale",
-            sale: sale[0]._id,
+            sale: saleId,
             stockAfter: product.stock
           }
         ],
@@ -190,26 +134,21 @@ export const createSale = async (
       );
     }
 
-    // ======================================================
-    // ✅ CONFIRMAR TRANSACCIÓN
-    // ======================================================
-
     await session.commitTransaction();
-
     session.endSession();
 
-    res.status(201).json({
+    return res.status(201).json({
+      success: true,
       sale: sale[0],
       change
     });
 
   } catch (error: any) {
-    // ❌ CANCELAR TRANSACCIÓN
     await session.abortTransaction();
-
     session.endSession();
 
-    res.status(500).json({
+    return res.status(500).json({
+      success: false,
       message: error.message
     });
   }
@@ -220,7 +159,7 @@ export const createSale = async (
 // ======================================================
 
 export const getSales = async (
-  _req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -229,9 +168,14 @@ export const getSales = async (
       .populate("user")
       .sort({ createdAt: -1 });
 
-    res.json(sales);
+    res.json({
+      success: true,
+      data: sales
+    });
+
   } catch (error: any) {
     res.status(500).json({
+      success: false,
       message: error.message
     });
   }
@@ -241,27 +185,42 @@ export const getSales = async (
 // 📊 STATS
 // ======================================================
 
-export const getDailySales = async (
-  _req: Request,
-  res: Response
-) => {
+export const getDailySales = async (_req: Request, res: Response) => {
   try {
     const start = new Date();
-
     start.setHours(0, 0, 0, 0);
 
     const sales = await Sale.find({
       createdAt: { $gte: start }
     });
 
-    const total = sales.reduce(
-      (acc, s: any) => acc + (s.total || 0),
-      0
-    );
+    const total = sales.reduce((acc, s: any) => acc + (s.total || 0), 0);
+
+    res.json({ total, count: sales.length });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSaleById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const sale = await Sale.findById(id)
+      .populate("customer")
+      .populate("user");
+
+    if (!sale) {
+      return res.status(404).json({
+        message: "Sale not found"
+      });
+    }
+
+    const items = await SaleItem.find({ sale: id });
 
     res.json({
-      total,
-      count: sales.length
+      ...sale.toObject(),
+      items
     });
 
   } catch (error: any) {
@@ -271,42 +230,26 @@ export const getDailySales = async (
   }
 };
 
-
-export const getMonthlySales = async (
-  _req: Request,
-  res: Response
-) => {
+export const getMonthlySales = async (_req: Request, res: Response) => {
   try {
     const start = new Date();
-
     start.setDate(1);
-
     start.setHours(0, 0, 0, 0);
 
     const sales = await Sale.find({
       createdAt: { $gte: start }
     });
 
-    const total = sales.reduce(
-      (acc, s: any) => acc + (s.total || 0),
-      0
-    );
+    const total = sales.reduce((acc, s: any) => acc + (s.total || 0), 0);
 
-    res.json({
-      total,
-      count: sales.length
-    });
-
+    res.json({ total, count: sales.length });
   } catch (error: any) {
-    res.status(500).json({
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
-
 
 export const getTopProducts = async (
-  _req: Request,
+  _req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -379,7 +322,7 @@ export const updateSaleStatus = async (
 // ======================================================
 
 export const getSaleItems = async (
-  _req: Request,
+  _req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -399,7 +342,7 @@ export const getSaleItems = async (
 
 
 export const getItemsBySale = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -420,7 +363,7 @@ export const getItemsBySale = async (
 
 
 export const getSaleItemById = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -582,7 +525,7 @@ export const getSummary = async (
 // ======================================================
 
 export const deleteSaleItem = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {

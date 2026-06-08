@@ -80,7 +80,7 @@ image: {
 },
     role: {
   type: String,
-  enum: ["superadmin", "admin", "manager", "employee", "user"],
+  enum: ["superadmin", "admin", "employee", "user"],
   default: "user"
 },
 
@@ -98,7 +98,11 @@ image: {
       type: String,
       required: false,
       unique: true
-    }
+    },
+    createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }
   },
   {
     timestamps: true,

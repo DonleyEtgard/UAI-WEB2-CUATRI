@@ -3,9 +3,26 @@ import { getWithCache, requestOrQueue } from "./offlineApi";
 export type UserRole =
   | "superadmin"
   | "admin"
-  | "manager"
   | "employee"
   | "user";
+
+export type PlanType =
+  | "free"
+  | "basic"
+  | "medium"
+  | "premium";
+
+export type SubscriptionStatus =
+  | "active"
+  | "expired"
+  | "pending"
+  | "suspended";
+
+export type PaymentMethod =
+  | "cash"
+  | "transfer"
+  | "moncash"
+  | "mercado pago";
 
 export type Address = {
   street?: string;
@@ -21,6 +38,7 @@ export type RegisterData = {
   name: string;
   lastName: string;
   email: string;
+  image?: string;
   address?: Address;
 };
 
@@ -43,12 +61,118 @@ export type CreateEmployeeData = {
   address?: Address;
 };
 
+export interface User {
+  _id: string;
+
+  firebaseUid?: string;
+
+  name: string;
+  lastName: string;
+  email: string;
+
+  image?: string;
+
+  role: UserRole;
+
+  plan?: PlanType;
+
+  subscriptionStatus?: SubscriptionStatus;
+
+  subscriptionPaid?: boolean;
+
+  lastPaymentMethod?: PaymentMethod;
+
+  lastPaymentAmount?: number;
+
+  lastPaymentDate?: string;
+
+  subscriptionStart?: string;
+
+  subscriptionEnd?: string;
+
+  trialUsed?: boolean;
+
+  trialEnd?: string;
+
+  address?: Address;
+
+  isVerified?: boolean;
+
+  isActive?: boolean;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Payment {
+  _id: string;
+
+  user:
+    | string
+    | {
+        _id: string;
+        name: string;
+        lastName: string;
+        email: string;
+      };
+
+  plan: "basic" | "medium" | "premium";
+
+  amount: number;
+
+  method: PaymentMethod;
+
+  status: "pending" | "paid" | "rejected";
+
+  qrData?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+  error?: string;
+}
+
+export interface UserResponse {
+  user: User;
+}
+
+export interface UsersResponse {
+  users: User[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface ApprovePaymentResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface PendingPaymentUser {
+  _id: string;
+  name: string;
+  lastName: string;
+  email: string;
+}
 // ==========================
 // AUTH
 // ==========================
 
-export const registerUser = async (data: RegisterData) => {
-  return await requestOrQueue("POST", "/users/register", data);
+export const registerUser = async (
+  data: RegisterData
+) => {
+  return await requestOrQueue(
+    "POST",
+    "/users/register",
+    data
+  );
 };
 
 // ==========================
@@ -56,26 +180,56 @@ export const registerUser = async (data: RegisterData) => {
 // ==========================
 
 export const getMe = async () => {
-  return await getWithCache<any>("/users/me");
+  return await getWithCache<ApiResponse<UserResponse>>(
+    "/users/me"
+  );
 };
 
-export const getUsers = async (page = 1, limit = 10) => {
-  return await getWithCache<any>(`/users?page=${page}&limit=${limit}`);
+export const getUsers = async (
+  page = 1,
+  limit = 10
+) => {
+  return await getWithCache<
+    ApiResponse<UsersResponse>
+  >(
+    `/users?page=${page}&limit=${limit}`
+  );
 };
 
-export const getUserById = async (id: string) => {
-  return await getWithCache<any>(`/users/${id}`);
+export const getUserById = async (
+  id: string
+) => {
+ return await getWithCache<
+    ApiResponse<UserResponse>
+  >(
+    `/users/${id}`
+  );
 };
 
-export const updateUser = async (id: string, data: UpdateUserData) => {
-  return await requestOrQueue("PATCH", `/users/${id}`, data);
+export const updateUser = async (
+  id: string,
+  data: UpdateUserData
+) => {
+  return await requestOrQueue(
+    "PATCH",
+    `/users/${id}`,
+    data
+  );
 };
 
-export const createEmployee = async (data: CreateEmployeeData) => {
-  return await requestOrQueue("POST", "/users/employees", data);
+export const createEmployee = async (
+  data: CreateEmployeeData
+) => {
+  return await requestOrQueue(
+    "POST",
+    "/users/employees",
+    data
+  );
 };
 
-export const deleteUser = async (id: string) => {
+export const deleteUser = async (
+  id: string
+) => {
   return await requestOrQueue(
     "DELETE",
     `/users/${id}`
@@ -83,12 +237,12 @@ export const deleteUser = async (id: string) => {
 };
 
 // ==========================
-// PAYMENTS
+// SUBSCRIPTIONS
 // ==========================
 
 export const paySubscription = async (
   plan: "basic" | "medium" | "premium",
-  paymentMethod: string
+  paymentMethod: PaymentMethod
 ) => {
   return await requestOrQueue(
     "POST",
@@ -100,14 +254,42 @@ export const paySubscription = async (
   );
 };
 
-export const createSubscriptionPayment = async (
-  plan: "basic" | "medium" | "premium"
-) => {
-  return await requestOrQueue(
-    "POST",
-    "/users/create-payment",
-    {
-      plan,
-    }
-  );
-};
+export const createSubscriptionPayment =
+  async (
+    plan:
+      | "basic"
+      | "medium"
+      | "premium"
+  ) => {
+    return await requestOrQueue(
+      "POST",
+      "/users/create-payment",
+      {
+        plan,
+      }
+    );
+  };
+
+// ==========================
+// PAYMENTS (SUPERADMIN)
+// ==========================
+
+export const getPendingPayments =
+  async () => {
+   return await getWithCache<
+      Payment[]
+    >(
+      "/users/pending-payments"
+    );
+  };
+
+export const approvePayment =
+  async (paymentId: string) => {
+     return await requestOrQueue<
+      ApprovePaymentResponse
+    >(
+      "PATCH",
+      `/users/approve-payment/${paymentId}`
+    );
+  };
+  

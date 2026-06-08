@@ -27,7 +27,7 @@ const SalesPage = () => {
       setLoading(true);
       const res = await API.get("/sales");
       console.log("SALES RESPONSE:", res.data);
-      const salesData = res.data?.data?.sales || res.data?.sales || res.data?.data || [];
+      const salesData = res.data?.data || [];
       console.log("SALES ARRAY:", salesData);
       setSales(Array.isArray(salesData) ? salesData : []);
     } catch (err) {
@@ -75,14 +75,14 @@ const SalesPage = () => {
   // DataGrid columns
   const columns = [
     { field: 'ref', headerName: 'Referencia', width: 140, renderCell: (params: any) => `#${params.row._id.slice(-8)}` },
-    { field: 'customerName', headerName: 'Cliente', width: 200, renderCell: (params: any) => typeof params.row.customer === 'object' ? `${params.row.customer.name} ${params.row.customer.lastName}` : 'Consumidor Final' },
+    { field: 'customerName', headerName: 'Cliente', width: 200, renderCell: (params: any) => params.row.customer && typeof params.row.customer === 'object' ? `${params.row.customer.name} ${params.row.customer.lastName}` : 'Consumidor Final' },
     { field: 'date', headerName: 'Fecha', width: 140, renderCell: (params: any) => new Date(params.row.createdAt).toLocaleDateString('es-ES') },
     { field: 'itemsCount', headerName: 'Items', width: 100, renderCell: (params: any) => `${params.row.itemsCount || 0} pzs` },
     { field: 'status', headerName: 'Estado', width: 130, renderCell: (params: any) => <Chip label={params.row.status} color={getStatusColor(params.row.status)} size="small" /> },
     { field: 'total', headerName: 'Total', width: 120, align: 'right' as const, renderCell: (params: any) => `$${params.row.total.toFixed(2)}` },
     { field: 'actions', headerName: 'Acciones', width: 120, align: 'center' as const, sortable: false, renderCell: (params: any) => (
       <Button size="small" variant="outlined" onClick={() => navigate(`/app/sales/${params.row._id}`)}>Detalles</Button>
-    )}
+    ) },
   ];
 
   const rows = sales.map(s => ({ ...s, id: s._id }));

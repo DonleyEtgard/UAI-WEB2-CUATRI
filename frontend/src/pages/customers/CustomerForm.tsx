@@ -16,10 +16,11 @@ const CustomerForm = () => {
 
   const [form, setForm] = useState({
     name: "",
-    lastName: "",
     email: "",
     phone: "",
     address: "",
+    debt: 0,
+    payments: [] as any[],
     isActive: true,
   });
 
@@ -29,8 +30,8 @@ const CustomerForm = () => {
       try {
         setFetching(true);
         const res = await API.get(`/customers/${id}`);
-        const c = res.data.data.customer;
-        setForm({ ...c });
+        // Ajustado para coincidir con la respuesta directa del backend
+        setForm({ ...res.data });
       } catch (err) {
         console.error(err);
         alert("Error cargando datos del cliente");
@@ -42,22 +43,25 @@ const CustomerForm = () => {
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      if (isEdit) {
-        await API.patch(`/customers/${id}`, form);
-      } else {
-        await API.post("/customers", form);
-      }
-      navigate("/app/customers");
-    } catch (err) {
-      console.error(err);
-      alert("Error al guardar el cliente");
-    } finally {
-      setLoading(false);
+  e.preventDefault();
+
+  try {
+    setLoading(true);
+
+    if (isEdit) {
+      await API.patch(`/customers/${id}`, form);
+    } else {
+      await API.post("/customers", form);
     }
-  };
+
+    navigate("/app/customers");
+  } catch (err) {
+    console.error(err);
+    alert("Error al guardar el cliente");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (fetching) {
     return (
@@ -79,31 +83,54 @@ const CustomerForm = () => {
         <CardContent sx={{ pt: 4 }}>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              {/* Nombre y Apellido */}
-              <Grid size={{ xs: 12, sm: 6 }}>
+              {/* Nombre */}
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField
                   fullWidth
                   required
                   label="Nombre"
-                  placeholder="Ej. María"
+                  placeholder="Ej. Juan"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   variant="outlined"
                   size="medium"
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <TextField
                   fullWidth
-                  required
-                  label="Apellido"
-                  placeholder="Ej. González"
-                  value={form.lastName}
-                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                  variant="outlined"
-                  size="medium"
-                />
-              </Grid>
+                  type="number"
+                label="Deuda inicial"
+                 placeholder="0"
+                value={form.debt}
+               onChange={(e) =>
+                setForm({
+             ...form,
+              debt: Number(e.target.value),
+                   })
+                    }
+                             />
+                   </Grid>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <TextField
+                  fullWidth
+                  type="number"
+                label="Pago inicial"
+                 placeholder="0"
+                // En edición mostramos el primer pago si existe, pero deshabilitamos para evitar sobreescribir historial
+                value={form.payments?.[0]?.amount || 0}
+                disabled={isEdit}
+               onChange={(e) =>
+                !isEdit && setForm({
+                  ...form,
+                  payments: [{ amount: Number(e.target.value), date: new Date() }],
+                })
+               }
+               helperText={isEdit ? "El historial de pagos se gestiona desde el detalle del cliente" : ""}
+                             />
+                   </Grid>
 
               {/* Email y Teléfono */}
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -133,17 +160,15 @@ const CustomerForm = () => {
 
               {/* Dirección */}
               <Grid size={12}>
-                <TextField
-                  fullWidth
-                  label="Dirección / Notas"
-                  placeholder="Calle, Ciudad, Provincia, Código Postal..."
-                  value={form.address || ""}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  variant="outlined"
-                  multiline
-                  rows={4}
-                />
-              </Grid>
+  <TextField
+    fullWidth
+    label="Dirección"
+    placeholder="Calle, Ciudad, etc."
+    value={form.address || ""}
+    onChange={(e) => setForm({ ...form, address: e.target.value })}
+    variant="outlined"
+  />
+</Grid>
 
               {/* Estado Activo */}
               <Grid size={12}>

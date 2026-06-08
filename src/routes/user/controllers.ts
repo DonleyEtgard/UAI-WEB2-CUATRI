@@ -4,7 +4,6 @@ import admin from "../../firebase";
 import User from "../../models/User";
 import Payment from "../../models/Payment";
 import type { AuthRequest } from "../../types/auth";
-
 // ============================================================================
 // AUTHENTICATION CONTROLLERS
 // ============================================================================
@@ -220,6 +219,8 @@ export const createEmployeeController = async (
     // ================================================================
     // AUTH VALIDATION
     // ================================================================
+    
+
 
     if (!req.dbUser) {
       return res.status(401).json({
@@ -298,33 +299,35 @@ export const createEmployeeController = async (
     // CREATE EMPLOYEE
     // ================================================================
 
-    const employee = new User({
-      firebaseUid,
-      email,
-      name,
-      lastName,
+ const employee = new User({
+  firebaseUid,
+  email,
+  name,
+  lastName,
 
-      role: "employee",
+  role: "employee",
 
-      image: image || "",
+  image: image || "",
 
-      address: {
-        street: address?.street || "",
-        number: address?.number || "",
-        city: address?.city || "",
-        state: address?.state || "",
-        country: address?.country || "Argentina",
-        postalCode: address?.postalCode || "",
-      },
+  address: {
+    street: address?.street || "",
+    number: address?.number || "",
+    city: address?.city || "",
+    state: address?.state || "",
+    country: address?.country || "Argentina",
+    postalCode: address?.postalCode || "",
+  },
 
-      isVerified: true,
+  isVerified: true,
 
-      isActive: true,
+  isActive: true,
 
-      plan: "free",
+  plan: "free",
 
-      createdBy: req.dbUser._id,
-    });
+  subscriptionStatus: "active",
+
+  createdBy: req.dbUser._id
+});
 
     await employee.save();
 
@@ -454,19 +457,35 @@ export const listUsersController = async (
 
     const skip = (page - 1) * limit;
 
-    const users = await User.find()
+    let filter = {};
+
+    // ====================================================
+    // ADMIN -> ONLY HIS USERS
+    // ====================================================
+
+    if (req.dbUser.role === "admin") {
+      filter = {
+        createdBy: req.dbUser._id,
+      };
+    }
+
+    // ====================================================
+    // SUPERADMIN -> ALL USERS
+    // ====================================================
+
+    const users = await User.find(filter)
       .select("-__v")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    const total = await User.countDocuments();
+    const total =
+      await User.countDocuments(filter);
 
     return res.status(200).json({
       success: true,
       data: {
         users,
-
         pagination: {
           total,
           page,
@@ -478,7 +497,10 @@ export const listUsersController = async (
 
   } catch (error: any) {
 
-    console.error("List users error:", error);
+    console.error(
+      "List users error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -616,11 +638,47 @@ export const deleteUserController = async (
 ) => {
   try {
 
+    // ==========================================================
+    // AUTH
+    // ==========================================================
+
+    if (!req.dbUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+        error: "NO_AUTH"
+      });
+    }
+
+    // ==========================================================
+    // ONLY SUPERADMIN
+    // ==========================================================
+
+    if (req.dbUser.role !== "superadmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only superadmin can delete users",
+        error: "FORBIDDEN"
+      });
+    }
+
     const { id } = req.params;
 
-    // ================================================================
-    // DELETE FROM DATABASE
-    // ================================================================
+    // ==========================================================
+    // CANNOT DELETE HIMSELF
+    // ==========================================================
+
+    if (req.dbUser._id.toString() === id) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot delete your own account",
+        error: "SELF_DELETE"
+      });
+    }
+
+    // ==========================================================
+    // DELETE
+    // ==========================================================
 
     const user = await User.findByIdAndDelete(id);
 
@@ -628,14 +686,16 @@ export const deleteUserController = async (
       return res.status(404).json({
         success: false,
         message: "User not found",
-        error: "NOT_FOUND",
+        error: "NOT_FOUND"
       });
     }
 
     return res.status(200).json({
       success: true,
       message: "User deleted successfully",
-      data: { id }
+      data: {
+        id
+      }
     });
 
   } catch (error: any) {
@@ -645,7 +705,7 @@ export const deleteUserController = async (
     return res.status(500).json({
       success: false,
       message: "Error deleting user",
-      error: error.message,
+      error: error.message
     });
 
   }

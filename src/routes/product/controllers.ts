@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
+import type { AuthRequest } from "../../types/auth";
 
 // Validation schemas
 const createProductSchema = Joi.object({
@@ -10,20 +11,26 @@ const createProductSchema = Joi.object({
   cost: Joi.number().min(0).required(),
   stock: Joi.number().integer().min(0).required(),
   description: Joi.string().max(500).optional(),
-  category: Joi.string().max(50).optional()
+  category: Joi.string().max(50).optional(),
+  images: Joi.array()
+  .items(Joi.string())
+  .default([]),
 });
+
 // 📌 Desactivar producto
 export const deactivateProduct = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
+     console.log("BODY:", req.body);
+     console.log("DB USER:", req.dbUser);
     const { id } = req.params;
 
     const product = await Product.findByIdAndUpdate(
       id,
       {
-        active: false
+        isActive: false
       },
       {
         new: true
@@ -49,7 +56,7 @@ export const deactivateProduct = async (
 };
 // 📌 Reactivar producto
 export const activateProduct = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -58,7 +65,7 @@ export const activateProduct = async (
     const product = await Product.findByIdAndUpdate(
       id,
       {
-        active: true
+        isActive: true
       },
       {
         new: true
@@ -83,7 +90,7 @@ export const activateProduct = async (
   }
 };
 // 📌 Crear producto
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     // Validate input
     const { error, value } = createProductSchema.validate(req.body);
@@ -94,10 +101,14 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
-    const { name, price, cost, stock, description, category } = value;
+    const { name, price, cost, stock, description, category, images, isActive } = value;
 
     // ✅ Evitar duplicados por nombre
-    const existing = await Product.findOne({ name });
+   const existing = await Product.findOne({
+     name,
+     user: req.dbUser?._id
+     });
+
     if (existing) {
       return res.status(400).json({
         message: "Product already exists"
@@ -110,7 +121,10 @@ export const createProduct = async (req: Request, res: Response) => {
       cost,
       stock,
       description,
-      category
+      category,
+      images,
+      user: req.dbUser?._id,
+      isActive: true
     });
 
     res.status(201).json(product);
@@ -124,9 +138,12 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 // 📌 Obtener todos los productos
-export const getProducts = async (_req: Request, res: Response) => {
+export const getProducts = async (_req: AuthRequest, res: Response) => {
   try {
-    const products = await Product.find({ isActive: true })
+    const products = await Product.find({
+        user: _req.dbUser?._id,
+       isActive: true
+        })
       .sort({ createdAt: -1 });
 
     res.json(products);
@@ -140,12 +157,16 @@ export const getProducts = async (_req: Request, res: Response) => {
 };
 
 // 📌 Obtener producto por ID
-export const getProductById = async (req: Request, res: Response) => {
+export const getProductById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findById(id);
-
+    const product = await Product.findOne({
+  _id: id,
+  user: req.dbUser?._id,
+  isActive: true
+});
+  
     if (!product || !product.isActive) {
       return res.status(404).json({
         message: "Product not found"
@@ -163,15 +184,17 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 // 📌 Actualizar producto
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-
-    const product = await Product.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true }
-    );
+const product = await Product.findOneAndUpdate(
+  {
+    _id: id,
+    user: req.dbUser?._id
+  },
+  req.body,
+  { new: true }
+);
 
     if (!product) {
       return res.status(404).json({
@@ -190,15 +213,22 @@ export const updateProduct = async (req: Request, res: Response) => {
 };
 
 // 📌 Eliminar producto (soft delete)
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+   const product = await Product.findOneAndUpdate(
+  {
+    _id: id,
+    user: req.dbUser?._id
+  },
+  {
+    isActive: false
+  },
+  {
+    new: true
+  }
+);
 
     if (!product) {
       return res.status(404).json({
@@ -215,11 +245,15 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
-export const getProductStats = async (req: Request, res: Response) => {
+export const getProductStats = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findById(id);
+     const product = await Product.findOne({
+          _id: id,
+           user: req.dbUser?._id,
+         isActive: true
+       });
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -259,7 +293,7 @@ export const getProductStats = async (req: Request, res: Response) => {
 };
 
 // 📌 Ajustar stock manualmente (MUY IMPORTANTE 🔥)
-export const updateStock = async (req: Request, res: Response) => {
+export const updateStock = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { quantity } = req.body;
@@ -270,7 +304,10 @@ export const updateStock = async (req: Request, res: Response) => {
       });
     }
 
-    const product = await Product.findById(id);
+    const product = await Product.findOne({
+  _id: id,
+  user: req.dbUser?._id
+});
 
     if (!product) {
       return res.status(404).json({

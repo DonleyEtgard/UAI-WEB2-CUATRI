@@ -22,7 +22,7 @@ const UserRolePage = () => {
         const res = await API.get(`/users/${id}`);
 
         // según tu backend puede venir en data.user o data
-        const user = res.data.user || res.data;
+        const user = res.data.data.user;
 
         setRole(user.role || "employee");
       } catch (err) {
@@ -82,7 +82,7 @@ const UserRolePage = () => {
             onChange={(e) => setRole(e.target.value)}
           >
             <option value="employee">Empleado</option>
-            <option value="client">Cliente / Usuario</option>
+            <option value="user">Usuario</option>
             {currentUser?.role === "superadmin" && (
               <option value="admin">Administrador</option>
             )}

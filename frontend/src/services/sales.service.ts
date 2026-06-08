@@ -13,7 +13,7 @@ export type RegisterData = {
   lastName: string;
   email: string;
   password: string;
-  role?: "admin" | "employee" | "manager" | "superadmin";
+  role?: "admin" | "employee" | "user" | "superadmin";
 };
 
 export type LoginData = {

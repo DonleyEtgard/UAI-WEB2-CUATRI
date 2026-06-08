@@ -34,7 +34,7 @@ const POSPage = () => {
   const { handleCreate, loading } = useCreateSale();
   const { reload: reloadSales } = useSales();
   const { user } = useAuth();
-
+const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
   const [amountPaid, setAmountPaid] = useState(0);
@@ -248,7 +248,15 @@ const POSPage = () => {
       </Grid>
 
       {/* CONTENIDO */}
-
+  <TextField
+  fullWidth
+  placeholder="Buscar producto..."
+  sx={{ mb: 3 }}
+  value={search}
+  onChange={(e) =>
+    setSearch(e.target.value)
+  }
+/>
       <Grid container spacing={3}>
 
         {/* PRODUCTOS */}
@@ -284,39 +292,71 @@ const POSPage = () => {
                     >
                       <CardContent>
 
-                        <Typography sx={{ fontWeight: 700 }}>
-                          {p.name}
-                        </Typography>
+  <Box
+    sx={{
+      height: 180,
+      mb: 2,
+      borderRadius: 2,
+      overflow: "hidden",
+      bgcolor: "#f3f4f6",
+    }}
+  >
+    <img
+      src={
+        p.images?.[0] ||
+        "https://placehold.co/400x300?text=Producto"
+      }
+      alt={p.name}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
+  </Box>
 
-                        <Chip
-                          size="small"
-                          color={
-                            p.stock > 0
-                              ? "success"
-                              : "error"
-                          }
-                          label={`Stock ${p.stock}`}
-                          sx={{ mt: 1 }}
-                        />
+  <Typography sx={{ fontWeight: 700 }}>
+    {p.name}
+  </Typography>
 
-                        <Typography
-                          variant="h5"
-                          color="primary"
-                          sx={{ mt: 2, fontWeight: 900 }}
-                        >
-                          $
-                          {p.price.toLocaleString()}
-                        </Typography>
+  <Typography
+    variant="body2"
+    color="text.secondary"
+  >
+    {p.category}
+  </Typography>
 
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          sx={{ mt: 2 }}
-                        >
-                          Agregar
-                        </Button>
+  <Chip
+    size="small"
+    color={
+      p.stock > 0
+        ? "success"
+        : "error"
+    }
+    label={`Stock ${p.stock}`}
+    sx={{ mt: 1 }}
+  />
 
-                      </CardContent>
+  <Typography
+    variant="h5"
+    color="primary"
+    sx={{
+      mt: 2,
+      fontWeight: 900,
+    }}
+  >
+    ${p.price.toLocaleString()}
+  </Typography>
+
+  <Button
+    fullWidth
+    variant="contained"
+    sx={{ mt: 2 }}
+  >
+    Agregar
+  </Button>
+
+</CardContent>
                     </Card>
                   </Grid>
                 ))}

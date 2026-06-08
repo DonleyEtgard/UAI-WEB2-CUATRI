@@ -39,8 +39,9 @@ const productSchema = new Schema(
     description: {
       type: String
     },
-image: {
-  type: String
+images: {
+  type: [String],
+  default: []
 },
     // 🏷️ Categoría (opcional)
     category: {

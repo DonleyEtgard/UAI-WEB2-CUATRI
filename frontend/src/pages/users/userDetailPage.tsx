@@ -15,7 +15,7 @@ const UserDetailPage = () => {
     const fetchUser = async () => {
       try {
        const res = await API.get(`/users/${id}`);
-        setUser(res.data);
+        setUser(res.data.data.user);
       } catch (err) {
         console.error(err);
       } finally {
@@ -41,7 +41,7 @@ const UserDetailPage = () => {
     </Box>
   );
 
-  const userData = user.data;
+  const userData = user.data; // Ajuste aquí para acceder a los datos del usuario correctamente 
 
   return (
     <Box sx={{ minHeight: '100vh', py: { xs: 2, md: 4 }, px: { xs: 2, md: 0 } }}>

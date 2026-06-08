@@ -1,10 +1,9 @@
 export interface Customer {
   _id?: string; // 🔥 MongoDB standard
 
-  personalInfo: PersonalInfo;
-
-  contactInfo: ContactInfo;
-
+  name: string;
+  email?: string;
+  phone?: string;
   address?: Address;
 
   // 💰 deuda actual
@@ -15,16 +14,6 @@ export interface Customer {
 
   createdAt?: string;
   updatedAt?: string;
-}
-
-export interface PersonalInfo {
-  firstName: string;
-  lastName: string;
-}
-
-export interface ContactInfo {
-  email?: string;
-  phone?: string;
 }
 
 export interface Address {

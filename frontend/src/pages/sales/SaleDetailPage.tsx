@@ -7,6 +7,14 @@ import API from "../../services/api";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
 
+/**
+ * Define valid currency literals. 
+ * We include "$ ARG" to resolve the assignment error, 
+ * though using standard codes like 'ARS' is preferred.
+ */
+export type Currency = 'HTG' | '$ ARG';
+export type SaleStatus = 'paid' | 'pending' | 'cancelled' | string;
+
 export interface SaleItem {
   productId: string;
   productName?: string;
@@ -18,10 +26,10 @@ export interface SaleItem {
 export interface Sale {
   _id: string;
   customerId: string;
-  totalAmount: number;
+  total: number;
   amountPaid: number;
-  status: string;
-  currency: string;
+  status: SaleStatus;
+  currency: Currency;
   createdAt: string;
   items: SaleItem[];
 }
@@ -68,7 +76,7 @@ const SaleDetailPage = () => {
     if (!sale) return null;
     const subtotal = sale.items.reduce((acc: number, i: SaleItem) => acc + i.totalPrice, 0);
     const avgItem = subtotal / sale.items.length || 0;
-    const change = sale.amountPaid - sale.totalAmount;
+    const change = sale.amountPaid - sale.total;
     return { subtotal, avgItem, change, profitEstimate: subtotal * 0.25 };
   }, [sale]);
 
@@ -116,7 +124,7 @@ const SaleDetailPage = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>Total</Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#667eea' }}>${sale.totalAmount.toFixed(2)}</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#667eea' }}>${sale.total.toFixed(2)}</Typography>
                     </Box>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>

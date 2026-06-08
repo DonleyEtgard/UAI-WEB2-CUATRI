@@ -31,8 +31,8 @@ const saleSchema = new Schema(
     },
     currency: {
       type: String,
-      enum: ["HTG", "USD"],
-      default: "HTG"
+      enum: ["HTG", "$ ARG"],
+      default: "$ ARG"
    },
    amountPaid: {
   type: Number,

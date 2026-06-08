@@ -15,7 +15,9 @@ const CustomerDetail = () => {
     const load = async () => {
       try {
         const res = await API.get(`/customers/${id}`);
-        setCustomer(res.data.data.customer);
+        // El backend devuelve el objeto directamente
+        console.log("DEBUG: Customer Detail Loaded:", res.data);
+        setCustomer(res.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -64,11 +66,14 @@ const CustomerDetail = () => {
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: 3 }}>
               <Avatar sx={{ width: 90, height: 90, bgcolor: 'rgba(255,255,255,0.2)', fontSize: '2.5rem', fontWeight: 800, border: '3px solid white' }}>
-                {customer.name[0]}
+                {customer.name?.[0] || '?'}
               </Avatar>
               <Box sx={{ flexGrow: 1, textAlign: { xs: 'center', md: 'left' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mb: 0.5 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{customer.name} {customer.lastName}</Typography>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Nombre del Cliente</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'white' }}>{customer.name}</Typography>
+                  </Box>
                   <Chip label={customer.isActive ? "Activo" : "Inactivo"} size="small" sx={{ bgcolor: customer.isActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: customer.isActive ? '#10b981' : '#ef4444', fontWeight: 700 }} />
                 </Box>
                 <Typography variant="body2" sx={{ fontFamily: 'monospace', opacity: 0.9 }}>ID: {id}</Typography>
@@ -104,6 +109,10 @@ const CustomerDetail = () => {
                     <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Dirección</Typography>
                     <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5 }}>{customer.address || "No especificada"}</Typography>
                   </Box>
+                  <Box sx={{ mt: 3 }}>
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Estado de Deuda</Typography>
+                    <Typography variant="h5" sx={{ color: (customer.debt || 0) > 0 ? '#ef4444' : '#10b981', fontWeight: 800 }}>${(customer.debt || 0).toLocaleString()}</Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -121,6 +130,30 @@ const CustomerDetail = () => {
             </Card>
           </Box>
         </Box>
+
+        {/* Historial de Pagos */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mt: 4 }}>
+          <CardHeader title="Historial de Pagos" />
+          <CardContent>
+            {!customer.payments || customer.payments.length === 0 ? (
+              <Typography sx={{ color: '#94a3b8', fontStyle: 'italic', py: 2, textAlign: 'center' }}>No hay pagos registrados para este cliente.</Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {customer.payments.map((p: any, i: number) => (
+                  <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Pago Recibido</Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b' }}>
+                        {new Date(p.date).toLocaleString('es-ES')}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ color: '#10b981', fontWeight: 800, fontSize: '1.2rem' }}>+ ${p.amount?.toLocaleString()}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
 
         <Button 
           onClick={() => navigate("/app/customers")}

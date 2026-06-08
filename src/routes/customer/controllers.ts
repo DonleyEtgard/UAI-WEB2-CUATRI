@@ -1,181 +1,257 @@
 import { Request, Response } from "express";
 import Customer from "../../models/Customer";
+import type { AuthRequest } from "../../types/auth";
 
-// 📌 Crear cliente
-export const createCustomer = async (req: Request, res: Response) => {
+export const createCustomer = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
-    const { name, email, phone, debt } = req.body;
+    console.log("BODY:", req.body);
+    console.log("DB USER:", req.dbUser);
+    const { name, email, phone, debt, address, payments, isActive } = req.body;
+
+    const userId = req.dbUser?._id;
 
     if (!name) {
-      return res.status(400).json({ message: "Name is required" });
+      return res.status(400).json({
+        message: "Name is required",
+      });
     }
 
-    // ✅ evitar duplicados por email
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    // evitar duplicados por usuario
     if (email) {
-      const existing = await Customer.findOne({ email });
+      const existing = await Customer.findOne({
+        email,
+        user: userId,
+      });
 
       if (existing) {
         return res.status(400).json({
-          message: "Customer already exists"
+          message: "Customer already exists",
         });
       }
     }
-
+  
     const customer = await Customer.create({
       name,
       email,
       phone,
-      debt: debt || 0,
-      payments: []
+      debt,
+      address,
+      payments,
+      isActive,
+      user: userId,
     });
 
     res.status(201).json(customer);
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error creating customer",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// 📌 Obtener todos
-export const getCustomers = async (_req: Request, res: Response) => {
+// ======================================
+// GET CUSTOMERS
+// ======================================
+
+export const getCustomers = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
+    const userId = req.dbUser?._id;
+
     const customers = await Customer.find({
-      isActive: true
-    }).sort({ createdAt: -1 });
+      user: userId,
+      isActive: true,
+    }).sort({
+      createdAt: -1,
+    });
 
     res.json(customers);
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error fetching customers",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// 📌 Obtener por ID
-export const getCustomerById = async (req: Request, res: Response) => {
+// ======================================
+// GET CUSTOMER BY ID
+// ======================================
+
+export const getCustomerById = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const { id } = req.params;
 
-    const customer = await Customer.findById(id);
+    const userId = req.dbUser?._id;
 
-    if (!customer || !customer.isActive) {
-      return res.status(404).json({
-        message: "Customer not found"
-      });
-    }
+   const customer = await Customer.findOne({
+  _id: id,
+  user: userId,
+});
+
+if (!customer) {
+  return res.status(404).json({ message: "Customer not found" });
+}
 
     res.json(customer);
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error fetching customer",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// 📌 Actualizar
-export const updateCustomer = async (req: Request, res: Response) => {
+// ======================================
+// UPDATE CUSTOMER
+// ======================================
+
+export const updateCustomer = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const { id } = req.params;
 
-    const customer = await Customer.findByIdAndUpdate(
-      id,
+    const userId = req.dbUser?._id;
+
+    const customer = await Customer.findOneAndUpdate(
+      {
+        _id: id,
+        user: userId,
+      },
       req.body,
-      { new: true }
+      {
+        new: true,
+      }
     );
 
     if (!customer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.json(customer);
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error updating customer",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// 📌 Agregar pago
-export const addPayment = async (req: Request, res: Response) => {
+// ======================================
+// ADD PAYMENT
+// ======================================
+
+export const addPayment = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const { id } = req.params;
     const { amount } = req.body;
 
-    if (!amount) {
+    const userId = req.dbUser?._id;
+
+    if (!amount || amount <= 0) {
       return res.status(400).json({
-        message: "Amount is required"
+        message: "Valid amount is required",
       });
     }
 
-    const customer = await Customer.findByIdAndUpdate(
-      id,
+    const customer = await Customer.findOneAndUpdate(
+      {
+        _id: id,
+        user: userId,
+      },
       {
         $push: {
           payments: {
             amount,
-            date: new Date()
-          }
+            date: new Date(),
+          },
         },
 
         $inc: {
-          debt: -amount
-        }
+          debt: -amount,
+        },
       },
-      { new: true }
+      {
+        new: true,
+      }
     );
 
     if (!customer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.json(customer);
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error adding payment",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-// 📌 Soft delete
-export const deleteCustomer = async (req: Request, res: Response) => {
+// ======================================
+// DELETE CUSTOMER (SOFT DELETE)
+// ======================================
+
+export const deleteCustomer = async (
+  req: AuthRequest,
+  res: Response
+) => {
   try {
     const { id } = req.params;
 
-    const customer = await Customer.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
+    const userId = req.dbUser?._id;
+
+    const customer = await Customer.findOneAndUpdate(
+      {
+        _id: id,
+        user: userId,
+      },
+      {
+        isActive: false,
+      },
+      {
+        new: true,
+      }
     );
 
     if (!customer) {
       return res.status(404).json({
-        message: "Customer not found"
+        message: "Customer not found",
       });
     }
 
     res.json({
-      message: "Customer deleted successfully"
+      message: "Customer deleted successfully",
     });
-
   } catch (error: any) {
     res.status(500).json({
       message: "Error deleting customer",
-      error: error.message
+      error: error.message,
     });
   }
 };

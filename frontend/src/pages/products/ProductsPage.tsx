@@ -21,15 +21,18 @@ import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 
-interface Product {
+export type Product = {
   _id: string;
   name: string;
-  sku: string;
-  category: string;
+  user: string;
+  description?: string;
   price: number;
+  cost: number;
   stock: number;
+  category?: string;
+  images?: string[];
   isActive: boolean;
-}
+};
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,17 +41,23 @@ const ProductsPage = () => {
   const navigate = useNavigate();
 
   const loadProducts = async () => {
-    try {
-      setLoading(true);
-      const res = await API.get("/products");
-      setProducts(Array.isArray(res.data?.data?.products) ? res.data.data.products : []);
-    } catch (err) {
-      console.error("Error loading products:", err);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const res = await API.get("/products");
+
+    setProducts(
+      Array.isArray(res.data)
+        ? res.data
+        : []
+    );
+  } catch (err) {
+    console.error(err);
+    setProducts([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadProducts();
@@ -72,7 +81,10 @@ const ProductsPage = () => {
   const totalProducts = products.length;
   const lowStock = products.filter((p) => p.stock < 5).length;
   const activeProducts = products.filter((p) => p.isActive).length;
-  const inventoryValue = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+  const inventoryValue = products.reduce(
+  (acc, p) => acc + (p.cost * p.stock),
+  0
+);
 
 
 return (
@@ -285,16 +297,6 @@ return (
                           }
                         </Typography>
 
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                        >
-                          SKU:
-                          {
-                            params.row
-                              .sku
-                          }
-                        </Typography>
                       </Box>
                     </Box>
                   ),

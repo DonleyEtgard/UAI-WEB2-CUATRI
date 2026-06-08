@@ -1,4 +1,3 @@
-import API from "./api";
 import { getWithCache, requestOrQueue } from "./offlineApi";
 
 export interface Payment {
@@ -8,17 +7,20 @@ export interface Payment {
 
 export interface Customer {
   _id?: string;
-
-  // ✅ COINCIDE CON BACKEND
   name: string;
-
+  lastName?: string;
+  address?: string;
   email?: string;
-
   phone?: string;
+
+  user?: string; // 🔥 IMPORTANTE (Mongo ObjectId)
 
   debt?: number;
 
-  payments?: Payment[];
+  payments?: {
+    amount: number;
+    date: string | Date;
+  }[];
 
   isActive?: boolean;
 
@@ -26,95 +28,74 @@ export interface Customer {
   updatedAt?: string;
 }
 
-
 // ==========================
 // API
 // ==========================
 
 // 📌 Obtener todos
 export const getCustomers = async (): Promise<Customer[]> => {
-  return await getWithCache<Customer[]>("/customers");
+  return getWithCache<Customer[]>("/customers");
 };
-
 
 // 📌 Obtener por ID
-export const getCustomerById = async (
-  id: string
-): Promise<Customer> => {
-
-  return await getWithCache<Customer>(
-    `/customers/${id}`
-  );
+export const getCustomerById = async (id: string): Promise<Customer> => {
+  return getWithCache<Customer>(`/customers/${id}`);
 };
-
 
 // 📌 Crear cliente
 export const createCustomer = async (
   data: Customer
 ): Promise<Customer> => {
-
-  // ✅ fallback offline
   const fallbackCustomer: Customer = {
     ...data,
-
     _id: `offline_customer_${Date.now()}`,
-
     isActive: true,
-
     debt: data.debt || 0,
-
     payments: [],
   };
 
-  return await requestOrQueue<Customer>(
+  const result = await requestOrQueue<Customer>(
     "POST",
     "/customers",
     data,
     fallbackCustomer
   );
-};
 
+  return result;
+};
 
 // 📌 Actualizar cliente
 export const updateCustomer = async (
   id: string,
   data: Partial<Customer>
 ): Promise<Customer> => {
-
-  const res = await API.put(
+  const result = await requestOrQueue<Customer>(
+    "PUT",
     `/customers/${id}`,
     data
   );
 
-  return res.data;
+  return result;
 };
 
-
-// 📌 Agregar pago
+// 📌 Agregar pago (CORREGIDO endpoint + offline)
 export const addPayment = async (
   id: string,
   amount: number
 ): Promise<Customer> => {
-
-  const res = await API.post(
+  const result = await requestOrQueue<Customer>(
+    "POST",
     `/customers/${id}/payment`,
-    {
-      amount
-    }
+    { amount }
   );
 
-  return res.data;
+  return result;
 };
 
-
-// 📌 Eliminar cliente (soft delete)
-export const deleteCustomer = async (
-  id: string
-) => {
-
-  const res = await API.delete(
+// 📌 Eliminar cliente (soft delete + offline)
+export const deleteCustomer = async (id: string): Promise<void> => {
+  await requestOrQueue<void>(
+    "DELETE",
     `/customers/${id}`
   );
-
-  return res.data;
 };

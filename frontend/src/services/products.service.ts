@@ -3,7 +3,7 @@ import { getWithCache, requestOrQueue } from "./offlineApi";
 // TYPES
 // ==========================
 
-export type Currency = "ARS" | "USD" | "EUR";
+export type Currency =  "HTG" | "$ ARG";
  
 export type Category = {
   _id: string;
@@ -15,16 +15,15 @@ export type Category = {
 export type Product = {
   _id: string;
   name: string;
+  user: string;
   description?: string;
 
   price: number;
-  cost?: number;
-
-  currency?: Currency;
+  cost: number;
 
   stock: number;
 
-  category?: Category;
+  category?: string | Category;
 
   images?: string[];
 
@@ -35,9 +34,13 @@ export type Product = {
 };
 
 export type ProductStats = {
-  totalSold: number;
-  revenue: number;
-  stockHistory?: unknown[];
+  product: Product;
+  stats: {
+    stock: number;
+    totalSold: number;
+    totalRevenue: number;
+    profit: number;
+  };
 };
 
 // ==========================
@@ -110,7 +113,12 @@ export const updateStock = async (
   if (!id || id === "undefined") throw new Error("Product ID is required");
   // Fallback para actualización de stock offline
   const fallbackStockUpdate: Partial<Product> = { stock: quantity, updatedAt: new Date().toISOString() };
-  return await requestOrQueue<Product>("PATCH", `/products/${id}/stock`, { quantity }, fallbackStockUpdate as Product);
+  return await requestOrQueue<Product>(
+  "PATCH",
+  `/products/${id}/stock`,
+  { quantity },
+  fallbackStockUpdate as Product
+);
 };
 
 // 📊 STATS

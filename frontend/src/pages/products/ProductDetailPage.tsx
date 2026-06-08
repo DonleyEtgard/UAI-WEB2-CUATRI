@@ -89,6 +89,18 @@ const ProductDetailPage = () => {
         />
       </Box>
 
+      {/* MAIN IMAGE */}
+      {product.images && product.images.length > 0 && (
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <Box
+            component="img"
+            src={product.images[0]}
+            alt={product.name}
+            sx={{ width: '100%', maxHeight: 400, objectFit: 'contain', borderRadius: 4, bgcolor: 'background.paper' }}
+          />
+        </Box>
+      )}
+
       {/* KPI CARDS */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -152,13 +164,14 @@ const ProductDetailPage = () => {
 
         <CardContent>
           <Grid container spacing={3}>
+
             <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="overline">
                 Categoría
               </Typography>
 
               <Typography variant="h6">
-                {product.category?.name ||
+                {product.category ||
                   "Sin categoría"}
               </Typography>
             </Grid>

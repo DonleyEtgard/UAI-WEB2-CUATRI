@@ -18,92 +18,168 @@ import { AreaChartComponent } from '../../components/dashboard/AreaChartComponen
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  // Usamos los hooks de los features para obtener datos con soporte offline
-  const { products, loading: productsLoading } = useProducts();
-  const { customers, loading: customersLoading } = useCustomers();
-  const { sales, loading: salesLoading } = useSales();
 
-  const loading = productsLoading || customersLoading || salesLoading;
+const { products = [], loading: productsLoading } = useProducts();
+const { customers = [], loading: customersLoading } = useCustomers();
+
+const salesHook = useSales();
+
+console.log("salesHook:", salesHook);
+
+// Obtener array de ventas de forma segura
+const sales = Array.isArray(salesHook?.sales)
+  ? salesHook.sales
+  : [];
+
+const salesLoading = salesHook?.loading ?? false;
+
+const loading =
+  productsLoading ||
+  customersLoading ||
+  salesLoading;
 
   // ========================================================================
   // CALCULATE METRICS
   // ========================================================================
-  const metrics = useMemo(() => {
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+const metrics = useMemo(() => {
+  const safeSales = Array.isArray(sales) ? sales : [];
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeCustomers = Array.isArray(customers) ? customers : [];
 
-    // Basic KPIs
-    const totalRevenue = sales.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
-    const todaySales = sales.filter(s => s.createdAt?.startsWith(todayStr));
-    const todayRevenue = todaySales.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
+  const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
 
-    // Sales chart (last 6 months)
-    const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const last6Months = Array.from({ length: 6 }, (_, i) => {
-      const d = new Date();
-      d.setMonth(now.getMonth() - (5 - i));
-      return { monthIdx: d.getMonth(), year: d.getFullYear(), label: monthLabels[d.getMonth()] };
-    });
+  // Basic KPIs
+  const totalRevenue = safeSales.reduce(
+    (acc, s: any) => acc + (s.totalAmount || s.total || 0),
+    0
+  );
 
-    const monthlyData = last6Months.map(m => {
-      return sales
-        .filter(s => {
-          const sd = new Date(s.createdAt || '');
-          return sd.getMonth() === m.monthIdx && sd.getFullYear() === m.year;
-        })
-        .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
-    });
+  const todaySales = safeSales.filter(
+    (s) => s.createdAt?.startsWith(todayStr)
+  );
 
-    // Category distribution
-    const categoriesMap: Record<string, number> = {};
-    products.forEach(p => {
-      const cat = typeof p.category === 'string' ? p.category : p.category?.name || 'Sin Categoría';
-      categoriesMap[cat] = (categoriesMap[cat] || 0) + 1;
-    });
+  const todayRevenue = todaySales.reduce(
+    (acc, s: any) => acc + (s.totalAmount || s.total || 0),
+    0
+  );
 
-    // Invoice status counts
-    const statusCounts = {
-      paid: sales.filter(s => s.status === 'completed').length,
-      pending: sales.filter(s => s.status === 'pending').length,
-      cancelled: sales.filter(s => s.status === 'cancelled').length,
-    };
+  // Sales chart (last 6 months)
+  const monthLabels = [
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+  ];
 
-    // Critical Stock (stock < 10)
-    const criticalStock = products
-      .filter(p => (p.stock || 0) < 10)
-      .slice(0, 5);
-
-    // Top Customers by Debt
-    const topDebtCustomers = [...customers]
-      .filter(c => (c.debt || 0) > 0)
-      .sort((a, b) => (b.debt || 0) - (a.debt || 0))
-      .slice(0, 5);
+  const last6Months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date();
+    d.setMonth(now.getMonth() - (5 - i));
 
     return {
-      todayRevenue,
-      totalRevenue,
-      activeCustomers: customers.length,
-      totalProducts: products.length,
-      totalInvoices: sales.length,
-      salesByMonth: {
-        categories: last6Months.map(m => m.label),
-        series: [{ name: 'Ventas', data: monthlyData }],
-      },
-      productCategories: {
-        series: Object.values(categoriesMap),
-        labels: Object.keys(categoriesMap),
-      },
-      invoiceStatus: {
-        categories: ['Pagadas', 'Pendientes', 'Canceladas'],
-        series: [{ name: 'Facturas', data: [statusCounts.paid, statusCounts.pending, statusCounts.cancelled] }],
-      },
-      topCustomersByDebt: {
-        categories: topDebtCustomers.map(c => c.name),
-        series: [{ name: 'Deuda', data: topDebtCustomers.map(c => c.debt || 0) }],
-      },
-      criticalStock,
+      monthIdx: d.getMonth(),
+      year: d.getFullYear(),
+      label: monthLabels[d.getMonth()],
     };
-  }, [sales, products, customers]);
+  });
+
+  const monthlyData = last6Months.map((m) => {
+    return safeSales
+      .filter((s) => {
+        const sd = new Date(s.createdAt || "");
+        return (
+          sd.getMonth() === m.monthIdx &&
+          sd.getFullYear() === m.year
+        );
+      })
+      .reduce(
+        (acc, s: any) => acc + (s.totalAmount || s.total || 0),
+        0
+      );
+  });
+
+  // Category distribution
+  const categoriesMap: Record<string, number> = {};
+
+  safeProducts.forEach((p) => {
+    const cat =
+      p.category && typeof p.category === "object"
+        ? p.category.name
+        : p.category || "Sin Categoría";
+
+    categoriesMap[cat] = (categoriesMap[cat] || 0) + 1;
+  });
+
+  // Invoice status counts
+  const statusCounts = {
+    paid: safeSales.filter((s) => s.status === "completed").length,
+    pending: safeSales.filter((s) => s.status === "pending").length,
+    cancelled: safeSales.filter((s) => s.status === "cancelled").length,
+  };
+
+  // Critical Stock
+  const criticalStock = safeProducts
+    .filter((p) => (p.stock || 0) < 10)
+    .slice(0, 5);
+
+  // Top Customers by Debt
+  const topDebtCustomers = [...safeCustomers]
+    .filter((c) => (c.debt || 0) > 0)
+    .sort((a, b) => (b.debt || 0) - (a.debt || 0))
+    .slice(0, 5);
+
+  return {
+    todayRevenue,
+    totalRevenue,
+    activeCustomers: safeCustomers.length,
+    totalProducts: safeProducts.length,
+    totalInvoices: safeSales.length,
+
+    salesByMonth: {
+      categories: last6Months.map((m) => m.label),
+      series: [{ name: "Ventas", data: monthlyData }],
+    },
+
+    productCategories: {
+      series: Object.values(categoriesMap),
+      labels: Object.keys(categoriesMap),
+    },
+
+    invoiceStatus: {
+      categories: ["Pagadas", "Pendientes", "Canceladas"],
+      series: [
+        {
+          name: "Facturas",
+          data: [
+            statusCounts.paid,
+            statusCounts.pending,
+            statusCounts.cancelled,
+          ],
+        },
+      ],
+    },
+
+    topCustomersByDebt: {
+      categories: topDebtCustomers.map((c) => c.name),
+      series: [
+        {
+          name: "Deuda",
+          data: topDebtCustomers.map((c) => c.debt || 0),
+        },
+      ],
+    },
+
+    criticalStock,
+  };
+}, [sales, products, customers]);
 
   if (loading) {
     return (

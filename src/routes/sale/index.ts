@@ -10,6 +10,7 @@ import {
   getMonthlySales,
   getTopProducts,
   getSaleItems,
+  getSaleById,
   getItemsBySale,
   getSaleItemById,
   getSummary,
@@ -47,6 +48,7 @@ router.get(
   getTopProducts
 );
 
+router.get("/sales/:id", getSaleById);
 
 // ======================================================
 // 🎟️ TICKET
