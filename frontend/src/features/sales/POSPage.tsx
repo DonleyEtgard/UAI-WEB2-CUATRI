@@ -93,7 +93,7 @@ const [search, setSearch] = useState("");
   (acc, item) => acc + item.quantity,
   0
 );
-
+   
   const change = paymentMethod === "cash" ? amountPaid - total : 0;
 
   // 🧾 finalizar venta
@@ -182,6 +182,7 @@ const [search, setSearch] = useState("");
 
         <Button
           variant="outlined"
+          sx={{ fontSize: 14, textTransform: 'none' , color: 'white' }}
           startIcon={<RefreshIcon />}
           onClick={loadProducts}
         >
@@ -251,7 +252,7 @@ const [search, setSearch] = useState("");
   <TextField
   fullWidth
   placeholder="Buscar producto..."
-  sx={{ mb: 3 }}
+  sx={{ mb: 3 , "& .MuiOutlinedInput-root": { bgcolor: "white", borderRadius: 2 } }}
   value={search}
   onChange={(e) =>
     setSearch(e.target.value)
@@ -270,15 +271,22 @@ const [search, setSearch] = useState("");
 
             <CardContent>
               <Grid container spacing={2}>
-                {products.map((p: any) => (
-                  <Grid
-                    key={p._id}
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                      md: 4,
-                    }}
-                  >
+                {products.map((p: any) => {
+
+  console.log("Producto:", p.name);
+  console.log("Imagen:", p.images?.[0]);
+  console.log("Objeto completo:", p);
+
+  return (
+    <Grid
+      key={p._id}
+      size={{
+        xs: 12,
+        sm: 6,
+        md: 4,
+      }}
+    >
+                  
                     <Card
                       sx={{
                         cursor: "pointer",
@@ -302,18 +310,27 @@ const [search, setSearch] = useState("");
     }}
   >
     <img
-      src={
-        p.images?.[0] ||
-        "https://placehold.co/400x300?text=Producto"
-      }
-      alt={p.name}
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-      }}
-    />
-  </Box>
+  src={
+    p.images?.[0]
+      ? p.images[0]
+      : "https://placehold.co/400x300?text=Producto"
+  }
+  alt={p.name}
+  onLoad={() =>
+    console.log("IMG OK:", p.images?.[0])
+  }
+  onError={() =>
+
+    console.log("IMG ERROR:", p.images?.[0])
+    
+  }
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  }}
+/>
+     </Box>
 
   <Typography sx={{ fontWeight: 700 }}>
     {p.name}
@@ -359,7 +376,8 @@ const [search, setSearch] = useState("");
 </CardContent>
                     </Card>
                   </Grid>
-                ))}
+                );
+                })}
               </Grid>
             </CardContent>
           </Card>
@@ -393,6 +411,7 @@ const [search, setSearch] = useState("");
                     key={item.product._id}
                     sx={{
                       mb: 2,
+                      
                     }}
                   >
                     <CardContent>
@@ -432,6 +451,7 @@ const [search, setSearch] = useState("");
                         <Button
                           size="small"
                           variant="outlined"
+                          sx={{ minWidth: 45, padding: 0 , color: 'white', frontWeight: 900 }}
                           onClick={() =>
                             decreaseQty(
                               item.product._id
@@ -444,6 +464,7 @@ const [search, setSearch] = useState("");
                         <Button
                           size="small"
                           variant="outlined"
+                          sx={{ minWidth: 45, padding: 0 , color: 'white', frontWeight: 900 }}
                           onClick={() =>
                             addToCart(item.product)
                           }

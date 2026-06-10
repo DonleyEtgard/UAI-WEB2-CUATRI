@@ -171,8 +171,9 @@ const ProductDetailPage = () => {
               </Typography>
 
               <Typography variant="h6">
-                {product.category ||
-                  "Sin categoría"}
+                {(typeof product.category === "object"
+                  ? product.category?.name
+                  : product.category) || "Sin categoría"}
               </Typography>
             </Grid>
 
@@ -223,6 +224,7 @@ const ProductDetailPage = () => {
           display: "flex",
           gap: 2,
           flexWrap: "wrap",
+          color: 'white',
         }}
       >
         <Button
@@ -236,10 +238,11 @@ const ProductDetailPage = () => {
 
         <Button
           variant="contained"
+          sx={{ color: 'white', fontSize: 14, fontWeight: 700 }}
           onClick={() =>
             navigate(
               `/app/products/edit/${id}`
-            )
+            ) 
           }
         >
           Editar

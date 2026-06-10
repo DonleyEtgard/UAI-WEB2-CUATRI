@@ -32,15 +32,22 @@ const ProductFormPage = () => {
   const [fetching, setFetching] = useState(false);
 
   const [form, setForm] = useState({
-  name: "",
-  description: "",
-  price: 0,
-  cost: 0,
-  stock: 0,
-  category: "general",
-  images: [] as string[],
-  isActive: true,
-});
+    name: "",
+    description: "",
+    price: 0,
+    cost: 0,
+    stock: 0,
+    category: "general",
+    isActive: true,
+  });
+
+  // FIX: Split image state into existing URLs and newly selected File objects
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImageFiles, setNewImageFiles] = useState<
+    Array<{ file: File; preview: string }>
+  >([]);
+  // FIX: Track the total byte size of selected image files to pre-validate before submit
+  const [imageUploadSize, setImageUploadSize] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -49,10 +56,17 @@ const ProductFormPage = () => {
         setFetching(true);
         const res = await API.get(`/products/${id}`);
         const p = res.data.data?.product || res.data;
-        setForm({ 
-          ...p, 
-          images: p.images || [] 
+        setForm({
+          name: p.name || "",
+          description: p.description || "",
+          price: p.price || 0,
+          cost: p.cost || 0,
+          stock: p.stock || 0,
+          category: p.category || "general",
+          isActive: p.isActive ?? true,
         });
+        setExistingImages(p.images || []);
+        setNewImageFiles([]);
       } catch (err) {
         console.error(err);
         alert("Error cargando producto");
@@ -63,53 +77,101 @@ const ProductFormPage = () => {
     loadProduct();
   }, [id]);
 
-  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+  };
+
+  // FIX: Accept File objects and validate sizes instead of converting to Base64 strings
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    const base64Promises = files.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-      });
-    });
+    const maxTotalBytes = 10 * 1024 * 1024;
+    const maxFileBytes = 5 * 1024 * 1024;
+    const currentBytes = newImageFiles.reduce(
+      (sum, item) => sum + item.file.size,
+      0
+    );
+    const selectedBytes = files.reduce((sum, file) => sum + file.size, 0);
 
-    try {
-      const newImagesBase64 = await Promise.all(base64Promises);
-      setForm((prev) => ({
-        ...prev,
-        images: [...prev.images, ...newImagesBase64],
-      }));
-    } catch (error) {
-      console.error("Error al procesar imágenes:", error);
-      alert("Error al procesar las imágenes");
+    if (files.some((file) => file.size > maxFileBytes)) {
+      alert("Cada imagen no puede superar los 5 MB.");
+      return;
     }
-  };
 
-  const removeImage = (index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+    if (currentBytes + selectedBytes > maxTotalBytes) {
+      alert("El total de imágenes no puede superar los 10 MB.");
+      return;
+    }
+
+    const nextFiles = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
     }));
+
+    setNewImageFiles((prev) => [...prev, ...nextFiles]);
+    setImageUploadSize(currentBytes + selectedBytes);
   };
 
+  // FIX: Remove image either from existing URL list or from newly selected files
+  const removeImage = (index: number, isExisting = false) => {
+    if (isExisting) {
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+      return;
+    }
+
+    setNewImageFiles((prev) => {
+      const removed = prev[index];
+      const next = prev.filter((_, i) => i !== index);
+      if (removed) URL.revokeObjectURL(removed.preview);
+      setImageUploadSize(next.reduce((sum, item) => sum + item.file.size, 0));
+      return next;
+    });
+  };
+
+  // FIX: Submit using multipart/form-data with files in `images` field and keep `imageUrls` for existing URLs
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const payload = { ...form };
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("price", String(form.price));
+      formData.append("cost", String(form.cost));
+      formData.append("stock", String(form.stock));
+      formData.append("category", form.category);
+      formData.append("isActive", String(form.isActive));
+      formData.append("imageUrls", JSON.stringify(existingImages));
+
+      newImageFiles.forEach((image) => {
+        formData.append("images", image.file);
+      });
+
       if (isEdit) {
-        await API.patch(`/products/${id}`, payload);
+        await API.put(`/products/${id}`, formData);
       } else {
-        await API.post("/products", payload);
+        await API.post("/products", formData);
       }
+
       navigate("/app/products");
-    } catch (err) {
-      console.error(err);
-      alert("Error al guardar producto");
-    } finally {
+    } catch (err: any) {
+  console.error("SAVE ERROR:", err);
+
+  console.log(
+    "SERVER RESPONSE:",
+    err?.response?.data
+  );
+
+  alert(
+    err?.response?.data?.error ||
+    err?.response?.data?.message ||
+    "Error al guardar producto"
+  );
+} finally {
       setLoading(false);
     }
   };
@@ -182,7 +244,7 @@ const ProductFormPage = () => {
       <Card sx={{ mb: 4 }}>
         <CardHeader 
           title="Galería de Imágenes" 
-          subheader={`${form.images.length} imágenes seleccionadas`}
+          subheader={`${existingImages.length + newImageFiles.length} imágenes seleccionadas · ${formatBytes(imageUploadSize)} en archivos nuevos`}
           action={
             <Button
               variant="contained"
@@ -206,28 +268,42 @@ const ProductFormPage = () => {
               display: "flex",
               gap: 2,
               flexWrap: "wrap",
-              minHeight: form.images.length > 0 ? "auto" : 100,
+              minHeight: existingImages.length + newImageFiles.length > 0 ? "auto" : 100,
               alignItems: "center",
-              justifyContent: form.images.length > 0 ? "flex-start" : "center",
+              justifyContent: existingImages.length + newImageFiles.length > 0 ? "flex-start" : "center",
               border: "2px dashed #e2e8f0",
               borderRadius: 2,
               p: 2
             }}
           >
-            {form.images.length === 0 && (
+            {existingImages.length + newImageFiles.length === 0 && (
               <Typography color="text.secondary">No hay imágenes seleccionadas</Typography>
             )}
-            {form.images.map((img, index) => (
-              <Box key={index} sx={{ position: "relative", width: 120, height: 120 }}>
+           {existingImages.map((img, index) => (
+           <Box key={`existing-${index}`}>
+           <img
+            src={img}
+            alt={`preview-${index}`}
+            style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            borderRadius: 8,
+            }}
+          />
+           </Box>
+          ))}
+            {newImageFiles.map((image, index) => (
+              <Box key={`new-${index}`} sx={{ position: "relative", width: 120, height: 120 }}>
                 <img
-                  src={img}
-                  alt={`preview-${index}`}
+                  src={image.preview}
+                  alt={`preview-new-${index}`}
                   style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
                 />
                 <IconButton
                   size="small"
                   color="error"
-                  onClick={() => removeImage(index)}
+                  onClick={() => removeImage(index, false)}
                   sx={{ position: "absolute", top: -10, right: -10, bgcolor: "white", "&:hover": { bgcolor: "#f1f1f1" } }}
                 >
                   <DeleteIcon fontSize="small" />
@@ -415,21 +491,109 @@ const ProductFormPage = () => {
                       })
                     }
                   >
-                    <MenuItem value="general">
+                   <MenuItem value="general">
                       General
+                   </MenuItem>
+
+                  <MenuItem value="electronics">
+                     Electrónica
+                  </MenuItem>
+
+                  <MenuItem value="office">
+                     Oficina
+                   </MenuItem>
+
+                  <MenuItem value="services">
+                     Servicios
+                   </MenuItem>
+
+                 <MenuItem value="clothing">
+                    Ropa
+                 </MenuItem>
+
+                 <MenuItem value="footwear">
+                   Calzado
+                 </MenuItem>
+
+                 <MenuItem value="food">
+                   Comida
+                 </MenuItem>
+
+                 <MenuItem value="beverages">
+                   Bebidas
+                 </MenuItem>
+
+                 <MenuItem value="grocery">
+                   Almacén
+                 </MenuItem>
+
+                 <MenuItem value="health">
+                   Salud
+                 </MenuItem>
+
+                 <MenuItem value="beauty">
+                   Belleza
+                 </MenuItem>
+
+                 <MenuItem value="home">
+                   Hogar
+                 </MenuItem>
+
+                 <MenuItem value="furniture">
+                  Muebles
+                 </MenuItem>
+
+                 <MenuItem value="sports">
+                  Deportes
+                </MenuItem>
+
+                  <MenuItem value="toys">
+                      Juguetes
+                  </MenuItem>
+
+                  <MenuItem value="automotive">
+                      Automotor
+                     </MenuItem>
+
+                   <MenuItem value="hardware">
+                      Ferretería
+                   </MenuItem>
+
+                     <MenuItem value="construction">
+                       Construcción
+                     </MenuItem>
+
+                   <MenuItem value="books">
+                         Libros
                     </MenuItem>
 
-                    <MenuItem value="electronics">
-                      Electrónica
-                    </MenuItem>
+                  <MenuItem value="pets">
+                      Mascotas
+                 </MenuItem>
 
-                    <MenuItem value="office">
-                      Oficina
-                    </MenuItem>
+                <MenuItem value="jewelry">
+                         Joyería
+                   </MenuItem>
 
-                    <MenuItem value="services">
-                      Servicios
-                    </MenuItem>
+                <MenuItem value="accessories">
+                     Accesorios
+                </MenuItem>
+
+                <MenuItem value="technology">
+                  Tecnología
+                </MenuItem>
+
+                <MenuItem value="cleaning">
+                    Limpieza
+                 </MenuItem>
+
+                <MenuItem value="pharmacy">
+                    Farmacia
+                </MenuItem>
+
+              <MenuItem value="other">
+                   Otros
+                </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -448,6 +612,7 @@ const ProductFormPage = () => {
         >
           <Button
             variant="outlined"
+            sx={{ fontSize: 14, textTransform: 'none', color: 'white' }} 
             startIcon={<CancelIcon />}
             onClick={() =>
               navigate("/app/products")

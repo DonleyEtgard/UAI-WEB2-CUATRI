@@ -1,7 +1,3 @@
-// ============================================================================
-// AUTHORIZE ADMIN OR SUPERADMIN MIDDLEWARE
-// ============================================================================
-
 import { Response, NextFunction } from "express";
 import type { AuthRequest } from "../types/auth";
 

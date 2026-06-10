@@ -103,7 +103,7 @@ const SalesPage = () => {
               onClick={loadSales} 
               disabled={loading}
               variant="outlined"
-              sx={{ fontSize: 14, textTransform: 'none' }}
+              sx={{ fontSize: 14, textTransform: 'none' , color: 'white' }}
             >
               Actualizar
             </Button>

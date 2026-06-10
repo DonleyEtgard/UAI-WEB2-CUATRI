@@ -284,7 +284,20 @@ return (
                             "center",
                         }}
                       >
-                        <Inventory2Icon />
+                        {params.row.images && params.row.images.length > 0 ? (
+                          <Box
+                            component="img"
+                            src={`http://localhost:3000/${params.row.images[0]}`}
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: 2,
+                            }}
+                          />
+                        ) : (
+                          <Inventory2Icon />
+                        )}
                       </Box>
 
                       <Box>

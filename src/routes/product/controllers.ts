@@ -4,17 +4,47 @@ import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
 import type { AuthRequest } from "../../types/auth";
 
+// FIX: Parse image URLs from a variety of input shapes (stringified JSON, CSV, array)
+const parseImageUrls = (raw: any): string[] => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return raw
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+  return [];
+};
+
+// FIX: Build accessible URLs for files saved by multer
+const getUploadedImageUrls = (req: Request): string[] => {
+  const files = (req.files as Express.Multer.File[]) || [];
+  const host = req.get("host");
+  const protocol = req.protocol;
+  return files.map((file) => `${protocol}://${host}/uploads/products/${file.filename}`);
+};
+
 // Validation schemas
 const createProductSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   price: Joi.number().min(0).required(),
   cost: Joi.number().min(0).required(),
   stock: Joi.number().integer().min(0).required(),
-  description: Joi.string().max(500).optional(),
-  category: Joi.string().max(50).optional(),
+  description: Joi.string().allow("").optional(),
+  category: Joi.string().allow("").optional(),
+  isActive: Joi.boolean().optional(),
+
+  imageUrls: Joi.any().optional(),
+
   images: Joi.array()
-  .items(Joi.string())
-  .default([]),
+    .items(Joi.string())
+    .default([]),
 });
 
 // 📌 Desactivar producto
@@ -89,52 +119,121 @@ export const activateProduct = async (
     });
   }
 };
+
 // 📌 Crear producto
-export const createProduct = async (req: AuthRequest, res: Response) => {
-  try {
-    // Validate input
-    const { error, value } = createProductSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        message: "Validation error",
-        error: error.details[0].message
-      });
-    }
+export const createProduct = async (
+req: AuthRequest,
+res: Response
+) => {
+try {
+console.log("========== CREATE PRODUCT ==========");
+console.log("BODY:", req.body);
+console.log("FILES:", req.files);
+console.log("DB USER:", req.dbUser);
 
-    const { name, price, cost, stock, description, category, images, isActive } = value;
 
-    // ✅ Evitar duplicados por nombre
-   const existing = await Product.findOne({
-     name,
-     user: req.dbUser?._id
-     });
+// Verificar usuario autenticado
+if (!req.dbUser) {
+  return res.status(401).json({
+    message: "User not found",
+  });
+}
 
-    if (existing) {
-      return res.status(400).json({
-        message: "Product already exists"
-      });
-    }
+// Imágenes existentes + nuevas
+const imageUrls = parseImageUrls(
+  req.body.imageUrls || req.body.images
+);
 
-    const product = await Product.create({
-      name,
-      price,
-      cost,
-      stock,
-      description,
-      category,
-      images,
-      user: req.dbUser?._id,
-      isActive: true
-    });
+const uploadedUrls = getUploadedImageUrls(req);
 
-    res.status(201).json(product);
+const images = [
+  ...imageUrls,
+  ...uploadedUrls,
+];
 
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Error creating product",
-      error: error.message
-    });
-  }
+// Multipart/FormData envía todo como string
+const payload = {
+  name: req.body.name,
+  description: req.body.description,
+  price: Number(req.body.price),
+  cost: Number(req.body.cost),
+  stock: Number(req.body.stock),
+  category: req.body.category,
+  isActive: req.body.isActive === "true",
+  images,
+};
+console.log("PAYLOAD:", payload);
+
+const { error, value } =
+  createProductSchema.validate(payload, {
+    allowUnknown: true,
+  });
+
+if (error) {
+  console.log("JOI ERROR:", error.details);
+
+  return res.status(400).json({
+    message: "Validation error",
+    error: error.details[0].message,
+  });
+}
+
+const {
+  name,
+  price,
+  cost,
+  stock,
+  description,
+  category,
+  isActive,
+} = value;
+
+// Evitar duplicados
+const existing = await Product.findOne({
+  name: name.trim(),
+  user: req.dbUser._id,
+  isActive: true,
+});
+
+if (existing) {
+  return res.status(400).json({
+    message: "Product already exists",
+  });
+}
+
+const product = await Product.create({
+  name: name.trim(),
+  price,
+  cost,
+  stock,
+  description,
+  category,
+  images,
+  user: req.dbUser._id,
+  isActive: isActive ?? true,
+});
+
+console.log("PRODUCT CREATED:", product._id);
+
+return res.status(201).json({
+  success: true,
+  product,
+});
+
+
+} catch (error: any) {
+console.error(
+"CREATE PRODUCT ERROR:",
+error
+);
+
+return res.status(500).json({
+  success: false,
+  message: "Error creating product",
+  error: error.message,
+});
+
+}
 };
 
 // 📌 Obtener todos los productos
@@ -187,14 +286,23 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-const product = await Product.findOneAndUpdate(
-  {
-    _id: id,
-    user: req.dbUser?._id
-  },
-  req.body,
-  { new: true }
-);
+    const imageUrls = parseImageUrls(req.body.imageUrls || req.body.images);
+    const uploadedUrls = getUploadedImageUrls(req);
+    const images = [...imageUrls, ...uploadedUrls];
+
+    const updatePayload = {
+      ...req.body,
+      images,
+    };
+
+    const product = await Product.findOneAndUpdate(
+      {
+        _id: id,
+        user: req.dbUser?._id,
+      },
+      updatePayload,
+      { new: true }
+    );
 
     if (!product) {
       return res.status(404).json({

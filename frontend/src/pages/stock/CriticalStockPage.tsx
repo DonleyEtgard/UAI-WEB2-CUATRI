@@ -65,7 +65,7 @@ const CriticalStockPage = () => {
             onClick={loadCriticalStock}
             disabled={loading}
             variant="outlined"
-            sx={{ fontSize: 14 }}
+            sx={{ fontSize: 14 , color: 'white'}}
           >
             Actualizar
           </Button>
@@ -85,7 +85,7 @@ const CriticalStockPage = () => {
             {products.map((p) => {
               const config = getAlertConfig(p.stock);
               return (
-                <Grid item xs={12} sm={6} md={4} key={p._id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={p._id}>
                   <Card sx={{ borderRadius: 3, boxShadow: 2, transition: 'all 0.3s ease', '&:hover': { boxShadow: 4, transform: 'translateY(-4px)' } }}>
                     <CardContent sx={{ p: 3 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>

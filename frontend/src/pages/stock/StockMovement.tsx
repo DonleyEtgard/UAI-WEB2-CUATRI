@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Container, Card, CardContent, CardHeader, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Typography, CircularProgress } from "@mui/material";
+import { Box, Container, Card, CardContent, CardHeader, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
@@ -143,7 +143,7 @@ export default function StockMovement() {
             { label: "Hoy", value: todayMovements, color: "info" },
             { label: "Balance Neto", value: netBalance, color: netBalance >= 0 ? "success" : "error" },
           ].map((kpi, i) => (
-            <Grid item xs={12} sm={6} md={3} key={i}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
               <Card sx={{ borderRadius: 2, boxShadow: 1 }}>
                 <CardContent>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>{kpi.label}</p>
@@ -183,8 +183,10 @@ export default function StockMovement() {
                 onClick={() => loadMovements()}
                 disabled={loading}
                 size="small"
+                variant="outlined"
+                sx={{ fontSize: 14, textTransform: 'none', color: 'white' }}
               >
-                Actualizar
+              
               </Button>
             }
           />
