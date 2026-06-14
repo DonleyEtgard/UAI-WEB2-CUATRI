@@ -12,6 +12,7 @@ interface Sale {
   _id: string;
   customer: { name: string; lastName: string } | string;
   total: number;
+  costTotal: number;
   status: "paid" | "pending" | "cancelled";
   createdAt: string;
   itemsCount: number;
@@ -28,6 +29,7 @@ const SalesPage = () => {
       const res = await API.get("/sales");
       console.log("SALES RESPONSE:", res.data);
       const salesData = res.data?.data || [];
+      console.log("PRIMERA VENTA:", salesData[0]);
       console.log("SALES ARRAY:", salesData);
       setSales(Array.isArray(salesData) ? salesData : []);
     } catch (err) {
@@ -46,22 +48,44 @@ const SalesPage = () => {
   const totalRevenue = sales.reduce((acc, s) => acc + (s.status === 'paid' ? s.total : 0), 0);
   const pendingCount = sales.filter(s => s.status === 'pending').length;
   const averageTicket = sales.length > 0 ? totalRevenue / sales.length : 0;
+  const totalExpenses = sales.reduce((acc, sale) => acc + (sale.costTotal || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
+  const profitMargin =totalRevenue > 0 ? (netProfit / totalRevenue) * 100
+    : 0;
 
   // Chart Data
   const chartData = useMemo(() => {
-    const dailyData: { [key: string]: number } = {};
-    const sortedSales = [...sales].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-    sortedSales.forEach(sale => {
-      const date = new Date(sale.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
-      dailyData[date] = (dailyData[date] || 0) + sale.total;
-    });
-    return {
-      categories: Object.keys(dailyData),
-      series: Object.values(dailyData)
-    };
-  }, [sales]);
+  const revenueByDay: Record<string, number> = {};
+  const expenseByDay: Record<string, number> = {};
+
+  const sortedSales = [...sales].sort(
+    (a, b) =>
+      new Date(a.createdAt).getTime() -
+      new Date(b.createdAt).getTime()
+  );
+
+  sortedSales.forEach((sale) => {
+    const date = new Date(sale.createdAt)
+      .toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "short"
+      });
+
+    revenueByDay[date] =
+      (revenueByDay[date] || 0) +
+      (sale.status === "paid" ? sale.total : 0);
+
+    expenseByDay[date] =
+      (expenseByDay[date] || 0) +
+      (sale.costTotal || 0);
+  });
+
+  return {
+    categories: Object.keys(revenueByDay),
+    revenueSeries: Object.values(revenueByDay),
+    expenseSeries: Object.values(expenseByDay)
+  };
+}, [sales]);
 
   const getStatusColor = (status: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
     switch (status) {
@@ -71,6 +95,7 @@ const SalesPage = () => {
       default: return "default";
     }
   };
+  
 
   // DataGrid columns
   const columns = [
@@ -81,7 +106,21 @@ const SalesPage = () => {
     { field: 'status', headerName: 'Estado', width: 130, renderCell: (params: any) => <Chip label={params.row.status} color={getStatusColor(params.row.status)} size="small" /> },
     { field: 'total', headerName: 'Total', width: 120, align: 'right' as const, renderCell: (params: any) => `$${params.row.total.toFixed(2)}` },
     { field: 'actions', headerName: 'Acciones', width: 120, align: 'center' as const, sortable: false, renderCell: (params: any) => (
-      <Button size="small" variant="outlined" onClick={() => navigate(`/app/sales/${params.row._id}`)}>Detalles</Button>
+     <Button
+       size="small"
+       variant="outlined"
+       onClick={() => navigate(`/app/sales/${params.row._id}`)}
+       sx={{
+       color: "white",
+       borderColor: "#fff",
+       "&:hover": {
+       borderColor: "#fff",
+       backgroundColor: "rgba(255,255,255,0.08)",
+      },
+    }}
+   >
+  Detalles
+</Button>
     ) },
   ];
 
@@ -126,6 +165,10 @@ const SalesPage = () => {
             { label: "Transacciones", value: sales.length, color: "info" },
             { label: "Pendientes", value: pendingCount, color: "warning" },
             { label: "Ticket Promedio", value: `$${averageTicket.toFixed(2)}`, color: "primary" },
+            {label: "Gastos", value: `$${totalExpenses.toLocaleString()}`, color: "error"},
+            {label: "Ganancia Neta", value: `$${netProfit.toLocaleString()}`, color: netProfit >= 0 ? "success" : "error"},
+            {label: "Margen %",value: `${profitMargin.toFixed(1)}%`,color: profitMargin >= 0 ? "success" : "error"}
+ 
           ].map((kpi, i) => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
               <Card sx={{ borderRadius: 2, boxShadow: 1 }}>
@@ -140,14 +183,15 @@ const SalesPage = () => {
 
         {/* Chart */}
         <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 4 }}>
-          <CardHeader title="Tendencia de Ingresos" subheader="Evolución diaria de facturación" />
+          <CardHeader title="Ingresos vs Gastos" subheader="Comparación diaria"
+           />
           <CardContent>
             {chartData.categories.length > 0 ? (
               <Chart
                 options={{
                   chart: { toolbar: { show: false }, background: 'transparent' },
                   theme: { mode: 'light' },
-                  colors: ['#6366f1'],
+                 colors: ['#22c55e', '#ef4444'],
                   stroke: { curve: 'smooth', width: 3 },
                   fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 90, 100] } },
                   xaxis: { 
@@ -160,7 +204,16 @@ const SalesPage = () => {
                   tooltip: { y: { formatter: (val) => `$${val.toLocaleString()}` } },
                   markers: { size: 5, colors: ['#6366f1'], strokeWidth: 0 }
                 }}
-                series={[{ name: 'Ventas', data: chartData.series }]}
+                series={[
+                    {
+                     name: "Ingresos",
+                     data: chartData.revenueSeries
+                     },
+                     {
+                     name: "Gastos",
+                     data: chartData.expenseSeries
+                      }
+                    ]}
                 type="area"
                 height={300}
               />

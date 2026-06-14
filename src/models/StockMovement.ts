@@ -39,7 +39,12 @@ const stockMovementSchema = new Schema(
     // 📝 Motivo del movimiento
     reason: {
       type: String,
-      enum: ["sale", "restock", "adjustment"],
+       enum: [
+        "sale",
+        "restock",
+        "adjustment",
+        "initial_stock"
+        ],
       required: true
     },
 

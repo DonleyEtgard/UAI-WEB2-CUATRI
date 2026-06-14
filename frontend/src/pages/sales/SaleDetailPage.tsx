@@ -6,6 +6,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import API from "../../services/api";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
 /**
  * Define valid currency literals. 
@@ -16,11 +17,11 @@ export type Currency = 'HTG' | '$ ARG';
 export type SaleStatus = 'paid' | 'pending' | 'cancelled' | string;
 
 export interface SaleItem {
-  productId: string;
+  product?: string;
   productName?: string;
   quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+  price: number;
+  subtotal: number;
 }
 
 export interface Sale {
@@ -45,19 +46,23 @@ const SaleDetailPage = () => {
   useEffect(() => {
     if (!id) return;
 
-    const load = async () => {
-      try {
-        const res = await API.get<Sale>(`/sales/${id}`);
-        setSale(res.data);
-      } catch (err) {
-        console.error("Error loading sale:", err);
+   const load = async () => {
+       try {
+    const res = await API.get(`/sales/${id}`);
+
+     console.log("SALE DETAIL:", res.data);
+
+     setSale(res.data);
+     } catch (err) {
+      console.error("Error loading sale:", err);
       } finally {
-        setLoading(false);
-      }
+      setLoading(false);
+     }
     };
 
     load();
   }, [id]);
+     
 
   const handleDelete = async () => {
     if (!id || deleting) return;
@@ -74,11 +79,12 @@ const SaleDetailPage = () => {
 
   const metrics = useMemo(() => {
     if (!sale) return null;
-    const subtotal = sale.items.reduce((acc: number, i: SaleItem) => acc + i.totalPrice, 0);
+   const subtotal = sale.items.reduce( (acc, i) => acc + i.subtotal, 0 );
     const avgItem = subtotal / sale.items.length || 0;
     const change = sale.amountPaid - sale.total;
     return { subtotal, avgItem, change, profitEstimate: subtotal * 0.25 };
   }, [sale]);
+
 
   if (loading) return (
     <Box sx={{ display: 'flex', justifyContent: 'center', py: 10, minHeight: '100vh' }}>
@@ -186,41 +192,71 @@ const SaleDetailPage = () => {
                   <TableCell align="right"><strong>Total</strong></TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {sale.items.map((item, idx) => (
-                  <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                    <TableCell>{item.productName || item.productId}</TableCell>
-                    <TableCell align="center">{item.quantity}</TableCell>
-                    <TableCell align="right">${item.unitPrice.toFixed(2)}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>${item.totalPrice.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+             <TableBody>
+  {sale.items?.map((item, idx) => (
+    <TableRow
+      key={idx}
+      sx={{ '&:hover': { bgcolor: '#f8fafc' } }}
+    >
+      <TableCell>
+        {item.productName || item.product || "Producto"}
+      </TableCell>
+
+      <TableCell align="center">
+        {item.quantity}
+      </TableCell>
+
+      <TableCell align="right">
+        ${(item.price ?? 0).toFixed(2)}
+      </TableCell>
+
+      <TableCell
+        align="right"
+        sx={{ fontWeight: 700 }}
+      >
+        ${(item.subtotal ?? 0).toFixed(2)}
+      </TableCell>
+    </TableRow>
+    ))}
+    </TableBody>
             </Table>
           </TableContainer>
         </Card>
 
-        {/* Actions */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
-          <Button 
-            variant="outlined" 
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/app/sales")}
-            sx={{ textTransform: 'none', fontSize: 14 }}
-          >
-            Volver
-          </Button>
-          <Button 
-            variant="contained" 
-            color="error"
-            disabled={deleting}
-            startIcon={<DeleteIcon />}
-            onClick={handleDelete}
-            sx={{ textTransform: 'none', fontSize: 14 }}
-          >
-            {deleting ? <CircularProgress size={20} /> : 'Eliminar'}
-          </Button>
-        </Box>
+       <Box
+  sx={{
+    display: "flex",
+    gap: 2,
+    flexWrap: "wrap"
+  }}
+>
+  <Button
+    variant="outlined"
+    startIcon={<ArrowBackIcon />}
+    onClick={() => navigate("/app/sales")}
+  >
+    Volver
+  </Button>
+
+<Button
+  variant="contained"
+  color="info"
+  startIcon={<ReceiptIcon />}
+  onClick={() => navigate(`/app/sales/ticket/${sale._id}`)}
+>
+  Ver Ticket
+</Button>
+
+  <Button
+    variant="contained"
+    color="error"
+    disabled={deleting}
+    startIcon={<DeleteIcon />}
+    onClick={handleDelete}
+  >
+     {deleting ? <CircularProgress size={20} /> : "Eliminar"}
+    </Button>
+   </Box>
       </Container>
     </Box>
   );

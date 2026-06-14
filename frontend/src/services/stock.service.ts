@@ -4,10 +4,11 @@ export type StockMovement = {
   _id: string;
 
   product: {
-    _id: string;
-    name?: string;
-    price?: number;
-  };
+  _id: string;
+  name?: string;
+  price?: number;
+  cost?: number;
+};
 
   type: "in" | "out";
 

@@ -15,7 +15,10 @@ export const authenticateFirebase = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
+) => {   // ✅ Permitir preflight CORS
+  if (req.method === "OPTIONS") {
+    return next();
+  }
   try {
     // =====================================================================
     // 1. EXTRACT AND VALIDATE TOKEN

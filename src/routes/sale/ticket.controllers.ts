@@ -59,19 +59,11 @@ export const sendTicketWhatsApp = async (
   res: Response
 ) => {
   try {
-    const { saleId, phone } = req.body;
+    const { saleId } = req.body;
 
-    if (!saleId || !phone) {
-      return res.status(400).json({
-        message: "saleId and phone are required"
-      });
-    }
-
-    // ✅ URL DEL TICKET
     const url =
-         `http://localhost:5173/app/sales/ticket/${saleId}`;
-         
-    // ✅ MENSAJE
+      `http://localhost:5173/app/sales/ticket/${saleId}`;
+
     const message = `
 🧾 Ticket de compra
 
@@ -79,9 +71,8 @@ Ver ticket:
 ${url}
 `;
 
-    // ✅ LINK WHATSAPP
     const whatsappUrl =
-      `https://wa.me/${phone}?text=` +
+      `https://wa.me/?text=` +
       encodeURIComponent(message);
 
     res.json({

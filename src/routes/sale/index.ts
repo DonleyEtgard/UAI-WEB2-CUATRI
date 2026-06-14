@@ -48,7 +48,11 @@ router.get(
   getTopProducts
 );
 
-router.get("/sales/:id", getSaleById);
+router.get(
+  "/",
+  authenticateFirebase,
+  getSales
+);
 
 // ======================================================
 // 🎟️ TICKET
@@ -110,12 +114,6 @@ router.get(
 );
 
 router.get(
-  "/",
-  authenticateFirebase,
-  getSales
-);
-
-router.get(
   "/items/sale/:saleId",
   authenticateFirebase,
   getItemsBySale
@@ -132,5 +130,11 @@ router.delete(
   authenticateFirebase,
   deleteSaleItem
 );
+
+router.get("/:id", 
+  authenticateFirebase, 
+  getSaleById
+);
+
 
 export default router;

@@ -237,16 +237,23 @@ const ProductDetailPage = () => {
         </Button>
 
         <Button
-          variant="contained"
-          sx={{ color: 'white', fontSize: 14, fontWeight: 700 }}
-          onClick={() =>
-            navigate(
-              `/app/products/edit/${id}`
-            ) 
-          }
-        >
-          Editar
-        </Button>
+  variant="outlined"
+  sx={{
+    color: "white",
+    borderColor: "white",
+    fontSize: 14,
+    fontWeight: 700,
+    "&:hover": {
+      borderColor: "white",
+      backgroundColor: "rgba(255,255,255,0.08)",
+    },
+  }}
+  onClick={() =>
+    navigate(`/app/products/edit/${id}`)
+  }
+>
+  Editar
+</Button>
 
         <Button
           variant="contained"

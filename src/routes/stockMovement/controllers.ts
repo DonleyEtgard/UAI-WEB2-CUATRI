@@ -10,6 +10,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const {
       name,
       price,
+      cost,
       stock,
       category,
       user
@@ -18,6 +19,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const product = await Product.create({
       name,
       price,
+      cost,
       stock,
       category,
       active: true

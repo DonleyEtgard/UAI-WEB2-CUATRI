@@ -17,6 +17,7 @@ import AboutPage from "../pages/about";
 import { FormDemo } from "../pages/FormDemo/FormDemo";
 import ReduxDemoPage from "../pages/redux-demo";
 
+
 // PRIVATE PAGES
 import Dashboard from "../pages/dashboard/DashboardPage";
 import ProductsPage from "../pages/products/ProductsPage";
@@ -124,6 +125,11 @@ export const AppRouter: React.FC = () => {
                 <ProductDetailPage />
               </RoleGuard>
             }
+          />
+          
+          <Route
+             path="/app/products/edit/:id"
+           element={<ProductFormPage />}
           />
 
           {/* SALES */}
@@ -252,22 +258,22 @@ export const AppRouter: React.FC = () => {
             }
           />
            <Route
-  path="users/:id"
-  element={
-    <RoleGuard requiredRoles={["superadmin", "admin"]}>
-      <UserDetailPage />
-    </RoleGuard>
-  }
-/>
+          path="users/:id"
+          element={
+          <RoleGuard requiredRoles={["superadmin", "admin"]}>
+         <UserDetailPage />
+        </RoleGuard>
+       }
+      />
 
-<Route
-  path="users/roles/:id"
-  element={
-    <RoleGuard requiredRoles={["superadmin", "admin"]}>
+    <Route
+      path="users/roles/:id"
+      element={
+     <RoleGuard requiredRoles={["superadmin", "admin"]}>
       <UserRolePage />
     </RoleGuard>
-  }
-/>
+     }
+       />
           <Route
             path="users/new"
             element={

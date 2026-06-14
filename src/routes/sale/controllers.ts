@@ -44,6 +44,7 @@ export const createSale = async (
 
     let total = 0;
     const productMap: any = {};
+    let totalCost = 0;
 
     // =========================
     // VALIDAR PRODUCTOS
@@ -59,6 +60,8 @@ export const createSale = async (
 
       productMap[item.product] = product;
       total += product.price * item.quantity;
+
+      totalCost += product.cost * item.quantity;
     }
 
     // =========================
@@ -83,6 +86,7 @@ export const createSale = async (
           user,
           paymentMethod,
           total,
+          costTotal: totalCost,
           amountPaid: paymentMethod === "cash" ? amountPaid : 0,
           change,
           status: "paid",

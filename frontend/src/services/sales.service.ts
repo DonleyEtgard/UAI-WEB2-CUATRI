@@ -8,6 +8,61 @@ import type { Sale as ModelSale, SaleItem as ModelSaleItem, Currency as ModelCur
 // TYPES - AUTH
 // ==========================
 
+export interface TicketSale {
+  _id: string;
+
+  customer?: {
+    name?: string;
+    phone?: string;
+  };
+
+  user?: {
+    email?: string;
+    lastname?: string;
+    name?: string;
+  };
+
+  createdAt: string;
+
+  total: number;
+
+  paymentMethod?: string;
+
+  amountPaid?: number;
+
+  change?: number;
+
+  status?: string;
+
+  notes?: string;
+}
+
+export interface TicketItem {
+  _id: string;
+
+  quantity: number;
+
+  subtotal: number;
+
+  product?: {
+    name?: string;
+  };
+
+  productName?: string;
+}
+
+export interface TicketInfo {
+  sale: TicketSale;
+  items: TicketItem[];
+  customer: any; // Tipo Customer si se necesita
+  qrCode?: string;
+}
+
+export interface TicketData {
+  sale: Sale;
+  items: SaleItem[];
+}
+
 export type RegisterData = {
   name: string;
   lastName: string;
@@ -160,13 +215,6 @@ export const deleteSaleItem = async (id: string): Promise<{ message: string }> =
 // ======================================================
 // 🎟️ TICKET
 // ======================================================
-export type TicketInfo = {
-  sale: Sale;
-  customer: any; // Tipo Customer si se necesita
-  items: SaleItem[];
-  qrCode?: string;
-  // ... otros campos del ticket
-};
 
 // GET TICKET
 export const getTicket = async (id: string): Promise<TicketInfo> => {

@@ -1,49 +1,64 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Box, Card, CardContent, CardHeader, Button, Table, TableBody, TableCell, TableContainer, TableRow, Typography, Divider, Container, CircularProgress } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import { Box, Card, CardContent, Button, Table, TableBody, TableCell, TableContainer,
+   TableRow, Typography, Divider, Container, CircularProgress } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import TelegramIcon from "@mui/icons-material/Telegram";
-import { fetchTicket, type TicketData, type SaleItem } from "./api";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import API from "../../services/api";
+import {
+  getTicket,
+  type TicketInfo,
+  type TicketItem
+} from "../../services/sales.service";
 
 const TicketPage = () => {
   const { id } = useParams();
 
-  const [ticket, setTicket] = useState<TicketData | null>(null);
+  const [ticket, setTicket] = useState<TicketInfo | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const loadTicket = async () => {
-    try {
-      setLoading(true);
-      if (!id) return;
-      const data = await fetchTicket(id);
-      setTicket(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    console.log("LOADING TICKET:", id);
 
-  const sendWhatsApp = async () => {
-    try {
-      if (!ticket?.sale) return;
-      const phone = ticket.sale.customer?.phone;
-      if (!phone) {
-        alert("El cliente no tiene teléfono");
-        return;
+    setLoading(true);
+
+    const data = await getTicket(id!);
+
+    console.log("TICKET RESPONSE:", data);
+
+    setTicket(data);
+  } catch (err) {
+    console.error("TICKET ERROR:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+ const sendWhatsApp = async () => {
+  try {
+    if (!ticket?.sale) return;
+
+    const res = await API.post(
+      "/sales/ticket/send-whatsapp",
+      {
+        saleId: ticket.sale._id
       }
-      const res = await API.post("/sales/ticket/send-whatsapp", {
-        saleId: ticket.sale._id,
-        phone,
-      });
-      window.open(res.data.whatsappUrl, "_blank");
-    } catch (err) {
-      console.error(err);
-      alert("Error enviando WhatsApp");
-    }
-  };
+    );
+
+    window.open(
+      res.data.whatsappUrl,
+      "_blank"
+    );
+
+  } catch (err) {
+    console.error(err);
+    alert("Error enviando WhatsApp");
+  }
+};
 
   const sendTelegram = async () => {
     try {
@@ -60,8 +75,12 @@ const TicketPage = () => {
   };
 
   useEffect(() => {
-    if (id) loadTicket();
-  }, [id]);
+  console.log("SALE ID:", id);
+
+  if (id) {
+    loadTicket();
+  }
+}, [id]);
 
   if (loading) return (
     <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
@@ -80,9 +99,10 @@ const TicketPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', py: 4, px: 2, bgcolor: '#f8fafc' }}>
       <Container maxWidth="sm">
-        <Card sx={{ borderRadius: 3, boxShadow: 3, bgcolor: 'white' }}>
+        <Card sx={{ borderRadius: 3, boxShadow: 3, bgcolor: '#ffe0ab' }}>
           <CardContent sx={{ textAlign: 'center', pt: 4 }}>
-            <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>🧾 Ticket de Venta</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 , color: '#667eea'}}>HAITI BIZ</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>Ticket de Venta 🧾</Typography>
             <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace', display: 'block', fontSize: 11 }}>ID: {sale._id}</Typography>
           </CardContent>
 
@@ -96,6 +116,14 @@ const TicketPage = () => {
                 <Typography sx={{ fontWeight: 600 }}>{sale.customer?.name || "Consumidor Final"}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography sx={{ color: '#64748b' }}>Vendedor:</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: 12 }}>{sale.user?.name}</Typography>
+              </Box>
+               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography sx={{ color: '#64748b' }}>Vendedor:</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: 12 }}>{sale.user?.lastname}</Typography>
+              </Box>
+               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography sx={{ color: '#64748b' }}>Vendedor:</Typography>
                 <Typography sx={{ fontWeight: 600, fontSize: 12 }}>{sale.user?.email}</Typography>
               </Box>
@@ -113,7 +141,7 @@ const TicketPage = () => {
             <TableContainer>
               <Table size="small">
                 <TableBody>
-                  {items.map((item: SaleItem) => (
+                  {items.map((item: TicketItem) => (
                     <TableRow key={item._id} sx={{ borderBottom: 'none' }}>
                       <TableCell sx={{ p: 0.5, fontSize: 13 }}>
                         <Box>
@@ -180,35 +208,59 @@ const TicketPage = () => {
 
           {/* Actions */}
           <CardContent sx={{ display: 'grid', gap: 1.5 }}>
-            <Button 
-              fullWidth 
-              variant="outlined" 
-              startIcon={<PrintIcon />}
-              onClick={() => window.print()}
-              sx={{ textTransform: 'none' }}
-            >
-              Imprimir
-            </Button>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-              <Button 
-                variant="contained" 
-                sx={{ bgcolor: '#25d366', '&:hover': { bgcolor: '#1ea755' } }}
-                startIcon={<WhatsAppIcon />}
-                onClick={sendWhatsApp}
-                size="small"
-              >
-                WhatsApp
-              </Button>
-              <Button 
-                variant="contained" 
-                sx={{ bgcolor: '#0088cc', '&:hover': { bgcolor: '#0070a3' } }}
-                startIcon={<TelegramIcon />}
-                onClick={sendTelegram}
-                size="small"
-              >
-                Telegram
-              </Button>
-            </Box>
+            
+            <Box
+              sx={{
+              display: "flex",
+              gap: 2,
+              flexWrap: "wrap"
+          }}
+        >
+      <Button
+       variant="outlined"
+       startIcon={<ArrowBackIcon />}
+       onClick={() => navigate("/app/sales")}
+       >
+      Volver
+  </Button>
+
+  <Button
+    variant="contained"
+    startIcon={<PrintIcon />}
+    onClick={() =>
+      navigate(`/app/sales/ticket/${sale._id}`)
+    }
+  >
+    Imprimir
+  </Button>
+
+  <Button
+    variant="contained"
+    sx={{
+      bgcolor: "#25d366",
+      "&:hover": {
+        bgcolor: "#1ea755"
+      }
+    }}
+    startIcon={<WhatsAppIcon />}
+    onClick={sendWhatsApp}
+  >
+    WhatsApp
+  </Button>
+  <Button
+    variant="contained"
+    sx={{
+      bgcolor: "#25d366",
+      "&:hover": {
+        bgcolor: "#1ea755"
+      }
+    }}
+    startIcon={<TelegramIcon />}
+    onClick={sendTelegram}
+  >
+    Telegram
+  </Button>
+    </Box>
           </CardContent>
         </Card>
       </Container>

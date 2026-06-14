@@ -23,6 +23,17 @@ const saleSchema = new Schema(
       min: 0
     },
 
+  totalCost: {
+      type: Number,
+      default: 0,
+      min: 0
+     },
+
+    profit: {
+       type: Number,
+       default: 0
+      },
+
     // 💳 Método de pago
     paymentMethod: {
       type: String,

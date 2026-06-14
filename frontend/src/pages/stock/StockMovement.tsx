@@ -14,6 +14,27 @@ import {
 
 import { LineChartComponent } from "../../components/dashboard/LineChartComponent";
 
+export function useStockMovements() {
+  const [movements, setMovements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getStockMovements();
+        setMovements(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error loading stock movements for hook:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  return { movements, loading };
+}
+
 export default function StockMovement() {
   const [movements, setMovements] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +48,7 @@ export default function StockMovement() {
       const data = productId
         ? await getMovementsByProduct(productId)
         : await getStockMovements();
-
+        console.log("STOCK DATA:", data);
       setMovements(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error loading stock movements:", error);
