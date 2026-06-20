@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperadmin() {
+      return isSignedIn() && request.auth.token.role == 'superadmin';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (request.auth.token.role == 'admin' || isSuperadmin());
+    }
+
+    function isEmployee() {
+      return isSignedIn() && (request.auth.token.role == 'employee' || isAdmin());
+    }
+
+    function userOrg() {
+      return request.auth.token.organizationId;
+    }
+
+    function sameOrg(orgField) {
+      return orgField == userOrg();
+    }
+
+    function validateOrgOnWrite() {
+      return request.resource.data.organizationId == userOrg();
+    }
+
+    match /users/{userId} {
+      allow get, list: if isSignedIn() && (request.auth.uid == userId || isAdmin() || isSuperadmin());
+
+      allow create: if isSuperadmin();
+
+      allow update: if isSignedIn() && (
+        isSuperadmin()
+        || (
+          isAdmin()
+          && resource.data.role != 'superadmin'
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.organizationId == resource.data.organizationId
+        )
+        || (
+          request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.organizationId == resource.data.organizationId
+        )
+      );
+
+      allow delete: if isSuperadmin();
+    }
+
+    match /products/{productId} {
+      allow get, list: if isEmployee() && sameOrg(resource.data.organizationId);
+      allow create, update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /customers/{customerId} {
+      allow get, list: if isEmployee() && sameOrg(resource.data.organizationId);
+      allow create, update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /sales/{saleId} {
+      allow get, list: if isEmployee() && sameOrg(resource.data.organizationId);
+      allow create: if isEmployee() && validateOrgOnWrite();
+      allow update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /saleItems/{saleItemId} {
+      allow get, list: if isEmployee() && sameOrg(resource.data.organizationId);
+      allow create: if isEmployee() && validateOrgOnWrite();
+      allow update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /stockMovements/{movementId} {
+      allow get, list: if isEmployee() && sameOrg(resource.data.organizationId);
+      allow create: if isEmployee() && validateOrgOnWrite();
+      allow update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /reports/{reportId} {
+      allow get, list: if isAdmin() && sameOrg(resource.data.organizationId);
+      allow create, update, delete: if isAdmin() && validateOrgOnWrite();
+    }
+
+    match /organizations/{orgId} {
+      allow get, list: if isSignedIn() && (sameOrg(orgId) || isSuperadmin());
+      allow create: if isSuperadmin();
+      allow update: if isSuperadmin() || (isAdmin() && sameOrg(orgId) && request.resource.data.ownerId == resource.data.ownerId);
+      allow delete: if isSuperadmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

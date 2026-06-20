@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2732" viewBox="0 0 2048 2732">
+  <rect width="2048" height="2732" fill="#131315" />
+  <rect x="256" y="768" width="1536" height="896" rx="80" fill="#6366f1" />
+  <text x="1024" y="1320" fill="#ffffff" font-family="system-ui, sans-serif" font-size="120" font-weight="700" text-anchor="middle">HAITIBIZ ERP</text>
+  <text x="1024" y="1460" fill="#c7d2fe" font-family="system-ui, sans-serif" font-size="64" text-anchor="middle">App instalable y offline</text>
+</svg>
