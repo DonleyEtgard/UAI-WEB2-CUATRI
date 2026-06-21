@@ -21,6 +21,7 @@ import { authenticateFirebase } from "../../middlewares/authenticateFirebase";
 import { authorizeSuperadminOnly } from "../../middlewares/authorizeSuperadminOnly";
 
 import { authorizeAdminOrSuperadmin } from "../../middlewares/authorizeAdminOrSuperadmin";
+import { requireVerifiedEmail } from "../../middlewares/requireVerifiedEmail";
 
 const router: Router = express.Router();
 
@@ -63,6 +64,7 @@ router.get(
 router.get(
   "/",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   listUsersController
 );
@@ -70,18 +72,23 @@ router.get(
 router.post(
   "/pay-subscription",
   authenticateFirebase,
+  requireVerifiedEmail,
   paySubscription
 );
 
 router.get(
   "/payments/pending",
   authenticateFirebase,
+  requireVerifiedEmail,
+  authorizeSuperadminOnly,
   getPendingPayments
 );
 
 router.put(
   "/payments/:id/approve",
   authenticateFirebase,
+  requireVerifiedEmail,
+  authorizeSuperadminOnly,
   approvePayment
 );
 
@@ -92,6 +99,7 @@ router.put(
 router.get(
   "/:id",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   getUserByIdController
 );
@@ -103,6 +111,7 @@ router.get(
 router.patch(
   "/:id",
   authenticateFirebase,
+  requireVerifiedEmail,
   updateUserController
 );
 
@@ -114,6 +123,7 @@ router.patch(
 router.post(
   "/employees",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   createEmployeeController
 );
@@ -129,6 +139,7 @@ router.post(
 router.delete(
   "/:id",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeSuperadminOnly,
   deleteUserController
 );
@@ -143,6 +154,7 @@ router.delete(
 router.post(
   "/pay-subscription",
   authenticateFirebase,
+  requireVerifiedEmail,
   paySubscription
 );
 
@@ -152,6 +164,7 @@ router.post(
 router.post(
   "/create-payment",
   authenticateFirebase,
+  requireVerifiedEmail,
   createSubscriptionPayment
 );
 

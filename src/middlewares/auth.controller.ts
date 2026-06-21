@@ -3,8 +3,8 @@ import User from "../models/User";
 import admin from "../firebase";
 
 const actionCodeSettings = {
-  url: 'https://midominio.com/verify-email',
-  handleCodeInApp: true,
+  url: `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email`,
+  handleCodeInApp: false,
 };
 
 export const registerController = async (req: Request, res: Response) => {

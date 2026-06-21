@@ -28,8 +28,8 @@ const requireAuth = () => {
 };
 
 const actionCodeSettings = {
-  url: 'https://midominio.com/verify-email',
-  handleCodeInApp: true,
+  url: `${window.location.origin}/verify-email`,
+  handleCodeInApp: false,
 };
 
 // ============================================================================

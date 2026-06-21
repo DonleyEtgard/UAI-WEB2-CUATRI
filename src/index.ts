@@ -22,6 +22,7 @@ import {
 } from "./middlewares/AuthorizeRole";
 
 import { checkSubscription } from "./middlewares/checkSubscription";
+import { requireVerifiedEmail } from "./middlewares/requireVerifiedEmail";
 
 // ================= DB =================
 import connectDB from "./db";
@@ -117,9 +118,6 @@ app.get("/cors-test", (_req, res) => {
 // 🔐 USERS (RBAC completo)
 app.use(
   "/api/users",
-  authenticateFirebase,
-  authorizeAdminOrSuperadmin,
-  checkSubscription,
   userRoutes
 );
 
@@ -127,6 +125,7 @@ app.use(
 app.use(
   "/api/products",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   productRoutes
@@ -136,6 +135,7 @@ app.use(
 app.use(
   "/api/customers",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   customerRoutes
@@ -145,6 +145,7 @@ app.use(
 app.use(
   "/api/sales",
   authenticateFirebase,
+  requireVerifiedEmail,
   checkSubscription,
   saleRoutes
 );
@@ -153,6 +154,7 @@ app.use(
 app.use(
   "/api/sale-items",
   authenticateFirebase,
+  requireVerifiedEmail,
   checkSubscription,
   saleItem
 );
@@ -162,6 +164,7 @@ app.use(
 app.use(
   "/api/stock",
   authenticateFirebase,
+  requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   stockRoutes

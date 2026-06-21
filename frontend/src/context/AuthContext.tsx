@@ -355,9 +355,6 @@ export const AuthProvider: React.FC<
           password
         );
 
-      // Disparamos el envío del correo inmediatamente tras el registro en Firebase
-      await sendEmailVerificationEmail(credential.user);
-
       const idToken =
         await getFirebaseIdToken(
           credential.user

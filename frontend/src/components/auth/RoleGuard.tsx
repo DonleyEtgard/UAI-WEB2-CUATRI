@@ -262,7 +262,8 @@ export const AuthGuard: React.FC<
   GuardChildrenProps
 > = ({ children }) => {
   const {
-    isAuthenticated,
+    user,
+    firebaseUser,
     isLoading,
   } = useAuth();
 
@@ -272,7 +273,7 @@ export const AuthGuard: React.FC<
     return <LoadingScreen />;
   }
 
-  if (!isAuthenticated) {
+  if (!firebaseUser || !user) {
     return (
       <Navigate
         to="/login"

@@ -6,6 +6,8 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 // GUARDS
 import { AuthGuard, RoleGuard } from "../components/auth/RoleGuard";
+import { VerifiedGuard } from "../firebase/VerifiedGuard";
+import VerifyEmailPage from "../firebase/VerifyEmailPage";
 
 // PUBLIC PAGES
 import HomePage from "../pages/home/HomePage";
@@ -30,7 +32,7 @@ import CustomerForm from "../pages/customers/CustomerForm";
 import StockMovement from "../pages/stock/StockMovement";
 import CriticalStockPage from "../pages/stock/CriticalStockPage";
 import UserPage from "../pages/users/UserPage";
-import UserDetailPage from "../pages/users/UserDetailPage";
+import UserDetailPage from "../pages/users/userDetailPage";
 import UserRolePage from "../pages/users/UserRolePage";
 import PaymentPage from "../pages/payment/PaymentPage";
 import ReportsPage from "../pages/reports/ReportsPage";
@@ -71,6 +73,7 @@ export const AppRouter: React.FC = () => {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="verify-email" element={<VerifyEmailPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="form-demo" element={<FormDemo />} />
@@ -82,7 +85,9 @@ export const AppRouter: React.FC = () => {
           path="/app"
           element={
             <AuthGuard>
-              <DashboardLayout />
+              <VerifiedGuard>
+                <DashboardLayout />
+              </VerifiedGuard>
             </AuthGuard>
           }
         >
@@ -224,7 +229,7 @@ export const AppRouter: React.FC = () => {
           <Route
             path="stock"
             element={
-              <RoleGuard requiredRoles={["superadmin", "admin"]}>
+              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
                 <StockMovement />
               </RoleGuard>
             }

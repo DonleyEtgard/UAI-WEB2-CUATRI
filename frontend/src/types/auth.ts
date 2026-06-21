@@ -56,8 +56,8 @@ export interface AuthContextType {
    * Register user via Firebase + Mongo
    */
   register: (
-    firebaseUid: string,
     email: string,
+    password: string,
     name: string,
     lastName: string,
     address?: UserAddress

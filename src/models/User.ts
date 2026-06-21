@@ -80,8 +80,8 @@ image: {
 },
     role: {
   type: String,
-  enum: ["superadmin", "admin", "employee", "user"],
-  default: "user"
+  enum: ["superadmin", "admin", "employee"],
+  default: "admin"
 },
 
     isVerified: {
