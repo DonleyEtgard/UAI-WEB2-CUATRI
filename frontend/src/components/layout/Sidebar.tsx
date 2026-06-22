@@ -158,7 +158,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* ADMIN / SUPERADMIN / MANAGER */}
           {/* ============================================================ */}
 
-          {(user?.role === "admin" || user?.role === "superadmin" || user?.role === "manager") && (
+          {(user?.role === "admin" || user?.role === "superadmin" ) && (
             <>
               {isOpen && (
                 <div className="px-4 mt-6 mb-2">

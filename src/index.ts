@@ -12,6 +12,7 @@ import customerRoutes from "./routes/customer";
 import saleRoutes from "./routes/sale";
 import stockRoutes from "./routes/stockMovement";
 import saleItem from "./routes/saleItem"; 
+import dashboardRoutes from "./routes/dashboard";
 
 
 // ================= MIDDLEWARES =================
@@ -64,6 +65,8 @@ app.use(express.json({ limit: "10mb" }));
 // FIX: Also allow larger URL-encoded bodies for form submissions
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // FIX: Serve uploaded images from the uploads folder
+app.use("/api/dashboard", dashboardRoutes);
+
 console.log(
   "UPLOADS PATH:",
   path.join(process.cwd(), "src", "uploads")
@@ -116,8 +119,8 @@ app.get("/cors-test", (_req, res) => {
 // ============================================================================
 
 // 🔐 USERS (RBAC completo)
-app.use(
-  "/api/users",
+app.use("/api/users", 
+  authenticateFirebase, 
   userRoutes
 );
 

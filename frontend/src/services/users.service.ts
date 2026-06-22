@@ -3,8 +3,7 @@ import { getWithCache, requestOrQueue } from "./offlineApi";
 export type UserRole =
   | "superadmin"
   | "admin"
-  | "employee"
-  | "user";
+  | "employee";
 
 export type PlanType =
   | "free"

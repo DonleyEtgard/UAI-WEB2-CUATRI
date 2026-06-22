@@ -2,10 +2,30 @@ import { Request, Response } from "express";
 import StockMovement from "../../models/StockMovement";
 import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
+import User from "../../models/User";
+import type { AuthRequest } from "../../types/auth";
+import Joi from "joi";
 
+
+
+export const getOrganizationScope = (req: AuthRequest) => {
+  if (!req.dbUser) {
+    return { ownerAdmin: null };
+  }
+
+  if (req.dbUser.role === "superadmin") {
+    return {};
+  }
+
+  return {
+    ownerAdmin:
+      req.dbUser.ownerAdmin ||
+      req.dbUser._id,
+  };
+};
 
 // 📌 Crear producto
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const {
       name,
@@ -17,26 +37,38 @@ export const createProduct = async (req: Request, res: Response) => {
     } = req.body;
 
     const product = await Product.create({
-      name,
-      price,
-      cost,
-      stock,
-      category,
-      active: true
-    });
+  name,
+  price,
+  cost,
+  stock,
+  category,
+
+  createdBy: req.dbUser?._id,
+  ownerAdmin:
+    req.dbUser?.ownerAdmin ||
+    req.dbUser?._id,
+
+  isActive: true
+});
 
     // ✅ Registrar movimiento inicial
     if (stock > 0) {
-      await StockMovement.create({
-        product: product._id,
-        type: "in",
-        quantity: stock,
-        user,
-        reason: "initial_stock",
-        stockAfter: stock
-      });
-    }
+     await StockMovement.create({
+  product: product._id,
+  type: "in",
+  quantity: stock,
 
+  user: req.dbUser?._id,
+
+  reason: "initial_stock",
+  stockAfter: stock,
+
+  createdBy: req.dbUser?._id,
+  ownerAdmin:
+    req.dbUser?.ownerAdmin ||
+    req.dbUser?._id
+});
+    }
     res.status(201).json(product);
 
   } catch (error: any) {
@@ -78,7 +110,7 @@ export const updateProduct = async (
 };
 // 📌 Actualizar stock manualmente
 export const updateProductStock = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -120,14 +152,21 @@ export const updateProductStock = async (
     await product.save();
 
     // ✅ Registrar movimiento
-    await StockMovement.create({
-      product: product._id,
-      type,
+   await StockMovement.create({
+     product: product._id,
+     type,
       quantity,
-      user,
-      reason,
-      stockAfter: newStock
-    });
+
+     user: req.dbUser?._id,
+
+     reason,
+     stockAfter: newStock,
+
+  createdBy: req.dbUser?._id,
+  ownerAdmin:
+    req.dbUser?.ownerAdmin ||
+    req.dbUser?._id
+});
 
     res.json(product);
 
@@ -137,8 +176,9 @@ export const updateProductStock = async (
     });
   }
 };
+
 // 📌 Crear movimiento manual de stock
-export const createStockMovement = async (req: Request, res: Response) => {
+export const createStockMovement = async (req: AuthRequest, res: Response) => {
   try {
     const { product, type, quantity, user, reason } = req.body;
 
@@ -170,13 +210,25 @@ export const createStockMovement = async (req: Request, res: Response) => {
     }
 
     const movement = await StockMovement.create({
-      product,
-      type,
-      quantity,
-      user,
-      reason,
-      stockAfter: newStock
-    });
+    product,
+    type,
+    quantity,
+
+    user: req.dbUser?._id,
+
+    reason,
+    stockAfter: newStock,
+
+    createdBy: req.dbUser?._id,
+    ownerAdmin:
+    req.dbUser?.ownerAdmin ||
+    req.dbUser?._id
+});
+
+existingProduct.stock = newStock;
+await existingProduct.save();
+
+res.status(201).json(movement);
 
     existingProduct.stock = newStock;
     await existingProduct.save();
@@ -208,7 +260,6 @@ export const getStockMovements = async (_req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 
 // 📌 Movimientos por producto
@@ -250,18 +301,26 @@ export const getStockMovementById = async (req: Request, res: Response) => {
 };
 
 
-
 // 📊 Resumen de movimientos
-export const getStockSummary = async (_req: Request, res: Response) => {
+export const getStockSummary = async (
+  req: AuthRequest,
+  res: Response) => {
   try {
-    const result = await StockMovement.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          total: { $sum: "$quantity" }
-        }
+const scope = getOrganizationScope(req);
+
+const result = await StockMovement.aggregate([
+  {
+    $match: scope
+  },
+  {
+    $group: {
+      _id: "$type",
+      total: {
+        $sum: "$quantity"
       }
-    ]);
+    }
+  }
+]);
 
     res.json(result);
 
@@ -269,7 +328,6 @@ export const getStockSummary = async (_req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 
 // ======================================================
@@ -288,15 +346,20 @@ export const registerSaleMovement = async (
     if (!product) continue;
 
     // ✅ SOLO REGISTRAR MOVIMIENTO
-    await StockMovement.create({
-      product: product._id,
-      type: "out",
-      quantity: item.quantity,
-      user,
-      reason: "sale",
-      sale: saleId,
-      stockAfter: product.stock
-    });
+   await StockMovement.create({
+  product: product._id,
+  type: "out",
+  quantity: item.quantity,
+
+  user,
+
+  reason: "sale",
+  sale: saleId,
+  stockAfter: product.stock,
+
+  createdBy: item.createdBy,
+  ownerAdmin: item.ownerAdmin
+});
   }
 };
 
@@ -317,13 +380,18 @@ export const registerCancelMovement = async (
     await product.save();
 
     await StockMovement.create({
-      product: product._id,
-      type: "in",
-      quantity: item.quantity,
-      user,
-      reason: "adjustment",
-      sale: saleId,
-      stockAfter: newStock
-    });
+  product: product._id,
+  type: "in",
+  quantity: item.quantity,
+
+  user,
+
+  reason: "adjustment",
+  sale: saleId,
+  stockAfter: newStock,
+
+  createdBy: item.createdBy,
+  ownerAdmin: item.ownerAdmin
+});
   }
 };

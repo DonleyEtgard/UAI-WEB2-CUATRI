@@ -2,15 +2,28 @@ import { Request } from "express";
 
 export type UserRole = "employee" | "admin" | "superadmin";
 
+export interface UserAccess {
+  dashboard?: boolean;
+  products?: boolean;
+  sales?: boolean;
+  stock?: boolean;
+  users?: boolean;
+  reports?: boolean;
+  subscriptions?: boolean;
+}
+
 export interface DBUser {
   _id: string;
-  role: UserRole;
+  role: string;
   email: string;
   name: string;
   lastName: string;
-  firebaseUid?: string;
-  isActive?: boolean;
-  [key: string]: any;
+  firebaseUid: string;
+  ownerAdmin?: string;
+  isActive: boolean;
+  isVerified: boolean;
+
+  access?: UserAccess;
 }
 
 export interface FirebaseDecoded {

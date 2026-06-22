@@ -15,6 +15,15 @@ const saleSchema = new Schema(
       ref: "User",
       required: true
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    ownerAdmin: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      index: true
+    },
 
     // 💰 Total calculado en backend
     total: {

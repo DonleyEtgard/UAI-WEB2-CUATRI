@@ -102,6 +102,11 @@ image: {
     createdBy: {
     type: Schema.Types.ObjectId,
     ref: "User"
+  },
+    ownerAdmin: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    index: true
   }
   },
   {

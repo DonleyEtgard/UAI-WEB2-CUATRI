@@ -8,11 +8,14 @@ export interface AppUser {
   name: string;
   lastName?: string;
   role: UserRole;
-  organizationId?: string;
+  ownerAdmin?: string;
   createdBy?: string;
+
   plan?: "free" | "basic" | "active" | "suspended";
+
   subscriptionStart?: string;
   subscriptionEnd?: string;
+
   address?: {
     street?: string;
     number?: string;
@@ -23,6 +26,7 @@ export interface AppUser {
   };
   isActive: boolean;
   isVerified: boolean;
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -33,11 +37,11 @@ export interface Product {
   sku?: string;
   description?: string;
   category?: string;
-  organizationId: string;
-  createdBy: string;
   price: number;
   cost?: number;
   stock: number;
+  createdBy: string;
+  ownerAdmin: string;
   currency?: Currency;
   isActive: boolean;
   createdAt?: string;
@@ -47,10 +51,13 @@ export interface Product {
 export interface Customer {
   _id: string;
   name: string;
-  organizationId: string;
-  createdBy: string;
   email?: string;
   phone?: string;
+  debt?: number;
+  user: string;
+  createdBy: string;
+  ownerAdmin: string;
+
   address?: {
     street?: string;
     number?: string;
@@ -59,7 +66,7 @@ export interface Customer {
     country?: string;
     postalCode?: string;
   };
-  debt?: number;
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -68,22 +75,25 @@ export interface SaleItem {
   _id: string;
   sale: string;
   product: string;
-  productName?: string;
   quantity: number;
   price: number;
-  organizationId: string;
-  createdBy: string;
   subtotal: number;
+  createdBy: string;
+  ownerAdmin: string;
 }
 
 export interface Sale {
   _id: string;
   customer?: string;
   user: string;
-  status: "pending" | "paid" | "cancelled";
-  total: number;
-  organizationId: string;
   createdBy: string;
+  ownerAdmin: string;
+  status:
+    | "pending"
+    | "paid"
+    | "cancelled";
+
+  total: number;
   amountPaid?: number;
   change?: number;
   createdAt?: string;
@@ -97,8 +107,8 @@ export interface StockMovement {
   quantity: number;
   user: string;
   reason: string;
-  organizationId: string;
   createdBy: string;
+  ownerAdmin: string;
   sale?: string;
   stockAfter: number;
   createdAt?: string;

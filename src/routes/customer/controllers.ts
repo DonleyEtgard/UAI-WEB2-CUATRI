@@ -1,6 +1,34 @@
 import { Request, Response } from "express";
 import Customer from "../../models/Customer";
+import User from "../../models/User";
 import type { AuthRequest } from "../../types/auth";
+
+const getOwnerAdmin = (req: AuthRequest) =>
+  req.dbUser?.ownerAdmin || req.dbUser?._id;
+
+const getCustomerScope = async (req: AuthRequest, extra: Record<string, any> = {}) => {
+  if (req.dbUser?.role === "superadmin") return extra;
+
+  const ownerAdmin = getOwnerAdmin(req);
+  const orgUsers = await User.find({
+    $or: [
+      { _id: ownerAdmin },
+      { ownerAdmin },
+      { createdBy: ownerAdmin },
+    ],
+  }).select("_id");
+
+  const orgUserIds = orgUsers.map((user) => user._id);
+
+  return {
+    ...extra,
+    $or: [
+      { ownerAdmin },
+      { createdBy: { $in: orgUserIds } },
+      { user: { $in: orgUserIds } },
+    ],
+  };
+};
 
 export const createCustomer = async (
   req: AuthRequest,
@@ -29,7 +57,7 @@ export const createCustomer = async (
     if (email) {
       const existing = await Customer.findOne({
         email,
-        user: userId,
+        ...(await getCustomerScope(req)),
       });
 
       if (existing) {
@@ -48,6 +76,8 @@ export const createCustomer = async (
       payments,
       isActive,
       user: userId,
+      createdBy: userId,
+      ownerAdmin: getOwnerAdmin(req),
     });
 
     res.status(201).json(customer);
@@ -68,12 +98,11 @@ export const getCustomers = async (
   res: Response
 ) => {
   try {
-    const userId = req.dbUser?._id;
-
-    const customers = await Customer.find({
-      user: userId,
-      isActive: true,
-    }).sort({
+    const customers = await Customer.find(
+      await getCustomerScope(req, {
+        isActive: true,
+      })
+    ).sort({
       createdAt: -1,
     });
 
@@ -97,12 +126,11 @@ export const getCustomerById = async (
   try {
     const { id } = req.params;
 
-    const userId = req.dbUser?._id;
-
-   const customer = await Customer.findOne({
-  _id: id,
-  user: userId,
-});
+   const customer = await Customer.findOne(
+     await getCustomerScope(req, {
+       _id: id,
+     })
+   );
 
 if (!customer) {
   return res.status(404).json({ message: "Customer not found" });
@@ -128,13 +156,10 @@ export const updateCustomer = async (
   try {
     const { id } = req.params;
 
-    const userId = req.dbUser?._id;
-
     const customer = await Customer.findOneAndUpdate(
-      {
+      await getCustomerScope(req, {
         _id: id,
-        user: userId,
-      },
+      }),
       req.body,
       {
         new: true,
@@ -168,8 +193,6 @@ export const addPayment = async (
     const { id } = req.params;
     const { amount } = req.body;
 
-    const userId = req.dbUser?._id;
-
     if (!amount || amount <= 0) {
       return res.status(400).json({
         message: "Valid amount is required",
@@ -177,10 +200,9 @@ export const addPayment = async (
     }
 
     const customer = await Customer.findOneAndUpdate(
-      {
+      await getCustomerScope(req, {
         _id: id,
-        user: userId,
-      },
+      }),
       {
         $push: {
           payments: {
@@ -224,13 +246,10 @@ export const deleteCustomer = async (
   try {
     const { id } = req.params;
 
-    const userId = req.dbUser?._id;
-
     const customer = await Customer.findOneAndUpdate(
-      {
+      await getCustomerScope(req, {
         _id: id,
-        user: userId,
-      },
+      }),
       {
         isActive: false,
       },

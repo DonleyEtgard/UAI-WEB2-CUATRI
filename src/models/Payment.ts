@@ -23,6 +23,15 @@ const paymentSchema = new Schema({
     enum: ["cash", "card", "transfer", "moncash", "mercado-pago"],
     required: true
   },
+   createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      },
+      ownerAdmin: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        index: true
+      },
 
   status: {
     type: String,

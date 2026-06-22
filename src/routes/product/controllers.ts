@@ -2,7 +2,35 @@ import { Request, Response } from "express";
 import Joi from "joi";
 import Product from "../../models/Product";
 import SaleItem from "../../models/SaleItem";
+import User from "../../models/User";
 import type { AuthRequest } from "../../types/auth";
+
+const getOwnerAdmin = (req: AuthRequest) =>
+  req.dbUser?.ownerAdmin || req.dbUser?._id;
+
+const getProductScope = async (req: AuthRequest, extra: Record<string, any> = {}) => {
+  if (req.dbUser?.role === "superadmin") return extra;
+
+  const ownerAdmin = getOwnerAdmin(req);
+  const orgUsers = await User.find({
+    $or: [
+      { _id: ownerAdmin },
+      { ownerAdmin },
+      { createdBy: ownerAdmin },
+    ],
+  }).select("_id");
+
+  const orgUserIds = orgUsers.map((user) => user._id);
+
+  return {
+    ...extra,
+    $or: [
+      { ownerAdmin },
+      { createdBy: { $in: orgUserIds } },
+      { user: { $in: orgUserIds } },
+    ],
+  };
+};
 
 // FIX: Parse image URLs from a variety of input shapes (stringified JSON, CSV, array)
 const parseImageUrls = (raw: any): string[] => {
@@ -57,8 +85,10 @@ export const deactivateProduct = async (
      console.log("DB USER:", req.dbUser);
     const { id } = req.params;
 
-    const product = await Product.findByIdAndUpdate(
-      id,
+    const product = await Product.findOneAndUpdate(
+      await getProductScope(req, {
+        _id: id
+      }),
       {
         isActive: false
       },
@@ -92,8 +122,10 @@ export const activateProduct = async (
   try {
     const { id } = req.params;
 
-    const product = await Product.findByIdAndUpdate(
-      id,
+    const product = await Product.findOneAndUpdate(
+      await getProductScope(req, {
+        _id: id
+      }),
       {
         isActive: true
       },
@@ -191,7 +223,7 @@ const {
 // Evitar duplicados
 const existing = await Product.findOne({
   name: name.trim(),
-  user: req.dbUser._id,
+  ...(await getProductScope(req)),
   isActive: true,
 });
 
@@ -210,6 +242,8 @@ const product = await Product.create({
   category,
   images,
   user: req.dbUser._id,
+  createdBy: req.dbUser._id,
+  ownerAdmin: getOwnerAdmin(req),
   isActive: isActive ?? true,
 });
 
@@ -239,10 +273,11 @@ return res.status(500).json({
 // 📌 Obtener todos los productos
 export const getProducts = async (_req: AuthRequest, res: Response) => {
   try {
-    const products = await Product.find({
-        user: _req.dbUser?._id,
-       isActive: true
-        })
+    const products = await Product.find(
+      await getProductScope(_req, {
+        isActive: true
+      })
+    )
       .sort({ createdAt: -1 });
 
     res.json(products);
@@ -260,11 +295,12 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findOne({
-  _id: id,
-  user: req.dbUser?._id,
-  isActive: true
-});
+    const product = await Product.findOne(
+      await getProductScope(req, {
+        _id: id,
+        isActive: true
+      })
+    );
   
     if (!product || !product.isActive) {
       return res.status(404).json({
@@ -296,10 +332,9 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
     };
 
     const product = await Product.findOneAndUpdate(
-      {
+      await getProductScope(req, {
         _id: id,
-        user: req.dbUser?._id,
-      },
+      }),
       updatePayload,
       { new: true }
     );
@@ -326,10 +361,9 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
    const product = await Product.findOneAndUpdate(
-  {
-    _id: id,
-    user: req.dbUser?._id
-  },
+  await getProductScope(req, {
+    _id: id
+  }),
   {
     isActive: false
   },
@@ -357,17 +391,25 @@ export const getProductStats = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-     const product = await Product.findOne({
-          _id: id,
-           user: req.dbUser?._id,
+     const product = await Product.findOne(
+       await getProductScope(req, {
+         _id: id,
          isActive: true
-       });
+       })
+     );
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
     const stats = await SaleItem.aggregate([
-      { $match: { product: product._id } },
+      {
+        $match: {
+          product: product._id,
+          ...(req.dbUser?.role === "superadmin"
+            ? {}
+            : { ownerAdmin: product.ownerAdmin })
+        }
+      },
       {
         $group: {
           _id: null,
@@ -412,10 +454,11 @@ export const updateStock = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const product = await Product.findOne({
-  _id: id,
-  user: req.dbUser?._id
-});
+    const product = await Product.findOne(
+      await getProductScope(req, {
+        _id: id
+      })
+    );
 
     if (!product) {
       return res.status(404).json({

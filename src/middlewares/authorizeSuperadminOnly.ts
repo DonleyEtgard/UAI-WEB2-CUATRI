@@ -1,6 +1,3 @@
-// ============================================================================
-// AUTHORIZATION MIDDLEWARES - Role-based Access Control
-// ============================================================================
 
 import { Response, NextFunction } from "express";
 import type { AuthRequest } from "../types/auth";

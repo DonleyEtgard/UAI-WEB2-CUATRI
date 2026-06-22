@@ -1,7 +1,36 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 
 import Sale from "../../models/Sale";
 import SaleItem from "../../models/SaleItem";
+import User from "../../models/User";
+import type { AuthRequest } from "../../types/auth";
+
+const getOwnerAdmin = (req: AuthRequest) =>
+  req.dbUser?.ownerAdmin || req.dbUser?._id;
+
+const getSaleScope = async (req: AuthRequest, extra: Record<string, any> = {}) => {
+  if (req.dbUser?.role === "superadmin") return extra;
+
+  const ownerAdmin = getOwnerAdmin(req);
+  const orgUsers = await User.find({
+    $or: [
+      { _id: ownerAdmin },
+      { ownerAdmin },
+      { createdBy: ownerAdmin },
+    ],
+  }).select("_id");
+
+  const orgUserIds = orgUsers.map((user) => user._id);
+
+  return {
+    ...extra,
+    $or: [
+      { ownerAdmin },
+      { createdBy: { $in: orgUserIds } },
+      { user: { $in: orgUserIds } },
+    ],
+  };
+};
 
 
 // ======================================================
@@ -9,14 +38,16 @@ import SaleItem from "../../models/SaleItem";
 // ======================================================
 
 export const getTicket = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
     const { id } = req.params;
 
     // ✅ VENTA
-    const sale = await Sale.findById(id)
+    const sale = await Sale.findOne(await getSaleScope(req, {
+      _id: id
+    }))
       .populate("customer", "name phone")
       .populate("user", "name email")
       .lean();
@@ -55,7 +86,7 @@ export const getTicket = async (
 // ======================================================
 
 export const sendTicketWhatsApp = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -92,7 +123,7 @@ ${url}
 // ======================================================
 
 export const sendTicketTelegram = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {

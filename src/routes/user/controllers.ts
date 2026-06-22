@@ -180,6 +180,9 @@ export const registerController = async (
 
     await newUser.save();
 
+    newUser.ownerAdmin = newUser._id;
+    await newUser.save();
+
     // ===================================================================
     // RESPONSE
     // ===================================================================
@@ -324,9 +327,14 @@ export const createEmployeeController = async (
 
   plan: "free",
 
-  subscriptionStatus: "active",
+ subscriptionStatus: "active",
 
-  createdBy: req.dbUser._id
+  createdBy: req.dbUser._id,
+
+  ownerAdmin:
+    req.dbUser.role === "superadmin"
+      ? req.body.ownerAdmin || req.dbUser.ownerAdmin || req.dbUser._id
+      : req.dbUser.ownerAdmin || req.dbUser._id
 });
 
     await employee.save();
@@ -388,7 +396,19 @@ export const getUserByIdController = async (
 
     const { id } = req.params;
 
-    const user = await User.findById(id)
+    const filter =
+      req.dbUser.role === "superadmin"
+        ? { _id: id }
+        : {
+            _id: id,
+            $or: [
+              { _id: req.dbUser.ownerAdmin || req.dbUser._id },
+              { ownerAdmin: req.dbUser.ownerAdmin || req.dbUser._id },
+              { createdBy: req.dbUser.ownerAdmin || req.dbUser._id },
+            ],
+          };
+
+    const user = await User.findOne(filter)
       .select("-__v");
 
     if (!user) {
@@ -464,8 +484,16 @@ export const listUsersController = async (
     // ====================================================
 
     if (req.dbUser.role === "admin") {
+      const ownerAdmin =
+        req.dbUser.ownerAdmin || req.dbUser._id;
+
       filter = {
-        createdBy: req.dbUser._id,
+        $or: [
+          { _id: ownerAdmin },
+          { ownerAdmin },
+          { createdBy: ownerAdmin },
+          { createdBy: req.dbUser._id },
+        ],
       };
     }
 
@@ -520,7 +548,6 @@ export const updateUserController = async (
   res: Response
 ) => {
   try {
-
     if (!req.dbUser) {
       return res.status(401).json({
         success: false,
@@ -531,68 +558,94 @@ export const updateUserController = async (
 
     const { id } = req.params;
 
-    const updates = req.body;
-
     const isOwnProfile =
       req.dbUser._id.toString() === id;
 
-    const isAdmin =
-      ["admin", "superadmin"].includes(
-        req.dbUser.role
-      );
+    const canManageUsers =
+      req.dbUser.role === "admin" ||
+      req.dbUser.role === "superadmin";
 
-    if (!isOwnProfile && !isAdmin) {
+    if (!isOwnProfile && !canManageUsers) {
       return res.status(403).json({
         success: false,
-        message: "Can only update your own profile",
+        message: "Forbidden",
         error: "FORBIDDEN",
       });
     }
 
-    // ================================================================
-    // PROTECTED FIELDS
-    // ================================================================
+    const ownerAdmin =
+      req.dbUser.ownerAdmin ||
+      req.dbUser._id;
+
+    // =====================================================
+    // FILTRO DE SEGURIDAD
+    // =====================================================
+
+    const filter =
+      req.dbUser.role === "superadmin"
+        ? { _id: id }
+        : isOwnProfile
+        ? { _id: id }
+        : {
+            _id: id,
+            ownerAdmin,
+          };
+
+    // =====================================================
+    // WHITELIST DE CAMPOS EDITABLES
+    // =====================================================
+
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (req.body.name !== undefined) {
+      updateData.name = req.body.name;
+    }
+
+    if (req.body.lastName !== undefined) {
+      updateData.lastName = req.body.lastName;
+    }
+
+    if (req.body.image !== undefined) {
+      updateData.image = req.body.image;
+    }
+
+    if (req.body.phone !== undefined) {
+      updateData.phone = req.body.phone;
+    }
+
+    if (req.body.isActive !== undefined) {
+      updateData.isActive = req.body.isActive;
+    }
+
+    if (req.body.address) {
+      updateData.address = {
+        street:
+          req.body.address.street || "",
+        number:
+          req.body.address.number || "",
+        city:
+          req.body.address.city || "",
+        state:
+          req.body.address.state || "",
+        country:
+          req.body.address.country || "",
+        postalCode:
+          req.body.address.postalCode || "",
+      };
+    }
 
     if (
-      updates.role &&
-      req.dbUser.role !== "superadmin"
+      req.dbUser.role === "superadmin" &&
+      req.body.role
     ) {
-      delete updates.role;
+      updateData.role = req.body.role;
     }
 
-    if (updates.firebaseUid) {
-      delete updates.firebaseUid;
-    }
-
-    if (
-      updates.role === "superadmin" &&
-      req.dbUser.role !== "superadmin"
-    ) {
-      delete updates.role;
-    }
-
-    // ================================================================
-    // UPDATE
-    // ================================================================
-
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        ...updates,
-
-        address: {
-          street: updates.address?.street,
-          number: updates.address?.number,
-          city: updates.address?.city,
-          state: updates.address?.state,
-          country: updates.address?.country,
-          postalCode: updates.address?.postalCode,
-        },
-
-        image: updates.image,
-
-        updatedAt: new Date(),
-      },
+    const user = await User.findOneAndUpdate(
+      filter,
+      updateData,
       {
         new: true,
         runValidators: true,
@@ -616,17 +669,19 @@ export const updateUserController = async (
     });
 
   } catch (error: any) {
-
-    console.error("Update user error:", error);
+    console.error(
+      "Update user error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
       message: "Error updating user",
       error: error.message,
     });
-
   }
 };
+
 
 /**
  * DELETE /api/users/:id

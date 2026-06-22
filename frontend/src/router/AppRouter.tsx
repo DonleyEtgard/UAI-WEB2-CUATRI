@@ -126,7 +126,7 @@ export const AppRouter: React.FC = () => {
           <Route
             path="products/:id"
             element={
-              <RoleGuard requiredRoles={["superadmin", "admin", "employee"]}>
+              <RoleGuard requiredRoles={["superadmin", "admin"]}>
                 <ProductDetailPage />
               </RoleGuard>
             }
@@ -134,7 +134,12 @@ export const AppRouter: React.FC = () => {
           
           <Route
              path="/app/products/edit/:id"
-           element={<ProductFormPage />}
+           element={
+             <RoleGuard requiredRoles={["superadmin", "admin"]}>
+           <ProductFormPage />
+           </RoleGuard>
+           }
+
           />
 
           {/* SALES */}
@@ -146,8 +151,7 @@ export const AppRouter: React.FC = () => {
               </RoleGuard>
             }
           />
-           
-          <Route path="pos" element={<POSPage />} />
+          
 
           <Route
             path="sales/:id"
@@ -270,15 +274,7 @@ export const AppRouter: React.FC = () => {
         </RoleGuard>
        }
       />
-
-    <Route
-      path="users/roles/:id"
-      element={
-     <RoleGuard requiredRoles={["superadmin", "admin"]}>
-      <UserRolePage />
-    </RoleGuard>
-     }
-       />
+       
           <Route
             path="users/new"
             element={
@@ -289,7 +285,7 @@ export const AppRouter: React.FC = () => {
           />
 
           <Route
-           path="users/roles/:id"
+           path="users/roles"
            element={
            <RoleGuard requiredRoles={["superadmin", "admin"]}>
            <UserRolePage />

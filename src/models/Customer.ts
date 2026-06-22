@@ -5,6 +5,15 @@ const paymentSchema = new Schema({
     type: Number,
     required: true
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
+  ownerAdmin: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    index: true
+  },
 
   date: {
     type: Date,

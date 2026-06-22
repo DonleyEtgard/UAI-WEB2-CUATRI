@@ -14,6 +14,15 @@ const productSchema = new Schema(
        ref: "User",
        required: true
          },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    ownerAdmin: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      index: true
+    },
     // 💲 Precio de venta
     price: {
       type: Number,

@@ -7,6 +7,7 @@ import type { AuthRequest, FirebaseDecoded, DBUser } from "../types/auth";
 // MIDDLEWARE
 // ============================================================================
 
+
 /**
  * Middleware to authenticate Firebase ID Token
  * Verifies token and retrieves user from MongoDB
@@ -101,18 +102,31 @@ export const authenticateFirebase = async (
         }
 
         // cast mongoose doc to DBUser shape
-        dbUser = {
-          _id: String(found._id),
-          role: found.role,
-          email: found.email,
-          name: found.name,
-          lastName: found.lastName,
-          firebaseUid: found.firebaseUid,
-          isActive: found.isActive,
-          isVerified: found.isVerified || false,
-        } as DBUser;
+      dbUser = {
+     _id: String(found._id),
+     role: found.role,
+     email: found.email,
+     name: found.name,
+     lastName: found.lastName,
+     firebaseUid: found.firebaseUid,
+
+     ownerAdmin: found.ownerAdmin
+      ? String(found.ownerAdmin)
+     : undefined,
+
+       createdBy: found.createdBy
+        ? String(found.createdBy)
+       : undefined,
+
+       plan: found.plan,
+
+       address: found.address,
+
+      isActive: found.isActive,
+       isVerified: found.isVerified || false,
+      } as DBUser;
       }
-    } catch (error) {
+     } catch (error) {
       console.error("Database error:", error);
       return res.status(500).json({
         success: false,

@@ -5,7 +5,57 @@ import SaleItem from "../../models/SaleItem";
 import Product from "../../models/Product";
 import Sale from "../../models/Sale";
 import StockMovement from "../../models/StockMovement";
+import User from "../../models/User";
 import type { AuthRequest } from "../../types/auth";
+
+const getOwnerAdmin = (req: AuthRequest) =>
+  req.dbUser?.ownerAdmin || req.dbUser?._id;
+
+const getOrgUserIds = async (req: AuthRequest) => {
+  const ownerAdmin = getOwnerAdmin(req);
+
+  const users = await User.find({
+    $or: [
+      { _id: ownerAdmin },
+      { ownerAdmin },
+      { createdBy: ownerAdmin },
+    ],
+  }).select("_id");
+
+  return users.map((user) => user._id);
+};
+
+const getSaleScope = async (req: AuthRequest, extra: Record<string, any> = {}) => {
+  if (req.dbUser?.role === "superadmin") return extra;
+
+  const ownerAdmin = getOwnerAdmin(req);
+  const orgUserIds = await getOrgUserIds(req);
+
+  return {
+    ...extra,
+    $or: [
+      { ownerAdmin },
+      { createdBy: { $in: orgUserIds } },
+      { user: { $in: orgUserIds } },
+    ],
+  };
+};
+
+const getProductScope = async (req: AuthRequest, extra: Record<string, any> = {}) => {
+  if (req.dbUser?.role === "superadmin") return extra;
+
+  const ownerAdmin = getOwnerAdmin(req);
+  const orgUserIds = await getOrgUserIds(req);
+
+  return {
+    ...extra,
+    $or: [
+      { ownerAdmin },
+      { createdBy: { $in: orgUserIds } },
+      { user: { $in: orgUserIds } },
+    ],
+  };
+};
 
 // ======================================================
 // 🛒 CREAR VENTA
@@ -50,7 +100,12 @@ export const createSale = async (
     // VALIDAR PRODUCTOS
     // =========================
     for (const item of items) {
-      const product = await Product.findById(item.product).session(session);
+      const product = await Product.findOne(
+        await getProductScope(req, {
+          _id: item.product,
+          isActive: true,
+        })
+      ).session(session);
 
       if (!product) throw new Error("Product not found");
 
@@ -84,6 +139,8 @@ export const createSale = async (
         {
           customer,
           user,
+          createdBy: user,
+          ownerAdmin: getOwnerAdmin(req),
           paymentMethod,
           total,
           costTotal: totalCost,
@@ -113,7 +170,9 @@ export const createSale = async (
             quantity: item.quantity,
             price: product.price,
             subtotal: product.price * item.quantity,
-            productName: product.name
+            productName: product.name,
+            createdBy: user,
+            ownerAdmin: getOwnerAdmin(req)
           }
         ],
         { session }
@@ -129,6 +188,8 @@ export const createSale = async (
             type: "out",
             quantity: item.quantity,
             user,
+            createdBy: user,
+            ownerAdmin: getOwnerAdmin(req),
             reason: "sale",
             sale: saleId,
             stockAfter: product.stock
@@ -167,7 +228,7 @@ export const getSales = async (
   res: Response
 ) => {
   try {
-    const sales = await Sale.find()
+    const sales = await Sale.find(await getSaleScope(req))
       .populate("customer")
       .populate("user")
       .sort({ createdAt: -1 });
@@ -189,14 +250,14 @@ export const getSales = async (
 // 📊 STATS
 // ======================================================
 
-export const getDailySales = async (_req: Request, res: Response) => {
+export const getDailySales = async (req: AuthRequest, res: Response) => {
   try {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
 
-    const sales = await Sale.find({
+    const sales = await Sale.find(await getSaleScope(req, {
       createdAt: { $gte: start }
-    });
+    }));
 
     const total = sales.reduce((acc, s: any) => acc + (s.total || 0), 0);
 
@@ -206,11 +267,13 @@ export const getDailySales = async (_req: Request, res: Response) => {
   }
 };
 
-export const getSaleById = async (req: Request, res: Response) => {
+export const getSaleById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const sale = await Sale.findById(id)
+    const sale = await Sale.findOne(await getSaleScope(req, {
+      _id: id
+    }))
       .populate("customer")
       .populate("user");
 
@@ -234,15 +297,15 @@ export const getSaleById = async (req: Request, res: Response) => {
   }
 };
 
-export const getMonthlySales = async (_req: Request, res: Response) => {
+export const getMonthlySales = async (req: AuthRequest, res: Response) => {
   try {
     const start = new Date();
     start.setDate(1);
     start.setHours(0, 0, 0, 0);
 
-    const sales = await Sale.find({
+    const sales = await Sale.find(await getSaleScope(req, {
       createdAt: { $gte: start }
-    });
+    }));
 
     const total = sales.reduce((acc, s: any) => acc + (s.total || 0), 0);
 
@@ -253,11 +316,37 @@ export const getMonthlySales = async (_req: Request, res: Response) => {
 };
 
 export const getTopProducts = async (
-  _req: AuthRequest,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
+    const saleScope = await getSaleScope(req);
+
     const topProducts = await SaleItem.aggregate([
+      {
+        $lookup: {
+          from: "sales",
+          localField: "sale",
+          foreignField: "_id",
+          as: "saleData"
+        }
+      },
+      {
+        $unwind: "$saleData"
+      },
+      {
+        $match:
+          req.dbUser?.role === "superadmin"
+            ? {}
+            : {
+                $or: saleScope.$or.map((condition: any) => {
+                  const key = Object.keys(condition)[0];
+                  return {
+                    [`saleData.${key}`]: condition[key],
+                  };
+                }),
+              }
+      },
       {
         $group: {
           _id: "$product",
@@ -291,7 +380,7 @@ export const getTopProducts = async (
 // ======================================================
 
 export const updateSaleStatus = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ) => {
   try {
@@ -299,8 +388,10 @@ export const updateSaleStatus = async (
 
     const { status } = req.body;
 
-    const sale = await Sale.findByIdAndUpdate(
-      id,
+    const sale = await Sale.findOneAndUpdate(
+      await getSaleScope(req, {
+        _id: id
+      }),
       { status },
       { new: true }
     );
@@ -330,7 +421,18 @@ export const getSaleItems = async (
   res: Response
 ) => {
   try {
-    const items = await SaleItem.find()
+    const saleIds = await Sale.find(await getSaleScope(_req)).select("_id");
+
+    const items = await SaleItem.find(
+      _req.dbUser?.role === "superadmin"
+        ? {}
+        : {
+            $or: [
+              { ownerAdmin: getOwnerAdmin(_req) },
+              { sale: { $in: saleIds.map((sale) => sale._id) } },
+            ],
+          }
+    )
       .populate("product")
       .populate("sale")
       .sort({ createdAt: -1 });
@@ -352,6 +454,16 @@ export const getItemsBySale = async (
   try {
     const { saleId } = req.params;
 
+    const sale = await Sale.findOne(await getSaleScope(req, {
+      _id: saleId
+    }));
+
+    if (!sale) {
+      return res.status(404).json({
+        message: "Sale not found"
+      });
+    }
+
     const items = await SaleItem.find({
       sale: saleId
     }).populate("product");
@@ -371,7 +483,19 @@ export const getSaleItemById = async (
   res: Response
 ) => {
   try {
-    const item = await SaleItem.findById(req.params.id)
+    const saleIds = await Sale.find(await getSaleScope(req)).select("_id");
+
+    const item = await SaleItem.findOne(
+      req.dbUser?.role === "superadmin"
+        ? { _id: req.params.id }
+        : {
+            _id: req.params.id,
+            $or: [
+              { ownerAdmin: getOwnerAdmin(req) },
+              { sale: { $in: saleIds.map((sale) => sale._id) } },
+            ],
+          }
+    )
       .populate("product")
       .populate("sale");
 
@@ -406,10 +530,9 @@ export const getSummary = async (
     }
      
     // Ventas del usuario
-    const sales = await Sale.find({
-      user: userId,
+    const sales = await Sale.find(await getSaleScope(req, {
       status: "paid"
-    });
+    }));
 
     const revenue = sales.reduce(
       (acc, sale) => acc + sale.total,
@@ -427,6 +550,19 @@ export const getSummary = async (
     // TOP PRODUCTOS
     // ==========================
 
+    const saleScope = await getSaleScope(req);
+    const saleDataMatch =
+      req.dbUser?.role === "superadmin"
+        ? {}
+        : {
+            $or: saleScope.$or.map((condition: any) => {
+              const key = Object.keys(condition)[0];
+              return {
+                [`saleData.${key}`]: condition[key],
+              };
+            }),
+          };
+
     const topProducts = await SaleItem.aggregate([
       {
         $lookup: {
@@ -439,12 +575,7 @@ export const getSummary = async (
       {
         $unwind: "$saleData"
       },
-      {
-        $match: {
-          "saleData.user":
-            new mongoose.Types.ObjectId(userId)
-        }
-      },
+      { $match: saleDataMatch },
       {
         $group: {
           _id: "$productName",
@@ -472,14 +603,7 @@ export const getSummary = async (
 
     const monthlySales =
       await Sale.aggregate([
-        {
-          $match: {
-            user:
-              new mongoose.Types.ObjectId(
-                userId
-              )
-          }
-        },
+        { $match: saleScope },
         {
           $group: {
             _id: {
@@ -533,8 +657,18 @@ export const deleteSaleItem = async (
   res: Response
 ) => {
   try {
-    const item = await SaleItem.findByIdAndDelete(
-      req.params.id
+    const saleIds = await Sale.find(await getSaleScope(req)).select("_id");
+
+    const item = await SaleItem.findOneAndDelete(
+      req.dbUser?.role === "superadmin"
+        ? { _id: req.params.id }
+        : {
+            _id: req.params.id,
+            $or: [
+              { ownerAdmin: getOwnerAdmin(req) },
+              { sale: { $in: saleIds.map((sale) => sale._id) } },
+            ],
+          }
     );
 
     if (!item) {

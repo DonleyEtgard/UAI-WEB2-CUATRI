@@ -8,6 +8,15 @@ const stockMovementSchema = new Schema(
       ref: "Product",
       required: true
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    ownerAdmin: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      index: true
+    },
 
     // 🔄 Tipo de movimiento
     type: {

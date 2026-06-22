@@ -20,6 +20,8 @@ export interface DBUser {
   lastName: string;
   email: string;
   role: UserRole;
+  ownerAdmin?: string;
+  createdBy?: string;
   plan: SubscriptionPlan;
   address: UserAddress;
   image?: string;
