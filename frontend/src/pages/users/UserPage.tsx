@@ -76,16 +76,16 @@ const UserPage = () => {
     }
   };
 
-  const handleToggleActive = async (
-  id: string,
-  isActive: boolean
+ const handleToggleActive = async (
+  id: string
 ) => {
   try {
-    await API.patch(`/users/${id}`, {
-      isActive: !isActive,
-    });
+    await API.patch(
+      `/users/${id}/toggle-state`
+    );
 
     loadUsers();
+
   } catch (err) {
     console.error(err);
     alert("Error actualizando usuario");
@@ -136,7 +136,7 @@ const UserPage = () => {
 
       {/* TABLE */}
       <Card>
-        <CardHeader title="Lista de Usuarios" action={<Button onClick={loadUsers} size="small">🔄 Recargar</Button>} />
+        <CardHeader title="Lista de Usuarios" action={<Button onClick={loadUsers} size="small">🔄 </Button>} />
         <CardContent sx={{p: 0}}>
           {loading ? (
             <Box sx={{p: 2}}>
@@ -156,7 +156,7 @@ const UserPage = () => {
                       {params.row.name[0]}
                     </Box>
                     <Box>
-                      <div style={{fontWeight:600, color:'#fff'}}>{params.row.name} {params.row.lastName}</div>
+                      <div style={{fontWeight:600, color:'black'}}>{params.row.name} {params.row.lastName}</div>
                       <div style={{fontSize:10, color:'#9ca3af', fontFamily:'monospace'}}>ID: {params.row._id.slice(-6)}</div>
                     </Box>
                   </Box>
@@ -169,7 +169,7 @@ const UserPage = () => {
                   <Box style={{display:'flex', gap:6, justifyContent:'flex-end', width:'100%', fontSize:12}}>
                     <button onClick={() => navigate(`/app/users/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#6366f1', cursor:'pointer', textDecoration:'underline'}}>Ver</button>
                     <button onClick={() => navigate(`/app/users/edit/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#8b5cf6', cursor:'pointer', textDecoration:'underline'}}>Editar</button>
-                    <button onClick={() => handleToggleActive(params.row._id, params.row.isActive)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#f59e0b', cursor:'pointer', textDecoration:'underline'}}>{params.row.isActive ? 'Desactivar' : 'Activar'}</button>
+                    <button  onClick={() => handleToggleActive(params.row._id) }> {params.row.isActive ? "Desactivar" : "Activar"}</button>
                     <button onClick={() => handleDelete(params.row._id)} disabled={deletingId === params.row._id} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#ef4444', cursor:'pointer', textDecoration:'underline'}}>{deletingId === params.row._id ? '...' : 'Eliminar'}</button>
                   </Box>
                 )},

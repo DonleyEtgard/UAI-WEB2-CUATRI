@@ -49,7 +49,7 @@ const CustomerForm = () => {
     setLoading(true);
 
     if (isEdit) {
-      await API.patch(`/customers/${id}`, form);
+      await API.put(`/customers/${id}`, form);
     } else {
       await API.post("/customers", form);
     }
@@ -101,7 +101,7 @@ const CustomerForm = () => {
                 <TextField
                   fullWidth
                   type="number"
-                label="Deuda inicial"
+                label="Ultimo Pago"
                  placeholder="0"
                 value={form.debt}
                onChange={(e) =>

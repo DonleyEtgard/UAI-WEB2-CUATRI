@@ -156,6 +156,8 @@ export const updateCustomer = async (
   try {
     const { id } = req.params;
 
+    console.log("SCOPE:", await getCustomerScope(req, { _id: id }));
+    console.log("USER:", req.dbUser);
     const customer = await Customer.findOneAndUpdate(
       await getCustomerScope(req, {
         _id: id,
@@ -165,7 +167,7 @@ export const updateCustomer = async (
         new: true,
       }
     );
-
+      
     if (!customer) {
       return res.status(404).json({
         message: "Customer not found",

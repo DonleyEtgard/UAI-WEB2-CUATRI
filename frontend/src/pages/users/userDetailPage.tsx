@@ -33,15 +33,27 @@ const UserDetailPage = () => {
     </Box>
   );
 
-  if (!user || !user.data) return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', py: 10, minHeight: '100vh' }}>
-      <Box sx={{ textAlign: 'center' }}>
-        <EmptyState title="Usuario no encontrado" description="Este usuario no existe o fue eliminado." />
+ if (!user) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        py: 10,
+        minHeight: "100vh",
+      }}
+    >
+      <Box sx={{ textAlign: "center" }}>
+        <EmptyState
+          title="Usuario no encontrado"
+          description="Este usuario no existe o fue eliminado."
+        />
       </Box>
     </Box>
   );
+}
 
-  const userData = user.data; // Ajuste aquí para acceder a los datos del usuario correctamente 
+const userData = user; // Ajuste aquí para acceder a los datos del usuario correctamente 
 
   return (
     <Box sx={{ minHeight: '100vh', py: { xs: 2, md: 4 }, px: { xs: 2, md: 0 } }}>

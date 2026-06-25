@@ -557,7 +557,7 @@ export const updateUserController = async (
     }
 
     const { id } = req.params;
-
+    
     const isOwnProfile =
       req.dbUser._id.toString() === id;
 
@@ -682,6 +682,43 @@ export const updateUserController = async (
   }
 };
 
+export const toggleUserStateController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.isActive = !user.isActive;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${
+        user.isActive ? "activated" : "deactivated"
+      } successfully`,
+      data: {
+        user,
+      },
+    });
+
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 /**
  * DELETE /api/users/:id

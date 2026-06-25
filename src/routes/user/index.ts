@@ -11,7 +11,7 @@ import {
   getPendingPayments,
   approvePayment,
   createSubscriptionPayment,
-
+  toggleUserStateController,
   createEmployeeController
 
 } from "./controllers";
@@ -84,6 +84,12 @@ router.get(
   getPendingPayments
 );
 
+router.patch(
+  "/:id/toggle-state",
+  authenticateFirebase,
+   authorizeSuperadminOnly,
+  toggleUserStateController
+);
 router.put(
   "/payments/:id/approve",
   authenticateFirebase,

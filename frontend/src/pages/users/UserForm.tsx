@@ -28,6 +28,9 @@ const UserForm = () => {
     role: "employee" as AppUser["role"],
     isActive: true,
     plan: "free" as AppUser["plan"],
+    phone: "",
+    address: "",
+    image: "",
   });
 
   // =========================
@@ -61,9 +64,11 @@ const UserForm = () => {
 
         const res = await API.get(`/users/${id}`);
 
-        const user = res.data.data.user;
+       console.log(res.data);
 
-        setForm({
+       const user = res.data.data.user;
+
+      setForm({
           name: user.name || "",
           lastName: user.lastName || "",
           email: user.email || "",
@@ -71,7 +76,10 @@ const UserForm = () => {
           role: user.role || "employee",
           isActive: user.isActive ?? true,
           plan: user.plan || "free",
-        });
+          phone: user.phone || "",
+          address: user.address || "",
+          image: user.image || "",
+      });
       } catch (err) {
         console.error(err);
         alert("Error cargando usuario");
@@ -147,6 +155,9 @@ const UserForm = () => {
           role: form.role,
           plan: form.plan,
           isActive: form.isActive,
+          phone: form.phone,
+          address: form.address,
+          image: form.image,
         });
 
         alert("Usuario actualizado");
