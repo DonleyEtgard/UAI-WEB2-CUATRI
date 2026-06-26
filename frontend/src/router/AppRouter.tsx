@@ -18,6 +18,9 @@ import ContactPage from "../pages/contact";
 import AboutPage from "../pages/about";
 import { FormDemo } from "../pages/FormDemo/FormDemo";
 import ReduxDemoPage from "../pages/redux-demo";
+import SettingsPage from "@/components/layout/SettingsPage"; 
+
+import AuditLogPage from "@/components/layout/AuditLogPage"; 
 
 
 // PRIVATE PAGES
@@ -30,7 +33,6 @@ import CustomersPage from "../pages/customers/CustomersPage";
 import CustomerDetail from "../pages/customers/CustomerDetail";
 import CustomerForm from "../pages/customers/CustomerForm";
 import StockMovement from "../pages/stock/StockMovement";
-import CriticalStockPage from "../pages/stock/CriticalStockPage";
 import UserPage from "../pages/users/UserPage";
 import UserDetailPage from "../pages/users/userDetailPage";
 import UserRolePage from "../pages/users/UserRolePage";
@@ -39,6 +41,8 @@ import ReportsPage from "../pages/reports/ReportsPage";
 import SaleFormPage from "../pages/sales/SaleFormPage";
 import POSPage from "../features/sales/POSPage";
 import TicketPage from "../pages/sales/TicketPage";
+import CriticalStockPage from "../pages/stock/CriticalStockPage"; 
+
 
 
 // COMMON
@@ -189,20 +193,6 @@ export const AppRouter: React.FC = () => {
             }
           />
 
-          {/* REPORTS */}
-          <Route 
-            path="reports" 
-            element={<Navigate to="/app/reports/sales" replace />} 
-          />
-          <Route
-            path="reports/sales"
-            element={
-              <RoleGuard requiredRoles={["superadmin", "admin"]}>
-                <ReportsPage />
-              </RoleGuard>
-            }
-          />
-
           {/* CUSTOMERS */}
           <Route
             path="customers"
@@ -320,7 +310,42 @@ export const AppRouter: React.FC = () => {
               </RoleGuard>
             }
           />
+
+          {/* SETTINGS */}
+          <Route
+            path="settings"
+            element={
+              <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                <SettingsPage />
+              </RoleGuard>
+            }
+          />
+
+          {/* AUDIT LOG */}
+          <Route
+            path="audit-log"
+            element={
+              <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                <AuditLogPage />
+              </RoleGuard>
+            }
+          />
         </Route>
+
+        {/* ================= PRIVATE (NO LAYOUT) ================= */}
+        {/* REPORTS */}
+        <Route
+          path="/app/reports/sales"
+          element={
+            <AuthGuard>
+              <VerifiedGuard>
+                <RoleGuard requiredRoles={["superadmin", "admin"]}>
+                  <ReportsPage />
+                </RoleGuard>
+              </VerifiedGuard>
+            </AuthGuard>
+          }
+        />
 
         {/* ================= GLOBAL 404 ================= */}
         <Route path="/404" element={<NotFound />} />

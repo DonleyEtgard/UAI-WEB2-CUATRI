@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../services/api";
-import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip } from "@mui/material";
+import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip, TextField, InputAdornment } from "@mui/material";
 
 const CustomerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [customer, setCustomer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [newPaymentAmount, setNewPaymentAmount] = useState("");
 
   useEffect(() => {
-    if (!id) return;
-    const load = async () => {
+    const loadCustomer = async () => {
+      if (!id) return;
+      setLoading(true);
       try {
         const res = await API.get(`/customers/${id}`);
         // El backend devuelve el objeto directamente
@@ -24,8 +27,29 @@ const CustomerDetail = () => {
         setLoading(false);
       }
     };
-    load();
+    loadCustomer();
   }, [id]);
+
+  const handleAddPayment = async () => {
+    if (!id || !newPaymentAmount || Number(newPaymentAmount) <= 0) {
+      alert("Por favor, ingrese un monto válido.");
+      return;
+    }
+
+    try {
+      setPaymentLoading(true);
+      const res = await API.post(`/customers/${id}/payment`, {
+        amount: Number(newPaymentAmount),
+      });
+      setCustomer(res.data); // Actualiza el estado del cliente con la respuesta
+      setNewPaymentAmount(""); // Limpia el input
+    } catch (err) {
+      console.error("Error adding payment:", err);
+      alert("Hubo un error al registrar el pago.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!id || deleting) return;
@@ -111,7 +135,11 @@ const CustomerDetail = () => {
                   </Box>
                   <Box sx={{ mt: 3 }}>
                     <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Estado de Deuda</Typography>
-                    <Typography variant="h5" sx={{ color: (customer.debt || 0) > 0 ? '#ef4444' : '#10b981', fontWeight: 800 }}>${(customer.debt || 0).toLocaleString()}</Typography>
+                    {(customer.debt || 0) > 0 ? (
+                      <Typography variant="h5" sx={{ color: '#ef4444', fontWeight: 800 }}>${(customer.debt || 0).toLocaleString()}</Typography>
+                    ) : (
+                      <Typography variant="h5" sx={{ color: '#10b981', fontWeight: 800 }}>¡Deuda saldada!</Typography>
+                    )}
                   </Box>
                 </Box>
               </CardContent>
@@ -131,6 +159,40 @@ const CustomerDetail = () => {
           </Box>
         </Box>
 
+        {/* Registrar Pago */}
+        <Card sx={{ borderRadius: 3, boxShadow: 2, mt: 4 }}>
+          <CardHeader title="Registrar un Nuevo Pago" />
+          <CardContent>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+             <TextField
+             fullWidth
+             type="number"
+             label="Monto del Pago"
+             value={newPaymentAmount}
+             onChange={(e) => setNewPaymentAmount(e.target.value)}
+             slotProps={{
+             input: {
+             startAdornment: (
+             <InputAdornment position="start">
+            $
+            </InputAdornment>
+        ),
+      },
+      }}
+       disabled={paymentLoading}
+      />
+
+     <Button
+       variant="contained"
+       onClick={handleAddPayment}
+      disabled={paymentLoading || !newPaymentAmount}
+       >
+      {paymentLoading ? "Registrando..." : "Añadir Pago"}
+     </Button>
+      </Box>
+          </CardContent>
+        </Card>
+
         {/* Historial de Pagos */}
         <Card sx={{ borderRadius: 3, boxShadow: 2, mt: 4 }}>
           <CardHeader title="Historial de Pagos" />
@@ -142,9 +204,20 @@ const CustomerDetail = () => {
                 {customer.payments.map((p: any, i: number) => (
                   <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Pago Recibido</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        {p.type === 'initial' ? '💰 Pago Inicial' : '💵 Pago Recibido'}
+                      </Typography>
                       <Typography variant="caption" sx={{ color: '#64748b' }}>
                         {new Date(p.date).toLocaleString('es-ES')}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#64748b',
+                          mt: 0.5,
+                        }}
+                      >
+                        Saldo restante: ${p.remainingDebt?.toLocaleString()}
                       </Typography>
                     </Box>
                     <Typography sx={{ color: '#10b981', fontWeight: 800, fontSize: '1.2rem' }}>+ ${p.amount?.toLocaleString()}</Typography>

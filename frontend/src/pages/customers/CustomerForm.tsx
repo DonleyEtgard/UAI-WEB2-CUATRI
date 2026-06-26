@@ -15,12 +15,12 @@ const CustomerForm = () => {
   const [fetching, setFetching] = useState(false);
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
     debt: 0,
-    payments: [] as any[],
+    initialPayment: 0,
     isActive: true,
   });
 
@@ -98,19 +98,19 @@ const CustomerForm = () => {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  type="number"
-                label="Ultimo Pago"
-                 placeholder="0"
-                value={form.debt}
-               onChange={(e) =>
-                setForm({
-             ...form,
-              debt: Number(e.target.value),
-                   })
-                    }
-                             />
+               <TextField
+  fullWidth
+  type="number"
+  label="Deuda total"
+  placeholder="0"
+  value={form.debt}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      debt: Number(e.target.value),
+    })
+  }
+/>
                    </Grid>
 
               <Grid size={{ xs: 12, sm: 4 }}>
@@ -119,16 +119,17 @@ const CustomerForm = () => {
                   type="number"
                 label="Pago inicial"
                  placeholder="0"
-                // En edición mostramos el primer pago si existe, pero deshabilitamos para evitar sobreescribir historial
-                value={form.payments?.[0]?.amount || 0}
+                value={form.initialPayment}
                 disabled={isEdit}
                onChange={(e) =>
-                !isEdit && setForm({
+    setForm({
                   ...form,
-                  payments: [{ amount: Number(e.target.value), date: new Date() }],
+      initialPayment: Number(e.target.value),
                 })
                }
-               helperText={isEdit ? "El historial de pagos se gestiona desde el detalle del cliente" : ""}
+               helperText={
+    isEdit ? 'El historial de pagos se gestiona desde el detalle del cliente' : ''
+  }
                              />
                    </Grid>
 

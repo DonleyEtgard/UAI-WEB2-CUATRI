@@ -260,6 +260,7 @@ export const createEmployeeController = async (
       lastName,
       image,
       address,
+      role,
     } = req.body;
 
     // ================================================================
@@ -270,13 +271,30 @@ export const createEmployeeController = async (
       !firebaseUid ||
       !email ||
       !name ||
-      !lastName
+      !lastName ||
+      !role
     ) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
         error: "INVALID_INPUT",
       });
+    }
+
+    // ================================================================
+    // ROLE VALIDATION
+    // ================================================================
+    const allowedRolesForAdmin = ["employee", "client"];
+    if (req.dbUser.role === "admin" && !allowedRolesForAdmin.includes(role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Admins can only create employees or clients.",
+        error: "FORBIDDEN_ROLE",
+      });
+    }
+
+    if (req.dbUser.role === "superadmin" && !["admin", "employee", "client"].includes(role)) {
+      return res.status(403).json({ success: false, message: "Invalid role for creation.", error: "FORBIDDEN_ROLE" });
     }
 
     // ================================================================
@@ -308,7 +326,7 @@ export const createEmployeeController = async (
   name,
   lastName,
 
-  role: "employee",
+  role: role,
 
   image: image || "",
 
@@ -636,12 +654,24 @@ export const updateUserController = async (
       };
     }
 
+    // =====================================================
+    // ROLE MANAGEMENT PERMISSIONS
+    // =====================================================
+
     if (
-      req.dbUser.role === "superadmin" &&
-      req.body.role
+      req.body.role && canManageUsers
     ) {
-      updateData.role = req.body.role;
+      const targetUser = await User.findById(id);
+      if (targetUser) {
+        if (req.dbUser.role === 'superadmin' && ['admin', 'employee'].includes(req.body.role)) {
+          updateData.role = req.body.role;
+        } else if (req.dbUser.role === 'admin' && targetUser.ownerAdmin?.equals(ownerAdmin) && ['admin', 'employee'].includes(req.body.role)) {
+          updateData.role = req.body.role;
+        }
+      }
     }
+
+
 
     const user = await User.findOneAndUpdate(
       filter,

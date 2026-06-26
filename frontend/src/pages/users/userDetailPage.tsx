@@ -15,7 +15,7 @@ const UserDetailPage = () => {
     const fetchUser = async () => {
       try {
        const res = await API.get(`/users/${id}`);
-        setUser(res.data.data.user);
+        setUser(res.data.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -53,8 +53,6 @@ const UserDetailPage = () => {
   );
 }
 
-const userData = user; // Ajuste aquí para acceder a los datos del usuario correctamente 
-
   return (
     <Box sx={{ minHeight: '100vh', py: { xs: 2, md: 4 }, px: { xs: 2, md: 0 } }}>
       <Container maxWidth="lg">
@@ -63,14 +61,14 @@ const userData = user; // Ajuste aquí para acceder a los datos del usuario corr
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: 3 }}>
               <Avatar sx={{ width: 90, height: 90, bgcolor: 'rgba(255,255,255,0.2)', fontSize: '2.5rem', fontWeight: 800, border: '3px solid white' }}>
-                {userData.name ? userData.name[0] : 'U'}
+                {user.name ? user.name[0] : 'U'}
               </Avatar>
               <Box sx={{ flexGrow: 1, textAlign: { xs: 'center', md: 'left' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mb: 0.5, flexWrap: 'wrap' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{userData.name} {userData.lastName}</Typography>
-                  <Chip label={userData.role || 'user'} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 700 }} />
+                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{user.name} {user.lastName}</Typography>
+                  <Chip label={user.role || 'user'} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 700 }} />
                 </Box>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', opacity: 0.9 }}>Firebase UID: {userData.firebaseUid || 'N/A'}</Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', opacity: 0.9 }}>Firebase UID: {user.firebaseUid || 'N/A'}</Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Button variant="outlined" onClick={() => navigate(`/app/users/edit/${id}`)} sx={{ borderColor: 'white', color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}>
@@ -90,15 +88,15 @@ const userData = user; // Ajuste aquí para acceder a los datos del usuario corr
               <Box sx={{ spaceY: 3 }}>
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Email</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5 }}>{userData.email}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5 }}>{user.email}</Typography>
                 </Box>
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Rol</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5, textTransform: 'capitalize' }}>{userData.role}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5, textTransform: 'capitalize' }}>{user.role}</Typography>
                 </Box>
                 <Box>
                   <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase' }}>Fecha de Registro</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5 }}>{userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES') : 'N/A'}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 500, mt: 0.5 }}>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-ES') : 'N/A'}</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -110,8 +108,8 @@ const userData = user; // Ajuste aquí para acceder a los datos del usuario corr
             <CardContent>
               <Box sx={{ textAlign: 'center' }}>
                 <Chip 
-                  label={userData.isActive ? 'Activo' : 'Inactivo'} 
-                  color={userData.isActive ? 'success' : 'error'} 
+                  label={user.isActive ? 'Activo' : 'Inactivo'} 
+                  color={user.isActive ? 'success' : 'error'} 
                   variant="filled" 
                   sx={{ mb: 2, fontSize: 14, fontWeight: 700, p: '20px 12px' }}
                 />

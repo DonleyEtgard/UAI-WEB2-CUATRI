@@ -28,9 +28,16 @@ const UserForm = () => {
     role: "employee" as AppUser["role"],
     isActive: true,
     plan: "free" as AppUser["plan"],
-    phone: "",
-    address: "",
+    phone: "",    
     image: "",
+    address: {
+      street: "",
+      number: "",
+      city: "",
+      state: "",
+      country: "Argentina",
+      postalCode: "",
+    },
   });
 
   // =========================
@@ -76,9 +83,16 @@ const UserForm = () => {
           role: user.role || "employee",
           isActive: user.isActive ?? true,
           plan: user.plan || "free",
-          phone: user.phone || "",
-          address: user.address || "",
+          phone: user.phone || "",          
           image: user.image || "",
+          address: {
+            street: user.address?.street || "",
+            number: user.address?.number || "",
+            city: user.address?.city || "",
+            state: user.address?.state || "",
+            country: user.address?.country || "Argentina",
+            postalCode: user.address?.postalCode || "",
+          },
       });
       } catch (err) {
         console.error(err);
@@ -95,14 +109,21 @@ const UserForm = () => {
   // CHANGE
   // =========================
 
-  const handleChange = (
-    key: string,
-    value: string | boolean
-  ) => {
-    setForm((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+
+    if (name.startsWith("address.")) {
+      const addressField = name.split('.')[1];
+      setForm(prev => ({
+        ...prev,
+        address: { ...prev.address, [addressField]: value }
+      }));
+    } else {
+      setForm(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      }));
+    }
   };
 
   // =========================
@@ -148,29 +169,12 @@ const UserForm = () => {
       setLoading(true);
 
       if (isEdit) {
-        await API.patch(`/users/${id}`, {
-          name: form.name,
-          lastName: form.lastName,
-          email: form.email,
-          role: form.role,
-          plan: form.plan,
-          isActive: form.isActive,
-          phone: form.phone,
-          address: form.address,
-          image: form.image,
-        });
+        const { password, ...updatePayload } = form; // Excluimos la contraseña en la edición
+        await API.patch(`/users/${id}`, updatePayload);
 
         alert("Usuario actualizado");
       } else {
-        await API.post("/users/employees", {
-          name: form.name,
-          lastName: form.lastName,
-          email: form.email,
-          password: form.password,
-          role: form.role,
-          plan: form.plan,
-          isActive: form.isActive,
-        });
+        await API.post("/users/employees", form);
 
         alert("Usuario creado");
       }
@@ -237,8 +241,9 @@ const UserForm = () => {
                   required
                   label="Nombre"
                   placeholder="Ej. John"
+                  name="name"
                   value={form.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
+                  onChange={handleChange}
                   variant="outlined"
                   size="medium"
                 />
@@ -249,8 +254,9 @@ const UserForm = () => {
                   required
                   label="Apellido"
                   placeholder="Ej. Doe"
+                  name="lastName"
                   value={form.lastName}
-                  onChange={(e) => handleChange("lastName", e.target.value)}
+                  onChange={handleChange}
                   variant="outlined"
                   size="medium"
                 />
@@ -264,8 +270,9 @@ const UserForm = () => {
                   required
                   label="Correo Electrónico"
                   placeholder="john@empresa.com"
+                  name="email"
                   value={form.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={handleChange}
                   variant="outlined"
                   size="medium"
                 />
@@ -280,22 +287,105 @@ const UserForm = () => {
                     required
                     label="Contraseña"
                     placeholder="••••••••"
+                    name="password"
                     value={form.password}
-                    onChange={(e) => handleChange("password", e.target.value)}
+                    onChange={handleChange}
                     variant="outlined"
                     size="medium"
                   />
                 </Grid>
               )}
+                {/* Teléfono */}
+<Grid size={12}>
+  <TextField
+    fullWidth
+    label="Teléfono"
+    name="phone"
+    value={form.phone}
+    onChange={handleChange}
+  />
+</Grid>
 
+{/* Imagen */}
+<Grid size={12}>
+  <TextField
+    fullWidth
+    label="URL de Imagen"
+    name="image"
+    value={form.image}
+    onChange={handleChange}
+  />
+</Grid>
+
+{/* Dirección */}
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="Calle"
+    name="address.street"
+    value={form.address.street}
+    onChange={handleChange}
+  />
+</Grid>
+
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="Número"
+    name="address.number"
+    value={form.address.number}
+    onChange={handleChange}
+  />
+</Grid>
+
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="Ciudad"
+    name="address.city"
+    value={form.address.city}
+    onChange={handleChange}
+  />
+</Grid>
+
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="Provincia"
+    name="address.state"
+    value={form.address.state}
+    onChange={handleChange}
+  />
+</Grid>
+
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="País"
+    name="address.country"
+    value={form.address.country}
+    onChange={handleChange}
+  />
+</Grid>
+
+<Grid size={{ xs: 12, sm: 6 }}>
+  <TextField
+    fullWidth
+    label="Código Postal"
+    name="address.postalCode"
+    value={form.address.postalCode}
+    onChange={handleChange}
+  />
+</Grid>
               {/* Rol y Plan */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Rol Administrativo</InputLabel>
                   <Select
                     value={form.role}
-                    onChange={(e) => handleChange("role", e.target.value as AppUser["role"])}
+                    onChange={handleChange as any} // Cast to any to handle MUI's SelectChangeEvent
                     label="Rol Administrativo"
+                    name="role"
                   >
                     <MenuItem value="employee">Empleado</MenuItem>
                     <MenuItem value="client">Cliente / Usuario</MenuItem>
@@ -311,8 +401,9 @@ const UserForm = () => {
                   <InputLabel>Plan de Suscripción</InputLabel>
                   <Select
                     value={form.plan}
-                    onChange={(e) => handleChange("plan", e.target.value)}
+                    onChange={handleChange as any} // Cast to any to handle MUI's SelectChangeEvent
                     label="Plan de Suscripción"
+                    name="plan"
                   >
                     <MenuItem value="free">Free</MenuItem>
                     <MenuItem value="basic">Basic</MenuItem>
@@ -328,7 +419,8 @@ const UserForm = () => {
                   control={
                     <Switch
                       checked={form.isActive}
-                      onChange={(e) => handleChange("isActive", e.target.checked)}
+                      onChange={handleChange}
+                      name="isActive"
                       size="medium"
                     />
                   }

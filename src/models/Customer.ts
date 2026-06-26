@@ -1,24 +1,37 @@
 import { Schema, model, InferSchemaType } from "mongoose";
 
 const paymentSchema = new Schema({
-  amount: {
+   amount: {
     type: Number,
-    required: true
+    required: true,
   },
+
+  type: {
+    type: String,
+    enum: ["initial", "payment"],
+    default: "payment",
+  },
+
+  remainingDebt: {
+    type: Number,
+    default: 0,
+  },
+
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
+
   ownerAdmin: {
     type: Schema.Types.ObjectId,
     ref: "User",
-    index: true
+    index: true,
   },
 
   date: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 
 }, { _id: false });
 

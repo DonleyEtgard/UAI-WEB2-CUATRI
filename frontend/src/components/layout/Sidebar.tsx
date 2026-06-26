@@ -144,15 +144,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             {isOpen && <span className="font-black text-sm text-white whitespace-nowrap animate-in fade-in duration-300">Inventario</span>}
           </NavLink>
 
-          {/* STOCK CRÍTICO */}
-          <NavLink
-            to="/app/stock/critical"
-            className={linkClass}
-            onClick={onClose}
-          >
-            <span className="text-xl shrink-0">⚠️</span>
-            {isOpen && <span className="font-black text-sm text-white whitespace-nowrap animate-in fade-in duration-300">Stock Crítico</span>}
-          </NavLink>
 
           {/* ============================================================ */}
           {/* ADMIN / SUPERADMIN / MANAGER */}
@@ -186,6 +177,17 @@ const Sidebar: React.FC<SidebarProps> = ({
               >
                 <span className="text-xl shrink-0">🔐</span>
                 {isOpen && <span className="font-black text-sm text-white whitespace-nowrap animate-in fade-in duration-300">Roles</span>}
+              </NavLink>
+
+             
+              {/* AUDIT LOG */}
+              <NavLink
+                to="/app/audit-log"
+                className={linkClass}
+                onClick={onClose}
+              >
+                <span className="text-xl shrink-0">📋</span>
+                {isOpen && <span className="font-black text-sm text-white whitespace-nowrap animate-in fade-in duration-300">Actividad</span>}
               </NavLink>
 
               {/* REPORTS */}

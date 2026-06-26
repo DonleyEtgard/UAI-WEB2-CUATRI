@@ -226,7 +226,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             <button type="submit" disabled={isLoading} className="mt-4">
-              {isLoading ? "Provisioning Workspace..." : "Launch ERP Platform"}
+              {isLoading ? "Provisioning Workspace..." : "Iniciar Sesion"}
             </button>
           </form>
 

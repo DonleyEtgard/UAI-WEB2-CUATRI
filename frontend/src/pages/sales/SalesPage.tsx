@@ -46,7 +46,6 @@ const SalesPage = () => {
 
   // KPIs
   const totalRevenue = sales.reduce((acc, s) => acc + (s.status === 'paid' ? s.total : 0), 0);
-  const pendingCount = sales.filter(s => s.status === 'pending').length;
   const averageTicket = sales.length > 0 ? totalRevenue / sales.length : 0;
   const totalExpenses = sales.reduce((acc, sale) => acc + (sale.costTotal || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
@@ -163,9 +162,7 @@ const SalesPage = () => {
           {[
             { label: "Ingresos Totales", value: `$${totalRevenue.toLocaleString()}`, color: "success" },
             { label: "Transacciones", value: sales.length, color: "info" },
-            { label: "Pendientes", value: pendingCount, color: "warning" },
             { label: "Ticket Promedio", value: `$${averageTicket.toFixed(2)}`, color: "primary" },
-            {label: "Gastos", value: `$${totalExpenses.toLocaleString()}`, color: "error"},
             {label: "Ganancia Neta", value: `$${netProfit.toLocaleString()}`, color: netProfit >= 0 ? "success" : "error"},
             {label: "Margen %",value: `${profitMargin.toFixed(1)}%`,color: profitMargin >= 0 ? "success" : "error"}
  

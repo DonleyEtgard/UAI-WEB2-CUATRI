@@ -10,6 +10,8 @@ import UiBadge from "../../components/common/UiBadge";
 interface Payment {
   amount: number;
   date: string;
+  type: "initial" | "payment";
+  remainingDebt: number;
 }
 
 interface Customer {
@@ -255,7 +257,11 @@ const CustomersPage = () => {
     const lastPayment =
       params.row.payments?.[params.row.payments.length - 1];
 
-    return <span>${lastPayment?.amount || 0}</span>;
+    if (!lastPayment) {
+      return <span>Sin pagos</span>;
+    }
+
+    return <span>${lastPayment.amount.toLocaleString()}</span>;
   },
 },
                 {

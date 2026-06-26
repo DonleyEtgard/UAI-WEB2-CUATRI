@@ -30,6 +30,7 @@ const getCustomerScope = async (req: AuthRequest, extra: Record<string, any> = {
   };
 };
 
+
 export const createCustomer = async (
   req: AuthRequest,
   res: Response
@@ -37,7 +38,15 @@ export const createCustomer = async (
   try {
     console.log("BODY:", req.body);
     console.log("DB USER:", req.dbUser);
-    const { name, email, phone, debt, address, payments, isActive } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      debt,
+      initialPayment = 0,
+      address,
+      isActive,
+    } = req.body;
 
     const userId = req.dbUser?._id;
 
@@ -53,34 +62,40 @@ export const createCustomer = async (
       });
     }
 
-    // evitar duplicados por usuario
-    if (email) {
-      const existing = await Customer.findOne({
-        email,
-        ...(await getCustomerScope(req)),
-      });
+    const finalDebt = debt - initialPayment;
 
-      if (existing) {
-        return res.status(400).json({
-          message: "Customer already exists",
-        });
-      }
+    const payments = [];
+
+    if (initialPayment > 0) {
+      payments.push({
+        amount: initialPayment,
+        type: "initial",
+        remainingDebt: finalDebt,
+        createdBy: userId,
+        ownerAdmin: getOwnerAdmin(req),
+        date: new Date(),
+      });
     }
-  
+
     const customer = await Customer.create({
       name,
       email,
       phone,
-      debt,
       address,
+
+      debt: finalDebt,
+
       payments,
+
       isActive,
+
       user: userId,
       createdBy: userId,
       ownerAdmin: getOwnerAdmin(req),
     });
 
     res.status(201).json(customer);
+
   } catch (error: any) {
     res.status(500).json({
       message: "Error creating customer",
@@ -201,25 +216,10 @@ export const addPayment = async (
       });
     }
 
-    const customer = await Customer.findOneAndUpdate(
+    const customer = await Customer.findOne(
       await getCustomerScope(req, {
         _id: id,
-      }),
-      {
-        $push: {
-          payments: {
-            amount,
-            date: new Date(),
-          },
-        },
-
-        $inc: {
-          debt: -amount,
-        },
-      },
-      {
-        new: true,
-      }
+      })
     );
 
     if (!customer) {
@@ -227,6 +227,27 @@ export const addPayment = async (
         message: "Customer not found",
       });
     }
+
+    if (amount > customer.debt) {
+      return res.status(400).json({
+        message: "Payment exceeds remaining debt",
+      });
+    }
+
+    const remainingDebt = customer.debt - amount;
+
+    customer.payments.push({
+      amount,
+      type: "payment",
+      remainingDebt,
+      createdBy: req.dbUser?._id,
+      ownerAdmin: getOwnerAdmin(req),
+      date: new Date(),
+    });
+
+    customer.debt = remainingDebt;
+
+    await customer.save();
 
     res.json(customer);
   } catch (error: any) {

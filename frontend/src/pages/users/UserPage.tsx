@@ -166,11 +166,30 @@ const UserPage = () => {
                 {field: 'plan', headerName: 'Plan', width: 120, renderCell: (params: any)=> <Chip label={params.value || 'free'} size="small" />},
                 {field: 'isActive', headerName: 'Estado', width: 140, renderCell: (params: any)=> params.value ? <UiBadge label='Activo' color='success' /> : <UiBadge label='Inactivo' color='error' />},
                 {field: 'actions', headerName: 'Acciones', width: 200, sortable: false, renderCell: (params: any)=> (
-                  <Box style={{display:'flex', gap:6, justifyContent:'flex-end', width:'100%', fontSize:12}}>
-                    <button onClick={() => navigate(`/app/users/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#6366f1', cursor:'pointer', textDecoration:'underline'}}>Ver</button>
-                    <button onClick={() => navigate(`/app/users/edit/${params.row._id}`)} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#8b5cf6', cursor:'pointer', textDecoration:'underline'}}>Editar</button>
-                    <button  onClick={() => handleToggleActive(params.row._id) }> {params.row.isActive ? "Desactivar" : "Activar"}</button>
-                    <button onClick={() => handleDelete(params.row._id)} disabled={deletingId === params.row._id} style={{background:'transparent', border:0, padding:4, borderRadius:6, color:'#ef4444', cursor:'pointer', textDecoration:'underline'}}>{deletingId === params.row._id ? '...' : 'Eliminar'}</button>
+                  <Box sx={{ display: 'flex', gap: 1, width: '100%', justifyContent: 'flex-end' }}>
+                    <Button size="small" variant="outlined" onClick={(e) => { e.stopPropagation(); navigate(`/app/users/${params.row._id}`); }}>
+                      Editar
+                    </Button>
+                    <Button size="small" variant="outlined" color="secondary" onClick={(e) => { e.stopPropagation(); navigate(`/app/users/edit/${params.row._id}`); }}>
+                      ✏️
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color={params.row.isActive ? 'warning' : 'success'}
+                      onClick={(e) => { e.stopPropagation(); handleToggleActive(params.row._id); }}
+                    >
+                      {params.row.isActive ? "🚫" : "🟢"}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      disabled={deletingId === params.row._id}
+                      onClick={(e) => { e.stopPropagation(); handleDelete(params.row._id); }}
+                    >
+                      {deletingId === params.row._id ? '...' : '🗑️'}
+                    </Button>
                   </Box>
                 )},
               ]}
