@@ -1,0 +1,52 @@
+{
+  "language": "Kreyòl Ayisyen",
+  "payment": {
+    "subscription": {
+      "title": "Abònman",
+      "premium": "Premium",
+      "subtitle": "Renouvèlman ak jesyon abònman"
+    },
+    "kpi": {
+      "plan": "PLAN",
+      "method": "METÒD",
+      "total": "TOTAL"
+    },
+    "config": {
+      "title": "Konfigirasyon",
+      "subtitle": "Chwazi plan ak metòd",
+      "planLabel": "Plan",
+      "methodLabel": "Metòd",
+      "generateButton": "Jenere Peman",
+      "generatingButton": "Ap jenere..."
+    },
+    "summary": {
+      "title": "Rezime",
+      "planLabel": "Plan {{plan}}",
+      "base": "Baz: ${{price}}",
+      "fee": "Frè: ${{price}}",
+      "total": "Total: ${{price}}"
+    },
+    "qr": {
+      "title": "Peman",
+      "subtitle": "Skane kòd QR la pou konplete tranzaksyon an",
+      "placeholder": "Jenere yon peman pou wè kòd QR la",
+      "confirmButton": "Konfime Peman",
+      "confirmingButton": "Ap konfime..."
+    },
+    "plans": {
+      "basic": "Debaz",
+      "medium": "Mwayen",
+      "premium": "Premium"
+    },
+    "methods": {
+      "moncash": "MonCash",
+      "mercado-pago": "Mercado Pago",
+      "transfer": "Transfè"
+    },
+    "alerts": {
+      "generateError": "Erè pandan jenerasyon peman an",
+      "confirmError": "Erè pandan konfimasyon peman an",
+      "confirmSuccess": "Abònman aktive avèk siksè"
+    }
+  }
+}

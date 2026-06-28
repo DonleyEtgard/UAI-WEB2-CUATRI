@@ -13,6 +13,7 @@ import {
   type TicketItem
 } from "../../services/sales.service";
 
+
 const TicketPage = () => {
   const { id } = useParams();
 

@@ -80,7 +80,7 @@ image: {
 },
     role: {
   type: String,
-  enum: ["superadmin", "admin", "employee"],
+  enum: ["superadmin", "admin", "employee", "client"],
   default: "admin"
 },
 

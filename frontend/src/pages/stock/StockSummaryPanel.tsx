@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getStockSummary } from "../../services/stock.service.ts";
 import { Box, Typography } from "@mui/material";
 
+
 interface StockSummary {
   totalIn: number;
   totalOut: number;

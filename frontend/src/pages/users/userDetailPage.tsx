@@ -5,6 +5,7 @@ import API from "../../services/api";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
 
+
 const UserDetailPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState<any>(null);

@@ -7,6 +7,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import StockFilterForm from "./StockFilterForm";
 import StockSummaryPanel from "./StockSummaryPanel";
 
+
 import {
   getStockMovements,
   getMovementsByProduct,

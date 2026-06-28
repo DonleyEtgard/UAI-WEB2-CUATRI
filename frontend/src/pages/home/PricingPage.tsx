@@ -1,43 +1,49 @@
 import { Link } from "react-router-dom";
-
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    desc: "Ideal para probar el sistema",
-    features: ["Acceso limitado", "Clientes básicos"],
-    highlight: false,
-  },
-  {
-    name: "Basic",
-    price: "$3000 / mes",
-    desc: "Para negocios en crecimiento",
-    features: [
-      "Ventas ilimitadas",
-      "Gestión de productos",
-      "Clientes completos",
-      "Reportes"
-    ],
-    highlight: true,
-  },
-  {
-    name: "Pro",
-    price: "$7000 / mes",
-    desc: "Para empresas",
-    features: [
-      "Todo lo anterior",
-      "Analytics avanzados",
-      "Soporte prioritario"
-    ],
-    highlight: false,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export default function PricingPage() {
+  const { t } = useTranslation();
+
+  const plans = [
+    {
+      name: t("pricing.plans.free.name"),
+      price: t("pricing.plans.free.price"),
+      desc: t("pricing.plans.free.desc"),
+      features: [
+        t("pricing.plans.free.features.0"),
+        t("pricing.plans.free.features.1"),
+      ],
+      highlight: false,
+    },
+    {
+      name: t("pricing.plans.basic.name"),
+      price: t("pricing.plans.basic.price"),
+      desc: t("pricing.plans.basic.desc"),
+      features: [
+        t("pricing.plans.basic.features.0"),
+        t("pricing.plans.basic.features.1"),
+        t("pricing.plans.basic.features.2"),
+        t("pricing.plans.basic.features.3"),
+      ],
+      highlight: true,
+    },
+    {
+      name: t("pricing.plans.pro.name"),
+      price: t("pricing.plans.pro.price"),
+      desc: t("pricing.plans.pro.desc"),
+      features: [
+        t("pricing.plans.pro.features.0"),
+        t("pricing.plans.pro.features.1"),
+        t("pricing.plans.pro.features.2"),
+      ],
+      highlight: false,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-950 text-white py-16 px-6">
       <h1 className="text-4xl font-bold text-center mb-10">
-        Planes
+        {t("pricing.title")}
       </h1>
 
       <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -64,7 +70,7 @@ export default function PricingPage() {
               to="/payment"
               className="block text-center bg-white text-black py-2 rounded-lg font-semibold"
             >
-              Elegir plan
+              {t("pricing.choosePlan")}
             </Link>
           </div>
         ))}

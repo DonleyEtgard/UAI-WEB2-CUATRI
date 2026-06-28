@@ -13,7 +13,8 @@ import {
   logoutUser,
   observeAuth,
   getFirebaseIdToken,
-  sendEmailVerificationEmail,
+  sendEmailVerificationEmail
+,
   forgotPassword as firebaseForgotPassword,
 } from "../firebase/auth";
 
@@ -535,6 +536,7 @@ export const AuthProvider: React.FC<
         err?.message || "Error al enviar el correo de verificación"
       );
     }
+                
   };
 
   // ==========================================================================

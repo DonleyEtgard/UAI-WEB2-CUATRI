@@ -6,7 +6,10 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuth } from "../../context/AuthContext";
 import API from "../../services/api";
 import type { AppUser } from "../../types/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase/config";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
+
 
 const UserForm = () => {
   const { id } = useParams();
@@ -168,14 +171,30 @@ const UserForm = () => {
     try {
       setLoading(true);
 
+      const payload = { ...form };
+
       if (isEdit) {
-        const { password, ...updatePayload } = form; // Excluimos la contraseña en la edición
-        await API.patch(`/users/${id}`, updatePayload);
+        // En edición, no se envía la contraseña.
+        // El backend ya excluye el cambio de email y firebaseUid.
+        const { password, ...updatePayload } = payload;
+        await API.patch(`/users/${id}`, updatePayload); 
 
         alert("Usuario actualizado");
       } else {
-        await API.post("/users/employees", form);
+        // 1. Crear usuario en Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
+        const firebaseUser = userCredential.user;
 
+        if (!firebaseUser.uid) {
+          throw new Error("No se pudo obtener el UID de Firebase.");
+        }
+
+        // 2. Preparar payload para nuestro backend, incluyendo el firebaseUid
+        const { password, ...employeePayload } = form;
+        const finalPayload = { ...employeePayload, firebaseUid: firebaseUser.uid };
+
+        // 3. Enviar datos al backend para crear el usuario en MongoDB
+        await API.post("/users/employees", finalPayload);
         alert("Usuario creado");
       }
 

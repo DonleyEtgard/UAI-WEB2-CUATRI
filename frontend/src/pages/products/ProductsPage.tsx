@@ -35,7 +35,7 @@ export type Product = {
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null); // This is used in handleDelete
   const navigate = useNavigate();
 
   const loadProducts = async () => {

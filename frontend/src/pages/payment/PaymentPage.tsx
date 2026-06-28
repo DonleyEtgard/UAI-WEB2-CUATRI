@@ -36,7 +36,7 @@ type SubscriptionPlan =
 
 type PaymentMethod =
   | "moncash"
-  | "mercado-pago"
+  | "mercado pago"
   | "transfer";
 
 interface PaymentData {
@@ -340,7 +340,7 @@ export default function PaymentPage() {
                       MonCash
                     </MenuItem>
 
-                    <MenuItem value="mercado-pago">
+                    <MenuItem value="mercado pago">
                       Mercado Pago
                     </MenuItem>
 

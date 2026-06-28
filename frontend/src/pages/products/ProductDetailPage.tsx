@@ -15,6 +15,7 @@ import { useProduct, useDeleteProduct } from "@/features/products";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
 
+
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

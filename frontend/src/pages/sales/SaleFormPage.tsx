@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import API from "../../services/api";
 
+
 interface CartItem {
   productId: string;
   name: string;

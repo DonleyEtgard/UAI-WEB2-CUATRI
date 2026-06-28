@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import InstallPWAButton from "../InstallPWAButton";
 
+
 const PublicNavbar = () => {
   return (
     <header className="public-navbar flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-black/70 to-black/40 backdrop-blur-md">

@@ -1,0 +1,34 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Akèy",
+      "about": "Konsènan",
+      "contact": "Kontak",
+      "login": "Konekte",
+      "status": "Sistèm nan anliy",
+      "access": "Aksede"
+    },
+
+    "sidebar": {
+      "dashboard": "Tablo Kontwòl",
+      "users": "Itilizatè yo",
+      "customers": "Kliyan yo",
+      "products": "Pwodwi yo",
+      "sales": "Vant yo",
+      "payments": "Peman yo",
+      "stock": "Envantè",
+      "settings": "Paramèt",
+      "audit": "Jounal Odit",
+      "logout": "Dekonekte"
+    },
+
+    "navbar": {
+      "profile": "Pwofil",
+      "settings": "Paramèt",
+      "notifications": "Notifikasyon",
+      "language": "Lang",
+      "theme": "Tèm",
+      "logout": "Dekonekte"
+    }
+  }
+}

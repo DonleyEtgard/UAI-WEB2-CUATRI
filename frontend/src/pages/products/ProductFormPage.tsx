@@ -23,11 +23,13 @@ import API from "../../services/api";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { useTranslation } from "react-i18next";
 
 const ProductFormPage = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
 
@@ -69,7 +71,7 @@ const ProductFormPage = () => {
         setNewImageFiles([]);
       } catch (err) {
         console.error(err);
-        alert("Error cargando producto");
+        alert(t("products.form.loadError"));
       } finally {
         setFetching(false);
       }
@@ -98,12 +100,12 @@ const ProductFormPage = () => {
     const selectedBytes = files.reduce((sum, file) => sum + file.size, 0);
 
     if (files.some((file) => file.size > maxFileBytes)) {
-      alert("Cada imagen no puede superar los 5 MB.");
+      alert(t("products.form.imageSizeError"));
       return;
     }
 
     if (currentBytes + selectedBytes > maxTotalBytes) {
-      alert("El total de imágenes no puede superar los 10 MB.");
+      alert(t("products.form.totalImageSizeError"));
       return;
     }
 
@@ -169,7 +171,7 @@ const ProductFormPage = () => {
   alert(
     err?.response?.data?.error ||
     err?.response?.data?.message ||
-    "Error al guardar producto"
+    t("products.form.saveError")
   );
 } finally {
       setLoading(false);
@@ -216,11 +218,11 @@ const ProductFormPage = () => {
           >
             {isEdit ? (
               <>
-                Editar <span style={{ color: "#6366f1" }}>Producto</span>
+                {t('products.form.editTitle')} <span style={{ color: "#6366f1" }}>{t('common.product')}</span>
               </>
             ) : (
               <>
-                Nuevo <span style={{ color: "#6366f1" }}>Producto</span>
+                {t('products.form.newTitle')} <span style={{ color: "#6366f1" }}>{t('common.product')}</span>
               </>
             )}
           </h1>
@@ -235,7 +237,7 @@ const ProductFormPage = () => {
               textTransform: "uppercase",
             }}
           >
-            Gestión de catálogo e inventario
+            {t('products.form.subtitle')}
           </p>
         </Box>
       </Box>
@@ -243,15 +245,15 @@ const ProductFormPage = () => {
       {/* GALLERY PREVIEW */}
       <Card sx={{ mb: 4 }}>
         <CardHeader 
-          title="Galería de Imágenes" 
-          subheader={`${existingImages.length + newImageFiles.length} imágenes seleccionadas · ${formatBytes(imageUploadSize)} en archivos nuevos`}
+          title={t('products.form.gallery.title')} 
+          subheader={t('products.form.gallery.subtitle', { count: existingImages.length + newImageFiles.length, size: formatBytes(imageUploadSize) })}
           action={
             <Button
               variant="contained"
               component="label"
               startIcon={<PhotoCamera />}
             >
-              Añadir Imágenes
+              {t('products.form.gallery.add')}
               <input
                 hidden
                 type="file"
@@ -277,7 +279,7 @@ const ProductFormPage = () => {
             }}
           >
             {existingImages.length + newImageFiles.length === 0 && (
-              <Typography color="text.secondary">No hay imágenes seleccionadas</Typography>
+              <Typography color="text.secondary">{t('products.form.gallery.empty')}</Typography>
             )}
            {existingImages.map((img, index) => (
            <Box key={`existing-${index}`}>
@@ -320,7 +322,7 @@ const ProductFormPage = () => {
           <Card>
             <CardContent>
               <Typography variant="overline">
-                Precio Actual
+                {t('products.form.kpi.currentPrice')}
               </Typography>
 
               <Typography
@@ -337,7 +339,7 @@ const ProductFormPage = () => {
           <Card>
             <CardContent>
               <Typography variant="overline">
-                Stock
+                {t('common.stock')}
               </Typography>
 
               <Typography
@@ -354,15 +356,15 @@ const ProductFormPage = () => {
           <Card>
             <CardContent>
               <Typography variant="overline">
-                Estado
+                {t('common.status')}
               </Typography>
 
               <Box sx={{ mt: 1 }}>
                 <Chip
                   label={
                     form.isActive
-                      ? "Activo"
-                      : "Inactivo"
+                      ? t('common.active')
+                      : t('common.inactive')
                   }
                   color={
                     form.isActive
@@ -381,8 +383,8 @@ const ProductFormPage = () => {
         {/* INFORMACIÓN GENERAL */}
         <Card sx={{ mb: 4 }}>
           <CardHeader
-            title="Información General"
-            subheader="Datos básicos del producto"
+            title={t('products.form.generalInfo.title')}
+            subheader={t('products.form.generalInfo.subtitle')}
           />
 
           <CardContent>
@@ -391,7 +393,7 @@ const ProductFormPage = () => {
                 <TextField
                   fullWidth
                   required
-                  label="Nombre"
+                  label={t('common.name')}
                   value={form.name}
                   onChange={(e) =>
                     setForm({
@@ -407,7 +409,7 @@ const ProductFormPage = () => {
                   fullWidth
                   multiline
                   rows={4}
-                  label="Descripción"
+                  label={t('common.description')}
                   value={form.description}
                   onChange={(e) =>
                     setForm({
@@ -424,8 +426,8 @@ const ProductFormPage = () => {
         {/* INFORMACIÓN COMERCIAL */}
         <Card sx={{ mb: 4 }}>
           <CardHeader
-            title="Información Comercial"
-            subheader="Precios, stock y categoría"
+            title={t('products.form.commercialInfo.title')}
+            subheader={t('products.form.commercialInfo.subtitle')}
           />
 
           <CardContent>
@@ -434,7 +436,7 @@ const ProductFormPage = () => {
                 <TextField
                   fullWidth
                   type="number"
-                  label="Precio"
+                  label={t('common.price')}
                   value={form.price}
                   onChange={(e) =>
                     setForm({
@@ -449,7 +451,7 @@ const ProductFormPage = () => {
                 <TextField
                   fullWidth
                   type="number"
-                  label="Costo"
+                  label={t('common.cost')}
                   value={form.cost}
                   onChange={(e) =>
                     setForm({
@@ -463,7 +465,7 @@ const ProductFormPage = () => {
   <TextField
     fullWidth
     type="number"
-    label="Stock"
+    label={t('common.stock')}
     value={form.stock}
     onChange={(e) =>
       setForm({
@@ -477,12 +479,12 @@ const ProductFormPage = () => {
               <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>
-                    Categoría
+                    {t('common.category')}
                   </InputLabel>
 
                   <Select
                     value={form.category}
-                    label="Categoría"
+                    label={t('common.category')}
                     onChange={(e) =>
                       setForm({
                         ...form,
@@ -618,7 +620,7 @@ const ProductFormPage = () => {
               navigate("/app/products")
             }
           >
-            Cancelar
+            {t('common.cancel')}
           </Button>
 
           <Button
@@ -628,10 +630,10 @@ const ProductFormPage = () => {
             disabled={loading}
           >
             {loading
-              ? "Guardando..."
+              ? t('common.saving')
               : isEdit
-              ? "Actualizar Producto"
-              : "Crear Producto"}
+              ? t('products.form.updateButton')
+              : t('products.form.createButton')}
           </Button>
         </Box>
       </form>

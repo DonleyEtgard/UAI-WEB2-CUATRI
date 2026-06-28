@@ -1,0 +1,34 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Home",
+      "about": "About",
+      "contact": "Contact",
+      "login": "Login",
+      "status": "System Online",
+      "access": "Get Access"
+    },
+
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "customers": "Customers",
+      "products": "Products",
+      "sales": "Sales",
+      "payments": "Payments",
+      "stock": "Stock",
+      "settings": "Settings",
+      "audit": "Audit Logs",
+      "logout": "Logout"
+    },
+
+    "navbar": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "notifications": "Notifications",
+      "language": "Language",
+      "theme": "Theme",
+      "logout": "Logout"
+    }
+  }
+}

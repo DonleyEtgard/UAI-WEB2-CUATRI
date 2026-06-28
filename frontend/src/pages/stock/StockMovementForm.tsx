@@ -4,6 +4,7 @@ import { createStockMovement } from "../../services/stock.service.ts";
 import { Container, Box, Typography, Card, CardContent, TextField, MenuItem, Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+
 type FormState = {
   product: string;
   type: "in" | "out";

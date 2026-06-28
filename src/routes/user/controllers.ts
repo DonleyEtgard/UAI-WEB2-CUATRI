@@ -261,22 +261,19 @@ export const createEmployeeController = async (
       image,
       address,
       role,
+      phone,
+      plan,
+      isActive,
     } = req.body;
 
     // ================================================================
     // VALIDATION
     // ================================================================
 
-    if (
-      !firebaseUid ||
-      !email ||
-      !name ||
-      !lastName ||
-      !role
-    ) {
+    if (!firebaseUid || !email || !name || !lastName || !role) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
+        message: "Missing required fields: firebaseUid, email, name, lastName, role",
         error: "INVALID_INPUT",
       });
     }
@@ -330,6 +327,8 @@ export const createEmployeeController = async (
 
   image: image || "",
 
+  phone: phone || "",
+
   address: {
     street: address?.street || "",
     number: address?.number || "",
@@ -341,9 +340,9 @@ export const createEmployeeController = async (
 
   isVerified: true,
 
-  isActive: true,
+  isActive: isActive ?? true,
 
-  plan: "free",
+  plan: plan || "free",
 
  subscriptionStatus: "active",
 
@@ -609,6 +608,17 @@ export const updateUserController = async (
             ownerAdmin,
           };
 
+    const userToUpdate = await User.findOne(filter);
+
+    if (!userToUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found or permission denied",
+        error: "NOT_FOUND",
+      });
+    }
+
+
     // =====================================================
     // WHITELIST DE CAMPOS EDITABLES
     // =====================================================
@@ -659,19 +669,29 @@ export const updateUserController = async (
     // =====================================================
 
     if (
-      req.body.role && canManageUsers
+      req.body.role && canManageUsers && req.body.role !== 'superadmin'
     ) {
-      const targetUser = await User.findById(id);
-      if (targetUser) {
-        if (req.dbUser.role === 'superadmin' && ['admin', 'employee'].includes(req.body.role)) {
+      // Superadmin puede asignar admin, employee, client
+      if (req.dbUser.role === 'superadmin') {
+        if (['admin', 'employee', 'client'].includes(req.body.role)) {
           updateData.role = req.body.role;
-        } else if (req.dbUser.role === 'admin' && targetUser.ownerAdmin?.equals(ownerAdmin) && ['admin', 'employee'].includes(req.body.role)) {
+        }
+      // Admin puede asignar employee, client a usuarios que le pertenecen
+      } else if (req.dbUser.role === 'admin') {
+        if (userToUpdate.ownerAdmin?.equals(ownerAdmin) && ['employee', 'client'].includes(req.body.role)) {
           updateData.role = req.body.role;
         }
       }
     }
 
+    if (req.body.plan && canManageUsers) {
+      updateData.plan = req.body.plan;
+    }
 
+    // Asignar rol personalizado en Firebase si el rol cambia
+    if (updateData.role && userToUpdate.firebaseUid) {
+      await admin.auth().setCustomUserClaims(userToUpdate.firebaseUid, { role: updateData.role });
+    }
 
     const user = await User.findOneAndUpdate(
       filter,
