@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getUsers, toggleUserStatus } from "./api";
-import type { User } from "./api";
+import { fetchUsers, toggleUserStatusAction } from "./api";
+import type { User } from "./types";
 
 const UserTable = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -13,8 +13,8 @@ const UserTable = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getUsers();
-      setUsers(data);
+      const data = await fetchUsers();
+      setUsers(data?.data?.users || []);
     } catch (err: any) {
       setError(err.message || "Error loading users");
     } finally {
@@ -27,10 +27,10 @@ const UserTable = () => {
   }, []);
 
   // 🔄 activar / desactivar
-  const handleToggle = async (id: string, isActive: boolean) => {
+  const handleToggle = async (id: string) => {
     try {
       setActionLoading(id);
-      await toggleUserStatus(id, isActive);
+      await toggleUserStatusAction(id);
       await loadUsers();
     } catch (err: any) {
       alert(err.message);
@@ -116,7 +116,7 @@ const UserTable = () => {
                 {/* ACTION */}
                 <td className="p-3">
                   <button
-                    onClick={() => handleToggle(user._id, user.isActive)}
+                    onClick={() => handleToggle(user._id)}
                     disabled={actionLoading === user._id}
                     className={`px-3 py-1 rounded text-white text-xs transition ${
                       user.isActive
