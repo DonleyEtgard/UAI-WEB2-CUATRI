@@ -3,6 +3,8 @@ import * as paymentService from "../../services/payments.service";
 import type {
   PaymentMethod,
   Payment,
+  PaymentMethodType,
+  SubscriptionPlan,
 } from "../../services/payments.service";
 
 // ============================================================================
@@ -12,6 +14,8 @@ import type {
 export type {
   PaymentMethod,
   Payment,
+  PaymentMethodType,
+  SubscriptionPlan,
 };
 
 // ============================================================================

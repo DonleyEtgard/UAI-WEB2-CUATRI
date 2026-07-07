@@ -1,12 +1,5 @@
 import * as productService from "../../services/products.service";
 
-import type {
-  Product, 
-  Category, 
-  Currency, 
-  ProductStats 
-} from "./types";
-
 // Re-export service functions as feature actions
 export const fetchProducts = 
   productService.getProducts;

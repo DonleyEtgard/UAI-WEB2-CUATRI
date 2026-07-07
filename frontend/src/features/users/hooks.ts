@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { 
-  fetchMe, 
-  fetchUsers, 
-  fetchUserById, 
-  updateUserAction, 
-  createEmployeeAction 
+  fetchMe,
+  fetchUsers,
+  fetchUserById,
+  updateUserAction,
+  createEmployeeAction
 } from "./api";
 import type { User, UpdateUserData, CreateEmployeeData } from "./types";
 
@@ -19,8 +19,11 @@ export const useMe = () => {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchMe();
-      setMe(data);
+      // La respuesta de la API viene anidada, la extraemos aquí
+      const response = await fetchMe();
+      if (response?.success && response.data?.user) {
+        setMe(response.data.user || null);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -45,8 +48,8 @@ export const useUsers = (page = 1, limit = 10) => {
     setLoading(true);
     try {
       const data = await fetchUsers(page, limit);
-      setUsers(data.users || []);
-      setTotal(data.total || 0);
+      setUsers(data?.data?.users || []);
+      setTotal(data?.data?.pagination?.total || 0);
     } finally {
       setLoading(false);
     }
@@ -69,7 +72,8 @@ export const useUser = (id?: string) => {
     setLoading(true);
     try {
       const data = await fetchUserById(id);
-      setUser(data);
+      // La respuesta de la API viene anidada
+      setUser(data?.data?.user || null);
     } finally {
       setLoading(false);
     }

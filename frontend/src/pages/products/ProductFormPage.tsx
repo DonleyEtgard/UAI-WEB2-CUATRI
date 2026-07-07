@@ -80,6 +80,13 @@ const ProductFormPage = () => {
     loadProduct();
   }, [id]);
 
+  // FIX: Clean up object URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      newImageFiles.forEach(imageFile => URL.revokeObjectURL(imageFile.preview));
+    };
+  }, [newImageFiles]);
+
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
     const sizes = ["Bytes", "KB", "MB", "GB"];

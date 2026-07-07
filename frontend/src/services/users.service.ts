@@ -52,7 +52,7 @@ export type UpdateUserData = {
   plan?: PlanType;    // FALTA
 };
 
-type CreateEmployeeData = {
+export type CreateEmployeeData = {
   firebaseUid: string;
   name: string;
   lastName: string;

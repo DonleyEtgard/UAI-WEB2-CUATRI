@@ -81,6 +81,13 @@
     "feature3Title": "Customer Management",
     "feature3Description": "Build strong relationships with your customers and increase loyalty.",
 
+    "feature4Title": "Reports and Analytics",
+    "feature4Description": "Detailed reports and metrics to make better decisions.",
+
+    "feature5Title": "Security and Roles",
+    "feature5Description": "Manage user permissions with a robust role system.",
+
+
     "contactUs": "Contact Us"
   },
 

@@ -3,9 +3,8 @@ import type {
   Address, 
   RegisterData, 
   UpdateUserData, 
-  CreateEmployeeData 
+  CreateEmployeeData
 } from "../../services/users.service";
-
-import type { User } from "../../models/User";
+import type { User } from "../../services/users.service";
 
 export type { User, UserRole, Address, RegisterData, UpdateUserData, CreateEmployeeData };

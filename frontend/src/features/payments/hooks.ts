@@ -15,6 +15,8 @@ import {
 
 import type {
   PaymentMethod,
+  PaymentMethodType,
+  SubscriptionPlan,
 } from "./api";
 
 export const usePaymentMethods = () => {
@@ -228,16 +230,15 @@ export const useSubscriptionPayment = () => {
     useState<string | null>(null);
 
   // 🔥 GENERATE QR
-  const generateQR = async () => {
+  const generateQR = async (plan: SubscriptionPlan, provider: PaymentMethodType) => {
 
     try {
 
       setLoading(true);
 
-      const res =
-        await createSubscriptionPaymentAction();
+      const res = await createSubscriptionPaymentAction(plan, provider);
 
-      setQr(res.qr); // Corregido: res es directamente el objeto de datos, no res.data
+      setQr(res.qr ?? null);
 
       return res;
 
@@ -248,15 +249,13 @@ export const useSubscriptionPayment = () => {
   };
 
   // 💳 CONFIRM PAYMENT
-  const confirmPayment = async (
-    paymentMethod: string
-  ) => {
+  const confirmPayment = async (plan: SubscriptionPlan, paymentMethod: PaymentMethodType) => {
 
     try {
 
       setLoading(true);
 
-      return await paySubscriptionAction(
+      return await paySubscriptionAction(plan,
         paymentMethod
       );
 

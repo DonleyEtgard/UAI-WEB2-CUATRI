@@ -37,7 +37,6 @@ export type Product = {
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -67,14 +66,11 @@ const ProductsPage = () => {
   const handleDelete = async (id: string) => {
     if (!confirm(t("products.list.confirmDelete"))) return;
     try {
-      setDeletingId(id);
       await API.delete(`/products/${id}`);
       setProducts((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       console.error(err);
       alert(t("products.list.deleteError"));
-    } finally {
-      setDeletingId(null);
     }
   };
 

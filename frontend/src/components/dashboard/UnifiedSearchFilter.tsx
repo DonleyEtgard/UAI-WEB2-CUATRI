@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 
 interface FilterProps {
@@ -42,7 +41,7 @@ const UnifiedSearchFilter: React.FC<FilterProps> = ({ onSearch }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             fullWidth
-            InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} /> }}
+            slotProps={{ input: { startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} /> } }}
           />
           <FormControl fullWidth>
             <InputLabel>Módulo</InputLabel>
@@ -61,16 +60,16 @@ const UnifiedSearchFilter: React.FC<FilterProps> = ({ onSearch }) => {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            InputProps={{ startAdornment: <CalendarTodayIcon sx={{ mr: 1, color: 'text.secondary' }} /> }}
+            slotProps={{ inputLabel: { shrink: true } }}
+            
           />
           <TextField
             label="Hasta"
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            InputProps={{ startAdornment: <CalendarTodayIcon sx={{ mr: 1, color: 'text.secondary' }} /> }}
+            slotProps={{ inputLabel: { shrink: true } }}
+            
           />
         </Box>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>

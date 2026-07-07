@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 
@@ -13,6 +13,7 @@ import {
   Chip,
   Stack,
   Divider,
+  IconButton
 } from "@mui/material";
 
 import {
@@ -25,13 +26,15 @@ import {
   Phone,
   Email,
   LocationOn,
+  WhatsApp,
+  Instagram
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 const HomePage = () => {
   const { t } = useTranslation();
 
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -726,6 +729,22 @@ const HomePage = () => {
                   >
                     Rosario, Santa Fe, Argentina
                   </Typography>
+                  <IconButton
+                  component="a"
+                  href="https://wa.me/5493417401354" // Reemplaza con tu número
+                  target="_blank"
+                  sx={{ color: '#4caf50', '&:hover': { color: '#66bb6a' } }}
+                >
+                  <WhatsApp />
+                </IconButton>
+                <IconButton
+                  component="a"
+                  href="https://www.instagram.com/mdeetch?igsh=MXc2MW5zNzFscWY0eg%3D%3D&utm_source=qr" // Reemplaza con tu usuario
+                  target="_blank"
+                  sx={{ color: '#f48fb1', '&:hover': { color: '#f8bbd0' } }}
+                >
+                  <Instagram />
+                </IconButton>
                 </Box>
               </Stack>
             </Box>

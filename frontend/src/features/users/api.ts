@@ -1,23 +1,23 @@
-import API from "../../services/api";
+import * as userService from "../../services/users.service";
 
-export interface User {
-  _id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  role: string;
-  plan?: string;
-  isActive: boolean;
-  createdAt?: string;
-}
+// ============================================================================
+// API (re-exportar funciones del servicio como acciones del feature)
+// ============================================================================
 
-export const getUsers = async (): Promise<User[]> => {
-  const res = await API.get("/users");
-  // Match the response structure observed in UserPage.tsx
-  return Array.isArray(res.data?.data?.users) ? res.data.data.users : [];
-};
+// 👤 Perfil del usuario actual
+export const fetchMe = userService.getMe;
 
-export const toggleUserStatus = async (id: string, isActive: boolean): Promise<void> => {
-  // Uses the PATCH method to invert the isActive status
-  await API.patch(`/users/${id}`, { isActive: !isActive });
-};
+// 👥 Listado de usuarios
+export const fetchUsers = userService.getUsers;
+
+// 🔍 Usuario individual
+export const fetchUserById = userService.getUserById;
+
+// ✏️ Actualizar usuario
+export const updateUserAction = userService.updateUser;
+
+// ➕ Crear empleado
+export const createEmployeeAction = userService.createEmployee;
+
+// 🔄 Cambiar estado de activación
+export const toggleUserStatusAction = userService.toggleUserActiveState;
