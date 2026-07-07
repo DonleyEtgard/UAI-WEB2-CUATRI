@@ -1,0 +1,848 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Accueil",
+      "about": "À propos",
+      "contact": "Contact",
+      "login": "Connexion",
+      "status": "Système en ligne",
+      "access": "Accéder"
+    },
+
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "users": "Utilisateurs",
+      "customers": "Clients",
+      "products": "Produits",
+      "sales": "Ventes",
+      "payments": "Paiements",
+      "stock": "Stock",
+      "settings": "Paramètres",
+      "audit": "Journal d'audit",
+      "roles": "Rôles",
+      "reports": "Rapports",
+      "subscription": "Abonnement",
+      "logout": "Déconnexion"
+    },
+
+    "navbar": {
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "notifications": "Notifications",
+      "language": "Langue",
+      "theme": "Thème",
+      "logout": "Déconnexion"
+    }
+  },
+
+  "auth": {
+    "professionalERPPlatform": "Plateforme ERP Professionnelle",
+    "emailAddress": "Adresse e-mail",
+    "password": "Mot de passe",
+    "show": "AFFICHER",
+    "hide": "MASQUER",
+    "forgotPassword": "Mot de passe oublié ?",
+    "login": "Se connecter",
+    "processing": "Traitement en cours...",
+    "quickAccess": "Accès rapide",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "createAccount": "Créer un compte",
+
+    "pleaseEnterEmail": "Veuillez saisir votre adresse e-mail",
+    "pleaseEnterPassword": "Veuillez saisir votre mot de passe",
+    "invalidEmail": "Veuillez saisir une adresse e-mail valide",
+    "loginFailed": "Échec de la connexion. Veuillez réessayer.",
+
+    "accountRecovery": "Récupération du compte",
+    "forgotPasswordTitle": "Mot de passe oublié ?",
+    "forgotPasswordSubtitle": "Entrez votre e-mail et nous vous aiderons à revenir.",
+    "sendInstructions": "Envoyer les instructions",
+    "backToLogin": "Retour à la connexion",
+
+    "instructionsSent": "Instructions envoyées !",
+    "instructionsSentMessage": "Vérifiez votre boîte de réception. Nous vous avons envoyé un lien pour réinitialiser votre mot de passe en toute sécurité.",
+
+    "enterYourEmail": "Veuillez saisir votre adresse e-mail."
+  },
+
+   "home": {
+    "heroTitle": "Gérez votre entreprise avec HAITIBIZ",
+    "heroSubtitle": "La plateforme ERP, POS et SaaS complète pour les entreprises modernes.",
+    "getStarted": "Commencer",
+    "learnMore": "En savoir plus",
+
+    "featuresTitle": "Tout ce dont votre entreprise a besoin",
+
+    "feature1Title": "Gestion des ventes",
+    "feature1Description": "Suivez les ventes, les factures et les paiements en temps réel.",
+
+    "feature2Title": "Gestion des stocks",
+    "feature2Description": "Gérez efficacement les produits, les mouvements de stock et les entrepôts.",
+
+    "feature3Title": "Gestion des clients",
+    "feature3Description": "Développez des relations solides avec vos clients et augmentez leur fidélité.",
+
+    "contactUs": "Nous contacter"
+  },
+
+
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "subtitle": "Vue d'ensemble et analyses de l'entreprise",
+    "welcome": "Bon retour !",
+    "totalSales": "Ventes Totales",
+    "totalCustomers": "Clients Totaux",
+    "totalProducts": "Produits Totaux",
+    "totalRevenue": "Revenus Totaux",
+    "salesOverview": "Aperçu des Ventes",
+    "monthlySales": "Ventes Mensuelles",
+    "topProducts": "Meilleurs Produits",
+    "recentActivity": "Activité Récente",
+    "quickActions": "Actions Rapides",
+     "operations": "Opérations",
+  "netProfit": "Bénéfice Net",
+  "totalExpenses": "Dépenses Totales",
+  "todaySales": "Ventes du Jour",
+
+  "incomeVsExpenses": "💵 Revenus vs Dépenses",
+  "dailyIncome": "💰 Revenus Quotidiens",
+  "topCustomersDebt": "💳 Principaux Clients Endettés"
+  },
+
+   "register": {
+      "createProfessionalAccount": "Créez votre compte professionnel",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "emailAddress": "Adresse e-mail",
+      "fullAddress": "Adresse complète",
+      "addressPlaceholder": "123 Nom de la rue",
+      "city": "Ville",
+      "zipCode": "Code postal",
+      "confirmPassword": "Confirmer le mot de passe",
+      "provisioningWorkspace": "Préparation de l'espace de travail...",
+      "registerButton": "Créer un compte",
+      "backToHome": "Retour à l'accueil",
+      "signIn": "Se connecter",
+      "fillRequiredFields": "Veuillez remplir tous les champs obligatoires",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "registrationError": "Échec de l'inscription"
+    },
+
+    "customers":{
+    "detail": {
+      "invalidAmount": "Veuillez saisir un montant valide.",
+      "paymentError": "Une erreur est survenue lors de l'enregistrement du paiement.",
+      "deleteConfirmation": "Supprimer le client ?",
+
+      "loadingProfile": "Chargement du profil...",
+      "customerNotFound": "Client introuvable",
+      "back": "Retour",
+
+      "customerName": "Nom du Client",
+      "active": "Actif",
+      "inactive": "Inactif",
+
+      "edit": "Modifier",
+      "delete": "Supprimer",
+
+      "contactInformation": "Informations de Contact",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "notSpecified": "Non spécifié",
+
+      "debtStatus": "État de la Dette",
+      "debtPaid": "Dette réglée !",
+
+      "additionalInformation": "Informations Complémentaires",
+      "registrationDate": "Date d'Inscription",
+
+      "registerPayment": "Enregistrer un Nouveau Paiement",
+      "paymentAmount": "Montant du Paiement",
+      "processing": "Enregistrement...",
+      "addPayment": "Ajouter un Paiement",
+
+      "paymentHistory": "Historique des Paiements",
+      "noPayments": "Aucun paiement enregistré pour ce client.",
+
+      "initialPayment": "💰 Paiement Initial",
+      "receivedPayment": "💵 Paiement Reçu",
+
+      "remainingBalance": "Solde restant",
+
+      "backToList": "← Retour à la liste"
+    },
+
+     "form": {
+      "editCustomer": "Modifier le client",
+      "newCustomer": "Nouveau client",
+      "subtitle": "Complétez les informations de contact et les préférences du client.",
+
+      "name": "Nom",
+      "namePlaceholder": "Ex. Jean",
+
+      "totalDebt": "Dette totale",
+      "initialPayment": "Paiement initial",
+      "initialPaymentHelper": "L'historique des paiements est géré depuis les détails du client.",
+
+      "email": "Email",
+      "emailPlaceholder": "contact@email.com",
+
+      "phone": "Téléphone",
+      "phonePlaceholder": "+33 ...",
+
+      "address": "Adresse",
+      "addressPlaceholder": "Rue, Ville, etc.",
+
+      "activeCustomer": "Client actif - Autoriser les nouvelles transactions",
+
+      "cancel": "Annuler",
+      "syncing": "Synchronisation...",
+      "updateCustomer": "Mettre à jour le client",
+      "saveCustomer": "Enregistrer le client",
+
+      "loadingCustomerError": "Erreur lors du chargement des données du client",
+      "saveCustomerError": "Erreur lors de l'enregistrement du client"
+    },
+
+     "list": {
+    "title": "Clients",
+    "subtitle": "Gérez votre portefeuille clients et leurs coordonnées.",
+    "newCustomer": "Nouveau client",
+
+    "totalCustomers": "Total des clients",
+    "activeCustomers": "Actifs",
+    "newCustomersMonth": "Nouveaux ce mois-ci",
+
+    "directory": "Répertoire des clients",
+    "noCustomers": "Aucun client",
+    "noCustomersDescription": "Créez votre premier client pour commencer.",
+    "createCustomer": "Créer un client",
+
+    "customer": "Client",
+    "email": "Email",
+    "phone": "Téléphone",
+    "debt": "Dette",
+    "lastPayment": "Dernier paiement",
+    "noPayments": "Aucun paiement",
+
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+
+    "confirmDelete": "Voulez-vous supprimer ce client ?",
+    "deleteError": "Erreur lors de la suppression du client"
+  }
+},
+    
+    "payment":{
+    "payment": {
+    "title": "Abonnement",
+    "premium": "Premium",
+    "subtitle": "Renouvellement et gestion de l'abonnement",
+
+    "plan": "Forfait",
+    "method": "Méthode",
+    "total": "Total",
+
+    "configuration": "Configuration",
+    "selectPlanMethod": "Sélectionnez un forfait et une méthode de paiement",
+
+    "basic": "Basic",
+    "medium": "Medium",
+    "premiumPlan": "Premium",
+
+    "generatePayment": "Générer le paiement",
+    "generating": "Génération...",
+
+    "payment": "Paiement",
+    "scanQr": "Scannez le QR code pour finaliser la transaction",
+
+    "generateToViewQr": "Générez un paiement pour afficher le QR code",
+
+    "paymentVerified": "Une fois le paiement effectué, notre équipe vérifiera la transaction.",
+    "status": "Statut",
+
+    "paymentError": "Erreur lors du traitement du paiement",
+    "generateError": "Erreur lors de la génération du paiement"
+  }
+},
+
+  "products": {
+  "detail": {
+    "notFound": "Produit introuvable",
+    "notFoundDescription": "Ce produit n'existe pas ou a été supprimé.",
+
+    "confirmDelete": "Supprimer le produit ?",
+    "deleteError": "Erreur lors de la suppression du produit",
+
+    "subtitle": "Informations complètes du produit",
+
+    "active": "Actif",
+    "hidden": "Masqué",
+
+    "salePrice": "Prix de Vente",
+    "cost": "Coût",
+    "availableStock": "Stock Disponible",
+
+    "generalInfo": "Informations Générales",
+    "generalInfoDescription": "Données principales du produit",
+
+    "category": "Catégorie",
+    "noCategory": "Sans catégorie",
+
+    "status": "Statut",
+
+    "description": "Description",
+    "noDescription": "Aucune description disponible.",
+
+    "back": "Retour",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+   "form": {
+    "loadError": "Erreur lors du chargement du produit",
+    "saveError": "Erreur lors de l'enregistrement du produit",
+
+    "imageMaxSize": "Chaque image ne peut pas dépasser 5 Mo.",
+    "imagesMaxTotalSize": "La taille totale des images ne peut pas dépasser 10 Mo.",
+
+    "editTitle": "Modifier",
+    "newTitle": "Nouveau",
+    "product": "Produit",
+
+    "subtitle": "Gestion du catalogue et des stocks",
+
+    "gallery": "Galerie d'Images",
+    "galleryDescription": "{{count}} images sélectionnées · {{size}} dans les nouveaux fichiers",
+    "addImages": "Ajouter des Images",
+    "noImages": "Aucune image sélectionnée",
+
+    "currentPrice": "Prix Actuel",
+    "stock": "Stock",
+    "status": "Statut",
+
+    "active": "Actif",
+    "inactive": "Inactif",
+
+    "generalInfo": "Informations Générales",
+    "generalInfoDescription": "Informations de base du produit",
+
+    "name": "Nom",
+    "description": "Description",
+
+    "businessInfo": "Informations Commerciales",
+    "businessInfoDescription": "Prix, stock et catégorie",
+
+    "price": "Prix",
+    "cost": "Coût",
+    "category": "Catégorie",
+
+    "cancel": "Annuler",
+    "saving": "Enregistrement...",
+    "updateProduct": "Mettre à jour le Produit",
+    "createProduct": "Créer un Produit",
+
+    "categories": {
+      "general": "Général",
+      "electronics": "Électronique",
+      "office": "Bureau",
+      "services": "Services",
+      "clothing": "Vêtements",
+      "footwear": "Chaussures",
+      "food": "Alimentation",
+      "beverages": "Boissons",
+      "grocery": "Épicerie",
+      "health": "Santé",
+      "beauty": "Beauté",
+      "home": "Maison",
+      "furniture": "Meubles",
+      "sports": "Sports",
+      "toys": "Jouets",
+      "automotive": "Automobile",
+      "hardware": "Quincaillerie",
+      "construction": "Construction",
+      "books": "Livres",
+      "pets": "Animaux",
+      "jewelry": "Bijoux",
+      "accessories": "Accessoires",
+      "technology": "Technologie",
+      "cleaning": "Nettoyage",
+      "pharmacy": "Pharmacie",
+      "other": "Autres"
+    }
+  },
+   "list": {
+    "confirmDelete": "Voulez-vous supprimer ce produit ?",
+    "deleteError": "Erreur lors de la suppression du produit",
+
+    "title": "Gestion des",
+    "highlight": "Produits",
+    "subtitle": "Gestion de l'inventaire",
+    "newProduct": "Nouveau Produit",
+
+    "totalProducts": "Produits",
+    "lowStock": "Stock Faible",
+    "activeProducts": "Actifs",
+    "inventoryValue": "Valeur du Stock",
+
+    "inventory": "Inventaire",
+    "inventoryDescription": "Liste complète des produits",
+
+    "noProducts": "Aucun produit",
+    "noProductsDescription": "Créez votre premier produit pour commencer à vendre.",
+    "createProduct": "Créer un produit",
+
+    "placeholderImage": "Produit",
+
+    "stock": "Stock",
+
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  }
+},
+"sales": {
+  "detail": {
+    "notFound": "Vente introuvable",
+    "notFoundDescription": "Cette vente n'existe pas ou a été supprimée.",
+
+    "confirmDelete": "Supprimer la vente ?",
+    "delete": "Supprimer",
+
+    "sale": "Vente",
+    "saleInfo": "Informations sur la Vente",
+
+    "total": "Total",
+    "paid": "Payé",
+    "change": "Monnaie rendue",
+    "customer": "Client",
+
+    "subtotal": "Sous-total",
+    "averageItem": "Moyenne/Article",
+    "estimatedProfit": "Bénéfice estimé",
+
+    "products": "Produits de cette Vente",
+    "items": "{{count}} articles",
+
+    "product": "Produit",
+    "quantity": "Quantité",
+    "unitPrice": "Prix Unitaire",
+
+    "placeholderProduct": "Produit",
+
+    "back": "Retour",
+    "viewTicket": "Voir le Ticket"
+  },
+
+   "form": {
+    "completeData": "Veuillez compléter les données",
+    "processError": "Erreur lors du traitement de la vente",
+    "newTransaction": "Nouvelle Transaction",
+    "subtitle": "Sélectionnez un client et ajoutez des produits au panier",
+    "customer": "Client",
+    "selectCustomer": "Sélectionnez un client...",
+    "searchProducts": "Rechercher des Produits",
+    "searchPlaceholder": "Écrivez le nom du produit...",
+    "stock": "Stock",
+    "noMatches": "Aucun produit ne correspond",
+    "typeToSearch": "Écrivez pour rechercher des produits",
+    "saleSummary": "Résumé de la Vente",
+    "items": "articles",
+    "emptyCart": "Le panier est vide",
+    "remove": "Retirer",
+    "subtotal": "Sous-total",
+    "taxes": "Taxes",
+    "total": "Total",
+    "finishSale": "Finaliser la Vente",
+    "cancel": "Annuler"
+  },
+
+   "list": {
+    "reference": "Référence",
+    "customer": "Client",
+    "finalConsumer": "Consommateur final",
+    "date": "Date",
+    "items": "Articles",
+    "pieces": "pcs",
+    "status": "Statut",
+    "total": "Total",
+    "actions": "Actions",
+    "details": "Détails",
+
+    "title": "Gestion des",
+    "highlight": "Ventes",
+    "subtitle": "Tableau opérationnel des transactions",
+
+    "refresh": "Actualiser",
+    "newSale": "Nouvelle vente",
+
+    "totalRevenue": "Revenus totaux",
+    "transactions": "Transactions",
+    "averageTicket": "Ticket moyen",
+    "netProfit": "Bénéfice net",
+    "margin": "Marge %",
+
+    "revenueVsExpenses": "Revenus vs Dépenses",
+    "dailyComparison": "Comparaison quotidienne",
+
+    "revenue": "Revenus",
+    "expenses": "Dépenses",
+
+    "noChartData": "Aucune donnée disponible",
+
+    "activityLog": "Journal d'activité",
+    "activityDescription": "Historique détaillé des transactions",
+
+    "emptyTitle": "Aucune vente enregistrée",
+    "emptyDescription": "Aucune vente n'a encore été enregistrée."
+  },
+
+  "ticket": {
+      "sendWhatsappError": "Erreur lors de l'envoi sur WhatsApp",
+      "sendTelegramError": "Erreur lors de l'envoi sur Telegram",
+
+      "notFound": "Ticket introuvable",
+
+      "title": "Ticket de Vente 🧾",
+
+      "customer": "Client",
+      "finalConsumer": "Consommateur final",
+
+      "seller": "Vendeur",
+      "date": "Date",
+
+      "total": "Total",
+      "paid": "Payé",
+      "change": "Monnaie rendue",
+
+      "method": "Méthode",
+      "status": "Statut",
+
+      "note": "Note",
+
+      "back": "Retour",
+      "print": "Imprimer",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram"
+    }
+  },
+   "stock": {
+    "critical": {
+      "outOfStock": "Rupture de stock",
+      "critical": "Critique",
+      "low": "Faible",
+
+      "title": "Alertes de Stock",
+      "subtitle": "Surveillance des stocks critiques",
+
+      "refresh": "Actualiser",
+
+      "healthyInventory": "Inventaire sain",
+      "healthyInventoryDescription": "Aucun produit n'a actuellement un stock critique.",
+
+      "stock": "STOCK",
+
+      "restock": "Réapprovisionner"
+    },
+     "filter": {
+    "searchPlaceholder": "Rechercher par ID produit...",
+    "filter": "Filtrer",
+    "clear": "Effacer"
+  },
+   "movements": {
+    "noData": "Aucune donnée",
+    "entries": "Entrées",
+    "exits": "Sorties",
+    "title": "Mouvements de Stock",
+    "subtitle": "Gestion des entrées et sorties d'inventaire",
+    "today": "Aujourd'hui",
+    "netBalance": "Solde Net",
+    "stockTrend": "Tendance du Stock",
+    "entriesVsExits": "Entrées vs Sorties",
+    "registeredMovements": "Mouvements Enregistrés",
+    "product": "Produit",
+    "type": "Type",
+    "quantity": "Quantité",
+    "date": "Date",
+    "entry": "Entrée",
+    "exit": "Sortie",
+    "registerMovement": "Enregistrer un Mouvement"
+  },
+  "form": {
+    "success": "Mouvement créé avec succès",
+    "error": "Erreur lors de la création du mouvement",
+
+    "title": "Enregistrer un Mouvement",
+    "subtitle": "Mettez à jour l'inventaire en enregistrant des entrées ou sorties manuelles.",
+
+    "productId": "ID du Produit",
+    "productPlaceholder": "Saisissez ou collez l'ID du produit",
+
+    "operationType": "Type d'Opération",
+    "entry": "Entrée (+)",
+    "exit": "Sortie (-)",
+
+    "quantity": "Quantité",
+
+    "reason": "Motif",
+    "manualAdjustment": "Ajustement Manuel",
+    "sale": "Vente",
+    "purchase": "Achat / Réapprovisionnement",
+
+    "save": "Enregistrer le Mouvement",
+    "cancel": "Annuler"
+  },
+   "summary": {
+    "loading": "Chargement du solde...",
+    "entries": "Entrées",
+    "exits": "Sorties",
+    "balance": "Solde"
+  }
+  },
+  "users": {
+  "detail": {
+    "notFoundTitle": "Utilisateur introuvable",
+    "notFoundDescription": "Cet utilisateur n'existe pas ou a été supprimé.",
+    "personalInfo": "Informations personnelles",
+    "email": "Email",
+    "role": "Rôle",
+    "registerDate": "Date d'inscription",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "edit": "Modifier",
+    "activate": "Activer",
+    "deactivate": "Désactiver",
+    "backToList": "← Retour à la liste",
+    "updateError": "Erreur lors de la mise à jour du statut."
+  },
+
+   "form": {
+      "success": "Mouvement créé avec succès",
+      "error": "Erreur lors de la création du mouvement",
+      "title": "Enregistrer un Mouvement",
+      "subtitle": "Mettez à jour l'inventaire en enregistrant des entrées ou sorties manuelles.",
+      "productId": "ID du Produit",
+      "productPlaceholder": "Saisissez ou collez l'ID du produit",
+      "operationType": "Type d'Opération",
+      "entry": "Entrée (+)",
+      "exit": "Sortie (-)",
+      "quantity": "Quantité",
+      "reason": "Motif",
+      "manualAdjustment": "Ajustement Manuel",
+      "sale": "Vente",
+      "purchase": "Achat / Réapprovisionnement",
+      "save": "Enregistrer le Mouvement",
+      "cancel": "Annuler"
+    },
+     "page": {
+      "confirmDeactivate": "Voulez-vous désactiver cet utilisateur ?",
+      "errorUpdatingStatus": "Erreur lors de la mise à jour du statut de l'utilisateur",
+      "errorUpdatingUser": "Erreur lors de la mise à jour de l'utilisateur",
+
+      "title": "Utilisateurs",
+      "subtitle": "Gestion des utilisateurs, des autorisations et des abonnements.",
+      "newUser": "Nouvel Utilisateur",
+
+      "totalUsers": "Total Utilisateurs",
+      "activeUsers": "Actifs",
+      "admins": "Admins",
+      "employees": "Employés",
+
+      "userList": "Liste des Utilisateurs",
+      "refresh": "Actualiser",
+
+      "noUsers": "Aucun utilisateur",
+      "noUsersDescription": "Créez votre premier utilisateur pour commencer.",
+      "createUser": "Créer un utilisateur",
+
+      "user": "Utilisateur",
+      "email": "Email",
+      "role": "Rôle",
+      "plan": "Abonnement",
+      "status": "Statut",
+      "actions": "Actions",
+
+      "active": "Actif",
+      "inactive": "Inactif",
+
+      "notAvailable": "N/A",
+      "free": "Gratuit",
+
+      "loading": "Chargement..."
+    },
+
+    "forms": {
+    "loadError": "Erreur lors du chargement de l'utilisateur",
+
+    "noPermission": "Vous n'avez pas les autorisations nécessaires",
+    "completeFields": "Veuillez remplir tous les champs",
+    "passwordRequired": "Le mot de passe est obligatoire",
+    "invalidRole": "Vous ne pouvez pas attribuer ce rôle",
+    "selfDisable": "Vous ne pouvez pas désactiver votre propre compte.",
+
+    "updated": "Utilisateur mis à jour",
+    "created": "Utilisateur créé",
+    "updateError": "Erreur lors de la mise à jour de l'utilisateur",
+    "createError": "Erreur lors de la création de l'utilisateur",
+
+    "accessDenied": "Accès refusé",
+    "teamPermission": "Vous n'avez pas la permission de gérer l'équipe.",
+    "back": "Retour",
+
+    "editTitle": "Modifier le Profil",
+    "newTitle": "Nouveau Membre",
+    "subtitle": "Configurez les informations d'accès et les privilèges.",
+
+    "name": "Prénom",
+    "namePlaceholder": "Ex. John",
+
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Ex. Doe",
+
+    "email": "Adresse E-mail",
+    "emailPlaceholder": "john@entreprise.com",
+    "emailHelper": "L'e-mail ne peut pas être modifié",
+
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+
+    "phone": "Téléphone",
+
+    "street": "Rue",
+    "number": "Numéro",
+    "city": "Ville",
+    "state": "Province",
+    "country": "Pays",
+    "postalCode": "Code Postal",
+
+    "adminRole": "Rôle Administratif",
+
+    "superadmin": "Superadmin",
+    "admin": "Administrateur",
+    "employee": "Employé",
+
+    "subscriptionPlan": "Plan d'Abonnement",
+
+    "free": "Free",
+    "basic": "Basic",
+    "medium": "Medium",
+    "premium": "Premium",
+
+    "selfUserActive": "Votre propre compte ne peut pas être désactivé",
+    "userActive": "Utilisateur actif avec accès au système",
+
+    "cancel": "Annuler",
+
+    "saving": "Enregistrement...",
+    "updateUser": "Mettre à Jour l'Utilisateur",
+    "createUser": "Créer l'Utilisateur"
+  },
+
+   "roles": {
+    "loadError": "Erreur lors du chargement des utilisateurs :",
+    "loadUsersError": "Impossible de charger les utilisateurs",
+
+    "updated": "Le rôle de {{name}} a été mis à jour avec succès.",
+    "saveError": "Erreur lors de l'enregistrement du rôle.",
+
+    "loading": "Chargement des utilisateurs...",
+
+    "title": "Gestion des Rôles",
+    "subtitle": "Attribuez des rôles aux utilisateurs pour contrôler leurs autorisations dans le système.",
+
+    "user": "Utilisateur",
+    "role": "Rôle",
+    "action": "Action",
+
+    "employee": "Employé",
+    "client": "Client",
+    "admin": "Administrateur",
+    "superadmin": "Super Admin",
+
+    "save": "Enregistrer"
+  }
+  },
+  "pos": {
+  "page": {
+    "emptyCart": "Le panier est vide",
+    "insufficientPayment": "Paiement insuffisant",
+    "saleSuccess": "Vente réalisée avec succès ✅",
+
+    "title": "Point de Vente",
+    "subtitle": "Gestion des ventes",
+
+    "refresh": "Actualiser",
+
+    "productsCount": "Produits",
+    "itemsCount": "Articles",
+    "total": "Total",
+    "paymentMethod": "Méthode",
+
+    "cash": "Espèces",
+    "card": "Carte",
+    "transfer": "Virement",
+
+    "searchPlaceholder": "Rechercher par nom, catégorie ou prix...",
+
+    "products": "Produits",
+    "productsSubtitle": "Sélectionnez des produits à vendre",
+
+    "stock": "Stock {{count}}",
+
+    "add": "Ajouter",
+
+    "saleDetail": "Détail de la Vente",
+    "articles": "{{count}} articles",
+
+    "remove": "Supprimer",
+
+    "paymentMethodLabel": "Méthode de paiement",
+
+    "amountReceived": "Montant reçu",
+
+    "change": "Monnaie",
+
+    "processing": "Traitement...",
+    "checkout": "Finaliser la Vente • ${{total}}",
+
+    "placeholderImage": "https://placehold.co/400x300?text=Produit"
+  }
+},
+
+"audit": {
+  "page": {
+    "loadError": "Erreur lors du chargement de l'activité",
+
+    "title": "📋 Journal d'Activité",
+    "subtitle": "Audit des actions réalisées par les utilisateurs sur la plateforme.",
+
+    "refresh": "Actualiser",
+
+    "totalLogs": "Total des Enregistrements",
+    "creations": "Créations",
+    "updates": "Mises à jour",
+    "deletions": "Suppressions",
+
+    "systemActivity": "Activité du Système",
+    "eventsList": "Liste complète des événements",
+
+    "errorLoading": "Erreur de chargement",
+
+    "noActivity": "Aucune activité",
+    "noActivityDescription": "Aucun enregistrement à afficher.",
+
+    "user": "Utilisateur",
+    "action": "Action",
+    "details": "Détails",
+    "date": "Date",
+
+    "system": "Système",
+    "notAvailable": "N/A"
+  }
+ }
+}

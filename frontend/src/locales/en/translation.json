@@ -1,0 +1,833 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Home",
+      "about": "About",
+      "contact": "Contact",
+      "login": "Login",
+      "status": "System Online",
+      "access": "Get Access"
+    },
+
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "customers": "Customers",
+      "products": "Products",
+      "sales": "Sales",
+      "payments": "Payments",
+      "stock": "Stock",
+      "settings": "Settings",
+      "audit": "Audit Logs",
+      "roles": "Roles",
+      "reports": "Reports",
+      "subscription": "Subscription",
+      "logout": "Logout"
+    },
+
+    "navbar": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "notifications": "Notifications",
+      "language": "Language",
+      "theme": "Theme",
+      "logout": "Logout"
+    }
+  },
+   "auth": {
+    "professionalERPPlatform": "Professional ERP Platform",
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "show": "SHOW",
+    "hide": "HIDE",
+    "forgotPassword": "Forgot your password?",
+    "login": "Login",
+    "processing": "Processing...",
+    "quickAccess": "Quick Access",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Create account",
+
+    "pleaseEnterEmail": "Please enter your email",
+    "pleaseEnterPassword": "Please enter your password",
+    "invalidEmail": "Please enter a valid email address",
+    "loginFailed": "Login failed. Please try again.",
+
+    "accountRecovery": "Account Recovery",
+    "forgotPasswordTitle": "Forgot your password?",
+    "forgotPasswordSubtitle": "Enter your email and we'll help you get back in.",
+    "sendInstructions": "Send Instructions",
+    "backToLogin": "Back to Login",
+
+    "instructionsSent": "Instructions sent!",
+    "instructionsSentMessage": "Check your inbox. We have sent you a link to securely reset your password.",
+
+    "enterYourEmail": "Please enter your email address."
+  },
+
+  "home": {
+    "heroTitle": "Manage your business with HAITIBIZ",
+    "heroSubtitle": "The complete ERP, POS and SaaS platform for modern companies.",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+
+    "featuresTitle": "Everything your business needs",
+
+    "feature1Title": "Sales Management",
+    "feature1Description": "Track sales, invoices and payments in real time.",
+
+    "feature2Title": "Inventory Control",
+    "feature2Description": "Manage products, stock movements and warehouses efficiently.",
+
+    "feature3Title": "Customer Management",
+    "feature3Description": "Build strong relationships with your customers and increase loyalty.",
+
+    "contactUs": "Contact Us"
+  },
+
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Business overview and analytics",
+    "welcome": "Welcome back!",
+    "totalSales": "Total Sales",
+    "totalCustomers": "Total Customers",
+    "totalProducts": "Total Products",
+    "totalRevenue": "Total Revenue",
+    "salesOverview": "Sales Overview",
+    "monthlySales": "Monthly Sales",
+    "topProducts": "Top Products",
+    "recentActivity": "Recent Activity",
+    "quickActions": "Quick Actions",
+    "operations": "Operations",
+    "netProfit": "Net Profit",
+    "totalExpenses": "Total Expenses",
+    "todaySales": "Today's Sales",
+
+   "incomeVsExpenses": "💵 Income vs Expenses",
+   "dailyIncome": "💰 Daily Income",
+   "topCustomersDebt": "💳 Top Customers by Debt"
+  },
+
+  "register": {
+      "createProfessionalAccount": "Create your professional account",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "emailAddress": "Email Address",
+      "fullAddress": "Full Address",
+      "addressPlaceholder": "123 Street Name",
+      "city": "City",
+      "zipCode": "Zip Code",
+      "confirmPassword": "Confirm Password",
+      "provisioningWorkspace": "Provisioning Workspace...",
+      "registerButton": "Create Account",
+      "backToHome": "Back to Home",
+      "signIn": "Sign In",
+      "fillRequiredFields": "Please fill in all required fields",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "registrationError": "Registration failed"
+    },
+     
+      "customers": {
+     "detail": {
+      "invalidAmount": "Please enter a valid amount.",
+      "paymentError": "An error occurred while registering the payment.",
+      "deleteConfirmation": "Delete customer?",
+
+      "loadingProfile": "Loading profile...",
+      "customerNotFound": "Customer not found",
+      "back": "Back",
+
+      "customerName": "Customer Name",
+      "active": "Active",
+      "inactive": "Inactive",
+
+      "edit": "Edit",
+      "delete": "Delete",
+
+      "contactInformation": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "notSpecified": "Not specified",
+
+      "debtStatus": "Debt Status",
+      "debtPaid": "Debt paid!",
+
+      "additionalInformation": "Additional Information",
+      "registrationDate": "Registration Date",
+
+      "registerPayment": "Register New Payment",
+      "paymentAmount": "Payment Amount",
+      "processing": "Processing...",
+      "addPayment": "Add Payment",
+
+      "paymentHistory": "Payment History",
+      "noPayments": "There are no payments registered for this customer.",
+
+      "initialPayment": "💰 Initial Payment",
+      "receivedPayment": "💵 Payment Received",
+
+      "remainingBalance": "Remaining balance",
+
+      "backToList": "← Back to list"
+    },
+
+     "form": {
+      "editCustomer": "Edit Customer",
+      "newCustomer": "New Customer",
+      "subtitle": "Complete the customer's contact information and preferences.",
+
+      "name": "Name",
+      "namePlaceholder": "Ex. John",
+
+      "totalDebt": "Total Debt",
+      "initialPayment": "Initial Payment",
+      "initialPaymentHelper": "Payment history is managed from the customer details page.",
+
+      "email": "Email",
+      "emailPlaceholder": "contact@email.com",
+
+      "phone": "Phone",
+      "phonePlaceholder": "+1 555 ...",
+
+      "address": "Address",
+      "addressPlaceholder": "Street, City, etc.",
+
+      "activeCustomer": "Active Customer - Enable for new transactions",
+
+      "cancel": "Cancel",
+      "syncing": "Synchronizing...",
+      "updateCustomer": "Update Customer",
+      "saveCustomer": "Save Customer",
+
+      "loadingCustomerError": "Error loading customer data",
+      "saveCustomerError": "Error saving customer"
+    },
+
+    "list":{
+    "title": "Customers",
+    "subtitle": "Manage your customer portfolio and contact information.",
+    "newCustomer": "New Customer",
+
+    "totalCustomers": "Total Customers",
+    "activeCustomers": "Active",
+    "newCustomersMonth": "New This Month",
+
+    "directory": "Customer Directory",
+    "noCustomers": "No customers found",
+    "noCustomersDescription": "Create your first customer to get started.",
+    "createCustomer": "Create Customer",
+
+    "customer": "Customer",
+    "email": "Email",
+    "phone": "Phone",
+    "debt": "Debt",
+    "lastPayment": "Last Payment",
+    "noPayments": "No payments",
+
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+
+    "confirmDelete": "Do you want to delete this customer?",
+    "deleteError": "Error deleting customer"
+  }
+},
+
+ "payment":{
+  "payment": {
+    "title": "Subscription",
+    "premium": "Premium",
+    "subtitle": "Subscription renewal and management",
+
+    "plan": "Plan",
+    "method": "Method",
+    "total": "Total",
+
+    "configuration": "Settings",
+    "selectPlanMethod": "Select a plan and payment method",
+
+    "basic": "Basic",
+    "medium": "Medium",
+    "premiumPlan": "Premium",
+
+    "generatePayment": "Generate Payment",
+    "generating": "Generating...",
+
+    "payment": "Payment",
+    "scanQr": "Scan the QR code to complete the transaction",
+
+    "generateToViewQr": "Generate a payment to view the QR code",
+
+    "paymentVerified": "Once the payment is completed, our team will verify the transaction.",
+    "status": "Status",
+
+    "paymentError": "Error processing payment",
+    "generateError": "Error generating payment"
+  }
+},
+
+  "products": {
+  "detail": {
+    "notFound": "Product not found",
+    "notFoundDescription": "This product does not exist or has been deleted.",
+
+    "confirmDelete": "Delete product?",
+    "deleteError": "Error deleting product",
+
+    "subtitle": "Complete product information",
+
+    "active": "Active",
+    "hidden": "Hidden",
+
+    "salePrice": "Sale Price",
+    "cost": "Cost",
+    "availableStock": "Available Stock",
+
+    "generalInfo": "General Information",
+    "generalInfoDescription": "Main product data",
+
+    "category": "Category",
+    "noCategory": "No category",
+
+    "status": "Status",
+
+    "description": "Description",
+    "noDescription": "No description available.",
+
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "form": {
+    "loadError": "Error loading product",
+    "saveError": "Error saving product",
+
+    "imageMaxSize": "Each image cannot exceed 5 MB.",
+    "imagesMaxTotalSize": "The total size of images cannot exceed 10 MB.",
+
+    "editTitle": "Edit",
+    "newTitle": "New",
+    "product": "Product",
+
+    "subtitle": "Catalog and inventory management",
+
+    "gallery": "Image Gallery",
+    "galleryDescription": "{{count}} images selected · {{size}} in new files",
+    "addImages": "Add Images",
+    "noImages": "No images selected",
+
+    "currentPrice": "Current Price",
+    "stock": "Stock",
+    "status": "Status",
+
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "generalInfo": "General Information",
+    "generalInfoDescription": "Basic product information",
+
+    "name": "Name",
+    "description": "Description",
+
+    "businessInfo": "Business Information",
+    "businessInfoDescription": "Prices, stock and category",
+
+    "price": "Price",
+    "cost": "Cost",
+    "category": "Category",
+
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "updateProduct": "Update Product",
+    "createProduct": "Create Product",
+
+    "categories": {
+      "general": "General",
+      "electronics": "Electronics",
+      "office": "Office",
+      "services": "Services",
+      "clothing": "Clothing",
+      "footwear": "Footwear",
+      "food": "Food",
+      "beverages": "Beverages",
+      "grocery": "Grocery",
+      "health": "Health",
+      "beauty": "Beauty",
+      "home": "Home",
+      "furniture": "Furniture",
+      "sports": "Sports",
+      "toys": "Toys",
+      "automotive": "Automotive",
+      "hardware": "Hardware",
+      "construction": "Construction",
+      "books": "Books",
+      "pets": "Pets",
+      "jewelry": "Jewelry",
+      "accessories": "Accessories",
+      "technology": "Technology",
+      "cleaning": "Cleaning",
+      "pharmacy": "Pharmacy",
+      "other": "Other"
+    }
+    
+  },
+
+  "list": {
+    "confirmDelete": "Do you want to delete this product?",
+    "deleteError": "Error deleting product",
+
+    "title": "Product",
+    "highlight": "Management",
+    "subtitle": "Inventory management",
+    "newProduct": "New Product",
+
+    "totalProducts": "Products",
+    "lowStock": "Low Stock",
+    "activeProducts": "Active",
+    "inventoryValue": "Inventory Value",
+
+    "inventory": "Inventory",
+    "inventoryDescription": "Complete product list",
+
+    "noProducts": "No products",
+    "noProductsDescription": "Create your first product to start selling.",
+    "createProduct": "Create Product",
+
+    "placeholderImage": "Product",
+
+    "stock": "Stock",
+
+    "edit": "Edit",
+    "delete": "Delete"
+  }
+},
+"sales": {
+  "detail": {
+    "notFound": "Sale not found",
+    "notFoundDescription": "This sale does not exist or has been deleted.",
+
+    "confirmDelete": "Delete sale?",
+    "delete": "Delete",
+
+    "sale": "Sale",
+    "saleInfo": "Sale Information",
+
+    "total": "Total",
+    "paid": "Paid",
+    "change": "Change",
+    "customer": "Customer",
+
+    "subtotal": "Subtotal",
+    "averageItem": "Average/Item",
+    "estimatedProfit": "Estimated Profit",
+
+    "products": "Products in this Sale",
+    "items": "{{count}} items",
+
+    "product": "Product",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+
+    "placeholderProduct": "Product",
+
+    "back": "Back",
+    "viewTicket": "View Receipt"
+  },
+  "form": {
+    "completeData": "Complete all required data",
+    "processError": "Error processing sale",
+
+    "newTransaction": "New Transaction",
+    "subtitle": "Select a customer and add products to the cart",
+
+    "customer": "Customer",
+    "selectCustomer": "Select a customer...",
+
+    "searchProducts": "Search Products",
+    "searchPlaceholder": "Type the product name...",
+
+    "stock": "Stock",
+
+    "noMatches": "No matching products found",
+    "typeToSearch": "Type to search products",
+
+    "saleSummary": "Sale Summary",
+    "items": "items",
+    "emptyCart": "The cart is empty",
+
+    "remove": "Remove",
+
+    "subtotal": "Subtotal",
+    "taxes": "Taxes",
+    "total": "Total",
+
+    "finishSale": "Complete Sale",
+    "cancel": "Cancel"
+  },
+
+  "list": {
+    "reference": "Reference",
+    "customer": "Customer",
+    "finalConsumer": "Final Consumer",
+    "date": "Date",
+    "items": "Items",
+    "pieces": "pcs",
+    "status": "Status",
+    "total": "Total",
+    "actions": "Actions",
+    "details": "Details",
+
+    "title": "Sales",
+    "highlight": "Management",
+    "subtitle": "Transaction operations dashboard",
+
+    "refresh": "Refresh",
+    "newSale": "New Sale",
+
+    "totalRevenue": "Total Revenue",
+    "transactions": "Transactions",
+    "averageTicket": "Average Ticket",
+    "netProfit": "Net Profit",
+    "margin": "Margin %",
+
+    "revenueVsExpenses": "Revenue vs Expenses",
+    "dailyComparison": "Daily comparison",
+
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+
+    "noChartData": "No data available",
+
+    "activityLog": "Activity Log",
+    "activityDescription": "Detailed transaction history",
+
+    "emptyTitle": "No sales records",
+    "emptyDescription": "There are no registered sales yet."
+  },
+
+  "ticket": {
+      "sendWhatsappError": "Error sending WhatsApp message",
+      "sendTelegramError": "Error sending Telegram message",
+
+      "notFound": "Ticket not found",
+
+      "title": "Sales Receipt 🧾",
+
+      "customer": "Customer",
+      "finalConsumer": "Final Consumer",
+
+      "seller": "Seller",
+      "date": "Date",
+
+      "total": "Total",
+      "paid": "Paid",
+      "change": "Change",
+
+      "method": "Method",
+      "status": "Status",
+
+      "note": "Note",
+
+      "back": "Back",
+      "print": "Print",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram"
+    }
+  },
+
+   "stock": {
+    "critical": {
+      "outOfStock": "Out of Stock",
+      "critical": "Critical",
+      "low": "Low",
+
+      "title": "Stock Alerts",
+      "subtitle": "Critical inventory monitoring",
+
+      "refresh": "Refresh",
+
+      "healthyInventory": "Healthy Inventory",
+      "healthyInventoryDescription": "There are currently no products with critical stock levels.",
+
+      "stock": "STOCK",
+
+      "restock": "Restock"
+    },
+    "filter": {
+    "searchPlaceholder": "Search by product ID...",
+    "filter": "Filter",
+    "clear": "Clear"
+  },
+
+   "movements": {
+    "noData": "No data",
+    "entries": "Entries",
+    "exits": "Exits",
+    "title": "Stock Movements",
+    "subtitle": "Inventory inbound and outbound management",
+    "today": "Today",
+    "netBalance": "Net Balance",
+    "stockTrend": "Stock Trend",
+    "entriesVsExits": "Entries vs Exits",
+    "registeredMovements": "Registered Movements",
+    "product": "Product",
+    "type": "Type",
+    "quantity": "Quantity",
+    "date": "Date",
+    "entry": "Entry",
+    "exit": "Exit",
+    "registerMovement": "Register Movement"
+  },
+  "summary": {
+    "loading": "Loading balance...",
+    "entries": "Entries",
+    "exits": "Exits",
+    "balance": "Balance"
+  }
+  },
+  "users": {
+  "detail": {
+    "notFoundTitle": "User not found",
+    "notFoundDescription": "This user does not exist or was deleted.",
+    "personalInfo": "Personal Information",
+    "email": "Email",
+    "role": "Role",
+    "registerDate": "Registration Date",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "edit": "Edit",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "backToList": "← Back to list",
+    "updateError": "Error updating user status."
+  },
+    "form": {
+      "success": "Movement created successfully",
+      "error": "Error creating movement",
+      "title": "Register Movement",
+      "subtitle": "Update inventory by registering manual entries or exits.",
+      "productId": "Product ID",
+      "productPlaceholder": "Type or paste the product ID",
+      "operationType": "Operation Type",
+      "entry": "Entry (+)",
+      "exit": "Exit (-)",
+      "quantity": "Quantity",
+      "reason": "Reason",
+      "manualAdjustment": "Manual Adjustment",
+      "sale": "Sale",
+      "purchase": "Purchase / Restocking",
+      "save": "Save Movement",
+      "cancel": "Cancel"
+    },
+    "page": {
+      "confirmDeactivate": "Do you want to deactivate this user?",
+      "errorUpdatingStatus": "Error updating user status",
+      "errorUpdatingUser": "Error updating user",
+
+      "title": "Users",
+      "subtitle": "User, permissions and subscriptions management.",
+      "newUser": "New User",
+
+      "totalUsers": "Total Users",
+      "activeUsers": "Active",
+      "admins": "Admins",
+      "employees": "Employees",
+
+      "userList": "User List",
+      "refresh": "Refresh",
+
+      "noUsers": "No users found",
+      "noUsersDescription": "Create your first user to get started.",
+      "createUser": "Create User",
+
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "plan": "Plan",
+      "status": "Status",
+      "actions": "Actions",
+
+      "active": "Active",
+      "inactive": "Inactive",
+
+      "notAvailable": "N/A",
+      "free": "Free",
+
+      "loading": "Loading..."
+    },
+
+    "forms": {
+    "loadError": "Error loading user",
+
+    "noPermission": "You do not have permission",
+    "completeFields": "Complete all fields",
+    "passwordRequired": "Password is required",
+    "invalidRole": "You cannot assign this role",
+    "selfDisable": "You cannot deactivate your own user.",
+
+    "updated": "User updated",
+    "created": "User created",
+    "updateError": "Error updating user",
+    "createError": "Error creating user",
+
+    "accessDenied": "Access Denied",
+    "teamPermission": "You do not have permission to manage the team.",
+    "back": "Back",
+
+    "editTitle": "Edit Profile",
+    "newTitle": "New Team Member",
+    "subtitle": "Configure access information and privileges.",
+
+    "name": "First Name",
+    "namePlaceholder": "e.g. John",
+
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "e.g. Doe",
+
+    "email": "Email Address",
+    "emailPlaceholder": "john@company.com",
+    "emailHelper": "Email cannot be modified",
+
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+
+    "phone": "Phone",
+
+    "street": "Street",
+    "number": "Number",
+    "city": "City",
+    "state": "State",
+    "country": "Country",
+    "postalCode": "Postal Code",
+
+    "adminRole": "Administrative Role",
+
+    "superadmin": "Superadmin",
+    "admin": "Administrator",
+    "employee": "Employee",
+
+    "subscriptionPlan": "Subscription Plan",
+
+    "free": "Free",
+    "basic": "Basic",
+    "medium": "Medium",
+    "premium": "Premium",
+
+    "selfUserActive": "Your own account cannot be disabled",
+    "userActive": "User is active and has system access",
+
+    "cancel": "Cancel",
+
+    "saving": "Saving...",
+    "updateUser": "Update User",
+    "createUser": "Create User"
+  },
+
+   "roles": {
+    "loadError": "Error loading users:",
+    "loadUsersError": "Users could not be loaded",
+
+    "updated": "{{name}}'s role was updated successfully.",
+    "saveError": "Error saving role.",
+
+    "loading": "Loading users...",
+
+    "title": "Role Management",
+    "subtitle": "Assign roles to users to control their permissions within the system.",
+
+    "user": "User",
+    "role": "Role",
+    "action": "Action",
+
+    "employee": "Employee",
+    "client": "Client",
+    "admin": "Administrator",
+    "superadmin": "Super Admin",
+
+    "save": "Save"
+  }
+  },
+
+  "pos": {
+  "page": {
+    "emptyCart": "The cart is empty",
+    "insufficientPayment": "Insufficient payment",
+    "saleSuccess": "Sale completed successfully ✅",
+
+    "title": "Point of Sale",
+    "subtitle": "Sales management",
+
+    "refresh": "Refresh",
+
+    "productsCount": "Products",
+    "itemsCount": "Items",
+    "total": "Total",
+    "paymentMethod": "Method",
+
+    "cash": "Cash",
+    "card": "Card",
+    "transfer": "Transfer",
+
+    "searchPlaceholder": "Search by name, category or price...",
+
+    "products": "Products",
+    "productsSubtitle": "Select products to sell",
+
+    "stock": "Stock {{count}}",
+
+    "add": "Add",
+
+    "saleDetail": "Sale Details",
+    "articles": "{{count}} items",
+
+    "remove": "Remove",
+
+    "paymentMethodLabel": "Payment Method",
+
+    "amountReceived": "Amount Received",
+
+    "change": "Change",
+
+    "processing": "Processing...",
+    "checkout": "Complete Sale • ${{total}}",
+
+    "placeholderImage": "https://placehold.co/400x300?text=Product"
+  }
+ },
+ "audit": {
+  "page": {
+    "loadError": "Error loading activity",
+
+    "title": "📋 Activity Log",
+    "subtitle": "Audit of actions performed by users on the platform.",
+
+    "refresh": "Refresh",
+
+    "totalLogs": "Total Logs",
+    "creations": "Creations",
+    "updates": "Updates",
+    "deletions": "Deletions",
+
+    "systemActivity": "System Activity",
+    "eventsList": "Complete event list",
+
+    "errorLoading": "Loading Error",
+
+    "noActivity": "No Activity",
+    "noActivityDescription": "There are no records to display.",
+
+    "user": "User",
+    "action": "Action",
+    "details": "Details",
+    "date": "Date",
+
+    "system": "System",
+    "notAvailable": "N/A"
+  }
+}
+}

@@ -1,0 +1,840 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Akèy",
+      "about": "Konsènan",
+      "contact": "Kontak",
+      "login": "Konekte",
+      "status": "Sistèm nan anliy",
+      "access": "Aksede"
+    },
+
+    "sidebar": {
+      "dashboard": "Tablo Kontwòl",
+      "users": "Itilizatè yo",
+      "customers": "Kliyan yo",
+      "products": "Pwodwi yo",
+      "sales": "Vant yo",
+      "payments": "Peman yo",
+      "stock": "Envantè",
+      "settings": "Paramèt",
+      "audit": "Jounal Odit",
+      "roles": "Wòl",
+      "reports": "Rapò",
+      "subscription": "Abònman",
+      "logout": "Dekonekte"
+    },
+
+    "navbar": {
+      "profile": "Pwofil",
+      "settings": "Paramèt",
+      "notifications": "Notifikasyon",
+      "language": "Lang",
+      "theme": "Tèm",
+      "logout": "Dekonekte"
+    }
+  },
+  "auth": {
+    "professionalERPPlatform": "Platfòm ERP Pwofesyonèl",
+    "emailAddress": "Adrès Imèl",
+    "password": "Modpas",
+    "show": "MONTRE",
+    "hide": "KACHE",
+    "forgotPassword": "Ou bliye modpas ou?",
+    "login": "Konekte",
+    "processing": "Ap trete...",
+    "quickAccess": "Aksè Rapid",
+    "dontHaveAccount": "Ou poko gen yon kont?",
+    "createAccount": "Kreye yon kont",
+
+    "pleaseEnterEmail": "Tanpri antre imèl ou",
+    "pleaseEnterPassword": "Tanpri antre modpas ou",
+    "invalidEmail": "Tanpri antre yon adrès imèl ki valab",
+    "loginFailed": "Koneksyon echwe. Tanpri eseye ankò.",
+
+    "accountRecovery": "Rekiperasyon Kont",
+    "forgotPasswordTitle": "Ou bliye modpas ou?",
+    "forgotPasswordSubtitle": "Antre imèl ou epi n ap ede w retounen.",
+    "sendInstructions": "Voye Enstriksyon yo",
+    "backToLogin": "Retounen nan Login",
+
+    "instructionsSent": "Enstriksyon yo voye!",
+    "instructionsSentMessage": "Tcheke bwat resepsyon ou. Nou voye yon lyen pou ede w retabli modpas ou an sekirite.",
+
+    "enterYourEmail": "Tanpri antre adrès imèl ou."
+  },
+
+  "home": {
+    "heroTitle": "Jere biznis ou ak HaitiBiz",
+    "heroSubtitle": "Platfòm ERP, POS ak SaaS konplè pou antrepriz modèn yo.",
+    "getStarted": "Kòmanse",
+    "learnMore": "Aprann plis",
+
+    "featuresTitle": "Tout sa biznis ou bezwen",
+
+    "feature1Title": "Jesyon Vant",
+    "feature1Description": "Swiv vant, fakti ak peman an tan reyèl.",
+
+    "feature2Title": "Jesyon Envantè",
+    "feature2Description": "Jere pwodwi, mouvman stock ak depo yo avèk efikasite.",
+
+    "feature3Title": "Jesyon Kliyan",
+    "feature3Description": "Kreye bon relasyon ak kliyan yo epi ogmante fidelite yo.",
+
+    "contactUs": "Kontakte Nou"
+  },
+
+  "dashboard": {
+    "title": "Tablo Kontwòl",
+    "subtitle": "Rezime ak analiz biznis la",
+    "welcome": "Byenveni ankò!",
+    "totalSales": "Total Vant",
+    "totalCustomers": "Total Kliyan",
+    "totalProducts": "Total Pwodwi",
+    "totalRevenue": "Total Revni",
+    "salesOverview": "Rezime Vant yo",
+    "monthlySales": "Vant Chak Mwa",
+    "topProducts": "Pwodwi Ki Pi Bon Yo",
+    "recentActivity": "Aktivite Resan",
+    "quickActions": "Aksyon Rapid",
+      "operations": "Operasyon",
+    "netProfit": "Pwofi Nèt",
+    "totalExpenses": "Depans Total",
+    "todaySales": "Vant Jodi a",
+
+    "incomeVsExpenses": "💵 Revni kont Depans",
+    "dailyIncome": "💰 Revni Chak Jou",
+    "topCustomersDebt": "💳 Pi Gwo Kliyan ki Gen Dèt"
+  },
+
+  "register": {
+      "createProfessionalAccount": "Kreye kont pwofesyonèl ou",
+      "firstName": "Prenon",
+      "lastName": "Non fanmi",
+      "emailAddress": "Adrès imèl",
+      "fullAddress": "Adrès konplè",
+      "addressPlaceholder": "123 Non lari a",
+      "city": "Vil",
+      "zipCode": "Kòd postal",
+      "confirmPassword": "Konfime modpas",
+      "provisioningWorkspace": "Ap prepare espas travay la...",
+      "registerButton": "Kreye kont",
+      "backToHome": "Retounen nan paj dakèy",
+      "signIn": "Konekte",
+      "fillRequiredFields": "Tanpri ranpli tout chan obligatwa yo",
+      "passwordsDoNotMatch": "Modpas yo pa menm",
+      "registrationError": "Enskripsyon an echwe"
+    },
+
+    "customers":{
+    "detail": {
+      "invalidAmount": "Antre yon montan ki valab.",
+      "paymentError": "Te gen yon erè pandan anrejistreman peman an.",
+      "deleteConfirmation": "Efase kliyan an?",
+
+      "loadingProfile": "Ap chaje pwofil la...",
+      "customerNotFound": "Kliyan pa jwenn",
+      "back": "Retounen",
+
+      "customerName": "Non Kliyan an",
+      "active": "Aktif",
+      "inactive": "Pa aktif",
+
+      "edit": "Modifye",
+      "delete": "Efase",
+
+      "contactInformation": "Enfòmasyon Kontak",
+      "email": "Imèl",
+      "phone": "Telefòn",
+      "address": "Adrès",
+      "notSpecified": "Pa espesifye",
+
+      "debtStatus": "Eta Dèt la",
+      "debtPaid": "Dèt la peye!",
+
+      "additionalInformation": "Lòt Enfòmasyon",
+      "registrationDate": "Dat Enskripsyon",
+
+      "registerPayment": "Anrejistre Nouvo Peman",
+      "paymentAmount": "Montan Peman an",
+      "processing": "Ap anrejistre...",
+      "addPayment": "Ajoute Peman",
+
+      "paymentHistory": "Istwa Peman yo",
+      "noPayments": "Pa gen okenn peman anrejistre pou kliyan sa a.",
+
+      "initialPayment": "💰 Premye Peman",
+      "receivedPayment": "💵 Peman Resevwa",
+
+      "remainingBalance": "Rès balans lan",
+
+      "backToList": "← Retounen sou lis la"
+    },
+
+    "form": {
+      "editCustomer": "Modifye Kliyan",
+      "newCustomer": "Nouvo Kliyan",
+      "subtitle": "Ranpli enfòmasyon kontak ak preferans kliyan an.",
+
+      "name": "Non",
+      "namePlaceholder": "Eg. Jan",
+
+      "totalDebt": "Dèt Total",
+      "initialPayment": "Premye Peman",
+      "initialPaymentHelper": "Istwa peman yo jere depi nan detay kliyan an.",
+
+      "email": "Imèl",
+      "emailPlaceholder": "contact@email.com",
+
+      "phone": "Telefòn",
+      "phonePlaceholder": "+509 ...",
+
+      "address": "Adrès",
+      "addressPlaceholder": "Lari, Vil, elatriye.",
+
+      "activeCustomer": "Kliyan Aktif - Pèmèt nouvo tranzaksyon yo",
+
+      "cancel": "Anile",
+      "syncing": "Ap senkronize...",
+      "updateCustomer": "Mete Kliyan an Ajou",
+      "saveCustomer": "Sove Kliyan an",
+
+      "loadingCustomerError": "Erè pandan chajman done kliyan an",
+      "saveCustomerError": "Erè pandan anrejistreman kliyan an"
+    },
+
+    "list": {
+    "title": "Kliyan",
+    "subtitle": "Jere lis kliyan ou yo ak enfòmasyon kontak yo.",
+    "newCustomer": "Nouvo Kliyan",
+
+    "totalCustomers": "Total Kliyan",
+    "activeCustomers": "Aktif",
+    "newCustomersMonth": "Nouvo mwa sa a",
+
+    "directory": "Repètwa Kliyan",
+    "noCustomers": "Pa gen kliyan",
+    "noCustomersDescription": "Kreye premye kliyan ou pou kòmanse.",
+    "createCustomer": "Kreye kliyan",
+
+    "customer": "Kliyan",
+    "email": "Imèl",
+    "phone": "Telefòn",
+    "debt": "Dèt",
+    "lastPayment": "Dènye Peman",
+    "noPayments": "Pa gen peman",
+
+    "status": "Estati",
+    "active": "Aktif",
+    "inactive": "Pa aktif",
+
+    "actions": "Aksyon",
+    "edit": "Modifye",
+    "delete": "Efase",
+
+    "confirmDelete": "Èske ou vle efase kliyan sa a?",
+    "deleteError": "Erè pandan efasman kliyan an"
+  }
+},
+     "payment":{
+    "payment": {
+    "title": "Abònman",
+    "premium": "Premium",
+    "subtitle": "Renouvèlman ak jesyon abònman",
+
+    "plan": "Plan",
+    "method": "Metòd",
+    "total": "Total",
+
+    "configuration": "Konfigirasyon",
+    "selectPlanMethod": "Chwazi yon plan ak yon metòd peman",
+
+    "basic": "Basic",
+    "medium": "Medium",
+    "premiumPlan": "Premium",
+
+    "generatePayment": "Jenere Peman",
+    "generating": "Ap jenere...",
+
+    "payment": "Peman",
+    "scanQr": "Eskane QR la pou fini tranzaksyon an",
+
+    "generateToViewQr": "Jenere yon peman pou wè QR la",
+
+    "paymentVerified": "Lè peman an fin fèt, ekip nou an ap verifye tranzaksyon an.",
+    "status": "Estati",
+
+    "paymentError": "Erè pandan pwosesis peman an",
+    "generateError": "Erè pandan jenerasyon peman an"
+  }
+},
+
+  "products": {
+  "detail": {
+    "notFound": "Pwodwi pa jwenn",
+    "notFoundDescription": "Pwodwi sa a pa egziste oswa li te efase.",
+
+    "confirmDelete": "Efase pwodwi a?",
+    "deleteError": "Erè pandan efasman pwodwi a",
+
+    "subtitle": "Enfòmasyon konplè sou pwodwi a",
+
+    "active": "Aktif",
+    "hidden": "Kache",
+
+    "salePrice": "Pri Vant",
+    "cost": "Pri Achte",
+    "availableStock": "Stock Disponib",
+
+    "generalInfo": "Enfòmasyon Jeneral",
+    "generalInfoDescription": "Done prensipal pwodwi a",
+
+    "category": "Kategori",
+    "noCategory": "Pa gen kategori",
+
+    "status": "Estati",
+
+    "description": "Deskripsyon",
+    "noDescription": "Pa gen deskripsyon disponib.",
+
+    "back": "Retounen",
+    "edit": "Modifye",
+    "delete": "Efase"
+  },
+
+   "form": {
+    "loadError": "Erè pandan chajman pwodwi a",
+    "saveError": "Erè pandan anrejistreman pwodwi a",
+
+    "imageMaxSize": "Chak imaj pa dwe depase 5 MB.",
+    "imagesMaxTotalSize": "Total imaj yo pa dwe depase 10 MB.",
+
+    "editTitle": "Modifye",
+    "newTitle": "Nouvo",
+    "product": "Pwodwi",
+
+    "subtitle": "Jesyon katalòg ak envantè",
+
+    "gallery": "Galri Imaj",
+    "galleryDescription": "{{count}} imaj chwazi · {{size}} nan nouvo fichye yo",
+    "addImages": "Ajoute Imaj",
+    "noImages": "Pa gen imaj chwazi",
+
+    "currentPrice": "Pri Aktyèl",
+    "stock": "Stock",
+    "status": "Estati",
+
+    "active": "Aktif",
+    "inactive": "Enaktif",
+
+    "generalInfo": "Enfòmasyon Jeneral",
+    "generalInfoDescription": "Enfòmasyon debaz sou pwodwi a",
+
+    "name": "Non",
+    "description": "Deskripsyon",
+
+    "businessInfo": "Enfòmasyon Komèsyal",
+    "businessInfoDescription": "Pri, stock ak kategori",
+
+    "price": "Pri",
+    "cost": "Pri Achte",
+    "category": "Kategori",
+
+    "cancel": "Anile",
+    "saving": "Ap anrejistre...",
+    "updateProduct": "Mete Pwodwi a Ajou",
+    "createProduct": "Kreye Pwodwi",
+
+    "categories": {
+      "general": "Jeneral",
+      "electronics": "Elektwonik",
+      "office": "Biwo",
+      "services": "Sèvis",
+      "clothing": "Rad",
+      "footwear": "Soulye",
+      "food": "Manje",
+      "beverages": "Bwason",
+      "grocery": "Makèt",
+      "health": "Sante",
+      "beauty": "Bote",
+      "home": "Kay",
+      "furniture": "Mèb",
+      "sports": "Espò",
+      "toys": "Jwèt",
+      "automotive": "Otomobil",
+      "hardware": "Materyo",
+      "construction": "Konstriksyon",
+      "books": "Liv",
+      "pets": "Bèt Kay",
+      "jewelry": "Bijou",
+      "accessories": "Akseswa",
+      "technology": "Teknoloji",
+      "cleaning": "Netwayaj",
+      "pharmacy": "Famasi",
+      "other": "Lòt"
+    }
+  },
+  "list": {
+    "confirmDelete": "Èske ou vle efase pwodwi sa a?",
+    "deleteError": "Erè pandan efasman pwodwi a",
+
+    "title": "Jesyon",
+    "highlight": "Pwodwi yo",
+    "subtitle": "Jesyon envantè",
+    "newProduct": "Nouvo Pwodwi",
+
+    "totalProducts": "Pwodwi",
+    "lowStock": "Stock Ba",
+    "activeProducts": "Aktif",
+    "inventoryValue": "Valè Envantè",
+
+    "inventory": "Envantè",
+    "inventoryDescription": "Lis konplè pwodwi yo",
+
+    "noProducts": "Pa gen pwodwi",
+    "noProductsDescription": "Kreye premye pwodwi ou pou kòmanse vann.",
+    "createProduct": "Kreye pwodwi",
+
+    "placeholderImage": "Pwodwi",
+
+    "stock": "Stock",
+
+    "edit": "Modifye",
+    "delete": "Efase"
+  }
+},
+
+"sales": {
+  "detail": {
+    "notFound": "Vant lan pa jwenn",
+    "notFoundDescription": "Vant sa a pa egziste oswa li te efase.",
+
+    "confirmDelete": "Efase vant lan?",
+    "delete": "Efase",
+
+    "sale": "Vant",
+    "saleInfo": "Enfòmasyon sou Vant lan",
+
+    "total": "Total",
+    "paid": "Peye",
+    "change": "Lajan Retounen",
+    "customer": "Kliyan",
+
+    "subtotal": "Sou-total",
+    "averageItem": "Mwayèn/Atik",
+    "estimatedProfit": "Pwofi Estime",
+
+    "products": "Pwodwi nan Vant sa a",
+    "items": "{{count}} atik",
+
+    "product": "Pwodwi",
+    "quantity": "Kantite",
+    "unitPrice": "Pri Inite",
+
+    "placeholderProduct": "Pwodwi",
+
+    "back": "Retounen",
+    "viewTicket": "Gade Tikè a"
+  },
+  
+  "form": {
+    "completeData": "Ranpli tout enfòmasyon yo",
+    "processError": "Erè pandan pwosesis vant lan",
+
+    "newTransaction": "Nouvo Tranzaksyon",
+    "subtitle": "Chwazi yon kliyan epi ajoute pwodwi nan panyen an",
+
+    "customer": "Kliyan",
+    "selectCustomer": "Chwazi yon kliyan...",
+
+    "searchProducts": "Chèche Pwodwi",
+    "searchPlaceholder": "Ekri non pwodwi a...",
+
+    "stock": "Stock",
+
+    "noMatches": "Pa gen pwodwi ki koresponn",
+    "typeToSearch": "Ekri pou chèche pwodwi",
+
+    "saleSummary": "Rezime Vant lan",
+    "items": "atik",
+    "emptyCart": "Panyen an vid",
+
+    "remove": "Retire",
+
+    "subtotal": "Sou-total",
+    "taxes": "Taks",
+    "total": "Total",
+
+    "finishSale": "Finalize Vant lan",
+    "cancel": "Anile"
+  },
+
+  "list": {
+    "reference": "Referans",
+    "customer": "Kliyan",
+    "finalConsumer": "Konsomatè final",
+    "date": "Dat",
+    "items": "Atik",
+    "pieces": "moso",
+    "status": "Estati",
+    "total": "Total",
+    "actions": "Aksyon",
+    "details": "Detay",
+
+    "title": "Jesyon",
+    "highlight": "Vant yo",
+    "subtitle": "Tablo operasyon tranzaksyon yo",
+
+    "refresh": "Mete ajou",
+    "newSale": "Nouvo Vant",
+
+    "totalRevenue": "Revni Total",
+    "transactions": "Tranzaksyon",
+    "averageTicket": "Tikè Mwayèn",
+    "netProfit": "Pwofi Nèt",
+    "margin": "Maj %",
+
+    "revenueVsExpenses": "Revni kont Depans",
+    "dailyComparison": "Konparezon chak jou",
+
+    "revenue": "Revni",
+    "expenses": "Depans",
+
+    "noChartData": "Pa gen done disponib",
+
+    "activityLog": "Dosye Aktivite",
+    "activityDescription": "Istwa detaye tranzaksyon yo",
+
+    "emptyTitle": "Pa gen dosye vant",
+    "emptyDescription": "Pa gen okenn vant ki anrejistre ankò."
+  },
+
+   "ticket": {
+      "sendWhatsappError": "Erè pandan voye WhatsApp",
+      "sendTelegramError": "Erè pandan voye Telegram",
+
+      "notFound": "Tikè a pa jwenn",
+
+      "title": "Tikè Vant 🧾",
+
+      "customer": "Kliyan",
+      "finalConsumer": "Konsomatè Final",
+
+      "seller": "Vandè",
+      "date": "Dat",
+
+      "total": "Total",
+      "paid": "Peye",
+      "change": "Lajan Retounen",
+
+      "method": "Metòd",
+      "status": "Estati",
+
+      "note": "Nòt",
+
+      "back": "Retounen",
+      "print": "Enprime",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram"
+    }
+  },
+
+  "stock": {
+    "critical": {
+      "outOfStock": "Pa gen stock",
+      "critical": "Kritik",
+      "low": "Ba",
+
+      "title": "Alèt Stock",
+      "subtitle": "Siveyans envantè kritik",
+
+      "refresh": "Mete ajou",
+
+      "healthyInventory": "Envantè an bon eta",
+      "healthyInventoryDescription": "Pa gen pwodwi ki gen stock kritik kounye a.",
+
+      "stock": "STOCK",
+
+      "restock": "Reapwovizyone"
+    },
+      "filter": {
+    "searchPlaceholder": "Chèche pa ID pwodwi...",
+    "filter": "Filtre",
+    "clear": "Netwaye"
+  },
+
+  "movements": {
+    "noData": "Pa gen done",
+    "entries": "Antre",
+    "exits": "Sòti",
+    "title": "Mouvman Stock",
+    "subtitle": "Jesyon antre ak sòti envantè",
+    "today": "Jodi a",
+    "netBalance": "Balans Nèt",
+    "stockTrend": "Tandans Stock",
+    "entriesVsExits": "Antre vs Sòti",
+    "registeredMovements": "Mouvman Anrejistre",
+    "product": "Pwodwi",
+    "type": "Kalite",
+    "quantity": "Kantite",
+    "date": "Dat",
+    "entry": "Antre",
+    "exit": "Sòti",
+    "registerMovement": "Anrejistre Mouvman"
+  },
+  "form": {
+    "success": "Mouvman an kreye avèk siksè",
+    "error": "Erè pandan kreyasyon mouvman an",
+
+    "title": "Anrejistre Mouvman",
+    "subtitle": "Mete ajou envantè a lè w anrejistre antre oswa sòti manyèlman.",
+
+    "productId": "ID Pwodwi a",
+    "productPlaceholder": "Ekri oswa kole ID pwodwi a",
+
+    "operationType": "Kalite Operasyon",
+    "entry": "Antre (+)",
+    "exit": "Sòti (-)",
+
+    "quantity": "Kantite",
+
+    "reason": "Rezon",
+    "manualAdjustment": "Ajisteman Manyèl",
+    "sale": "Vant",
+    "purchase": "Acha / Reyapwovizyònman",
+
+    "save": "Sove Mouvman an",
+    "cancel": "Anile"
+  },
+  "summary": {
+    "loading": "Ap chaje balans...",
+    "entries": "Antre",
+    "exits": "Sòti",
+    "balance": "Balans"
+  }
+  },
+  "users": {
+  "detail": {
+    "notFoundTitle": "Itilizatè pa jwenn",
+    "notFoundDescription": "Itilizatè sa a pa egziste oswa li efase.",
+    "personalInfo": "Enfòmasyon pèsonèl",
+    "email": "Imèl",
+    "role": "Wòl",
+    "registerDate": "Dat enskripsyon",
+    "status": "Estati",
+    "active": "Aktif",
+    "inactive": "Enaktif",
+    "edit": "Modifye",
+    "activate": "Aktive",
+    "deactivate": "Désaktive",
+    "backToList": "← Retounen nan lis la",
+    "updateError": "Erè pandan aktyalizasyon estati itilizatè."
+  },
+
+   "form": {
+      "success": "Mouvman an kreye avèk siksè",
+      "error": "Erè pandan kreyasyon mouvman an",
+      "title": "Anrejistre Mouvman",
+      "subtitle": "Mete ajou envantè a lè w anrejistre antre oswa sòti manyèlman.",
+      "productId": "ID Pwodwi a",
+      "productPlaceholder": "Ekri oswa kole ID pwodwi a",
+      "operationType": "Kalite Operasyon",
+      "entry": "Antre (+)",
+      "exit": "Sòti (-)",
+      "quantity": "Kantite",
+      "reason": "Rezon",
+      "manualAdjustment": "Ajisteman Manyèl",
+      "sale": "Vant",
+      "purchase": "Acha / Reyapwovizyònman",
+      "save": "Sove Mouvman an",
+      "cancel": "Anile"
+    },
+     "page": {
+      "confirmDeactivate": "Èske ou vle dezaktive itilizatè sa a?",
+      "errorUpdatingStatus": "Erè pandan aktyalizasyon eta itilizatè a",
+      "errorUpdatingUser": "Erè pandan aktyalizasyon itilizatè a",
+
+      "title": "Itilizatè yo",
+      "subtitle": "Jesyon itilizatè, pèmisyon ak abònman yo.",
+      "newUser": "Nouvo Itilizatè",
+
+      "totalUsers": "Total Itilizatè",
+      "activeUsers": "Aktif",
+      "admins": "Admin yo",
+      "employees": "Anplwaye yo",
+
+      "userList": "Lis Itilizatè yo",
+      "refresh": "Rafrechi",
+
+      "noUsers": "Pa gen itilizatè",
+      "noUsersDescription": "Kreye premye itilizatè ou pou kòmanse.",
+      "createUser": "Kreye Itilizatè",
+
+      "user": "Itilizatè",
+      "email": "Imèl",
+      "role": "Wòl",
+      "plan": "Plan",
+      "status": "Eta",
+      "actions": "Aksyon",
+
+      "active": "Aktif",
+      "inactive": "Pa Aktif",
+
+      "notAvailable": "N/A",
+      "free": "Gratis",
+
+      "loading": "Ap chaje..."
+    },
+
+    "forms": {
+    "loadError": "Erè pandan chajman itilizatè a",
+    "noPermission": "Ou pa gen pèmisyon",
+    "completeFields": "Tanpri ranpli tout chan yo",
+    "passwordRequired": "Modpas obligatwa",
+    "invalidRole": "Ou pa ka bay wòl sa a",
+    "selfDisable": "Ou pa ka dezaktive pwòp kont ou.",
+    "updated": "Itilizatè mete ajou",
+    "created": "Itilizatè kreye",
+    "updateError": "Erè pandan aktyalizasyon itilizatè a",
+    "createError": "Erè pandan kreyasyon itilizatè a",
+    "accessDenied": "Aksè refize",
+    "teamPermission": "Ou pa gen pèmisyon pou jere ekip la.",
+    "back": "Retounen",
+    "editTitle": "Modifye Pwofil",
+    "newTitle": "Nouvo Manm",
+    "subtitle": "Konfigure enfòmasyon aksè ak privilèj yo.",
+    "name": "Prenon",
+    "namePlaceholder": "Eg. John",
+    "lastName": "Siyati",
+    "lastNamePlaceholder": "Eg. Doe",
+    "email": "Adrès Imèl",
+    "emailPlaceholder": "john@entreprise.com",
+    "emailHelper": "Imèl la pa ka modifye",
+    "password": "Modpas",
+    "passwordPlaceholder": "••••••••",
+    "phone": "Telefòn",
+    "street": "Ri",
+    "number": "Nimewo",
+    "city": "Vil",
+    "state": "Pwovens",
+    "country": "Peyi",
+    "postalCode": "Kòd Postal",
+    "adminRole": "Wòl Administratif",
+    "superadmin": "Superadmin",
+    "admin": "Administratè",
+    "employee": "Anplwaye",
+    "subscriptionPlan": "Plan Abònman",
+    "free": "Gratis",
+    "basic": "Debaz",
+    "medium": "Mwayen",
+    "premium": "Premium",
+    "selfUserActive": "Ou pa ka dezaktive pwòp kont ou",
+    "userActive": "Itilizatè aktif e li gen aksè nan sistèm nan",
+    "cancel": "Anile",
+    "saving": "Ap anrejistre...",
+    "updateUser": "Mete Itilizatè a Ajou",
+    "createUser": "Kreye Itilizatè"
+  },
+
+   "roles": {
+    "loadError": "Erè pandan chajman itilizatè yo:",
+    "loadUsersError": "Pa t posib chaje itilizatè yo",
+
+    "updated": "Wòl {{name}} mete ajou avèk siksè.",
+    "saveError": "Erè pandan anrejistreman wòl la.",
+
+    "loading": "Ap chaje itilizatè yo...",
+
+    "title": "Jesyon Wòl yo",
+    "subtitle": "Bay itilizatè yo wòl pou kontwole pèmisyon yo nan sistèm nan.",
+
+    "user": "Itilizatè",
+    "role": "Wòl",
+    "action": "Aksyon",
+
+    "employee": "Anplwaye",
+    "client": "Kliyan",
+    "admin": "Administratè",
+    "superadmin": "Super Admin",
+
+    "save": "Sove"
+  }
+  },
+  "pos": {
+  "page": {
+    "emptyCart": "Panye a vid",
+    "insufficientPayment": "Peman an pa sifi",
+    "saleSuccess": "Vant lan fèt avèk siksè ✅",
+
+    "title": "Pwen Vant",
+    "subtitle": "Jesyon vant yo",
+
+    "refresh": "Rafrechi",
+
+    "productsCount": "Pwodwi",
+    "itemsCount": "Atik",
+    "total": "Total",
+    "paymentMethod": "Metòd",
+
+    "cash": "Lajan Kach",
+    "card": "Kat",
+    "transfer": "Transfè",
+
+    "searchPlaceholder": "Chèche pa non, kategori oswa pri...",
+
+    "products": "Pwodwi yo",
+    "productsSubtitle": "Chwazi pwodwi pou vann",
+
+    "stock": "Stock {{count}}",
+
+    "add": "Ajoute",
+
+    "saleDetail": "Detay Vant lan",
+    "articles": "{{count}} atik",
+
+    "remove": "Retire",
+
+    "paymentMethodLabel": "Metòd peman",
+
+    "amountReceived": "Kantite resevwa",
+
+    "change": "Lajan retounen",
+
+    "processing": "Ap trete...",
+    "checkout": "Finalize Vant lan • ${{total}}",
+
+    "placeholderImage": "https://placehold.co/400x300?text=Pwodwi"
+  }
+},
+"audit": {
+  "page": {
+    "loadError": "Erè pandan chajman aktivite yo",
+
+    "title": "📋 Rejis Aktivite",
+    "subtitle": "Odit sou aksyon itilizatè yo fè sou platfòm la.",
+
+    "refresh": "Rafrechi",
+
+    "totalLogs": "Total Rejis",
+    "creations": "Kreyasyon",
+    "updates": "Mizajou",
+    "deletions": "Sipresyon",
+
+    "systemActivity": "Aktivite Sistèm nan",
+    "eventsList": "Lis konplè evènman yo",
+
+    "errorLoading": "Erè pandan chajman",
+
+    "noActivity": "Pa gen aktivite",
+    "noActivityDescription": "Pa gen okenn rejis pou montre.",
+
+    "user": "Itilizatè",
+    "action": "Aksyon",
+    "details": "Detay",
+    "date": "Dat",
+
+    "system": "Sistèm",
+    "notAvailable": "N/A"
+  }
+ }
+}

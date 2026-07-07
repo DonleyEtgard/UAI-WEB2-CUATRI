@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <mask id="mask">
+      <rect width="512" height="512" rx="128" fill="white" />
+    </mask>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#6366f1" mask="url(#mask)" />
+  <path d="M144 176H368V208H144V176Z" fill="#fff" />
+  <path d="M144 272H368V304H144V272Z" fill="#fff" />
+  <path d="M144 336H272V368H144V336Z" fill="#fff" />
+  <circle cx="408" cy="184" r="56" fill="#fff" />
+</svg>

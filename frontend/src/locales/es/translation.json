@@ -1,0 +1,851 @@
+{
+  "navigation": {
+    "publicNavbar": {
+      "home": "Inicio",
+      "about": "Nosotros",
+      "contact": "Contacto",
+      "login": "Iniciar sesión",
+      "status": "Sistema en línea",
+      "access": "Acceder"
+    },
+
+    "sidebar": {
+      "dashboard": "Panel",
+      "users": "Usuarios",
+      "customers": "Clientes",
+      "products": "Productos",
+      "sales": "Ventas",
+      "payments": "Pagos",
+      "stock": "Inventario",
+      "settings": "Configuración",
+      "audit": "Auditoría",
+      "roles": "Roles",
+      "reports": "Reportes",
+      "subscription": "Suscripción",
+      "logout": "Cerrar sesión"
+    },
+
+    "navbar": {
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "notifications": "Notificaciones",
+      "language": "Idioma",
+      "theme": "Tema",
+      "logout": "Cerrar sesión"
+    }
+  },
+     
+  "auth": {
+    "professionalERPPlatform": "Plataforma ERP Profesional",
+    "emailAddress": "Correo Electrónico",
+    "password": "Contraseña",
+    "show": "MOSTRAR",
+    "hide": "OCULTAR",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "login": "Iniciar Sesión",
+    "processing": "Procesando...",
+    "quickAccess": "Acceso Rápido",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "createAccount": "Crear cuenta",
+
+    "pleaseEnterEmail": "Por favor ingresa tu correo electrónico",
+    "pleaseEnterPassword": "Por favor ingresa tu contraseña",
+    "invalidEmail": "Por favor ingresa un correo electrónico válido",
+    "loginFailed": "Error al iniciar sesión. Inténtalo nuevamente.",
+
+    "accountRecovery": "Recuperación de Cuenta",
+    "forgotPasswordTitle": "¿Olvidaste tu contraseña?",
+    "forgotPasswordSubtitle": "Ingresa tu email y te ayudaremos a volver.",
+    "sendInstructions": "Enviar Instrucciones",
+    "backToLogin": "Volver al inicio de sesión",
+
+    "instructionsSent": "¡Instrucciones enviadas!",
+    "instructionsSentMessage": "Revisa tu bandeja de entrada. Te hemos enviado un enlace para que puedas restablecer tu contraseña de forma segura.",
+
+    "enterYourEmail": "Por favor ingresa tu correo electrónico."
+  },
+
+  "home": {
+    "heroTitle": "Gestiona tu negocio con HAITIBIZ",
+    "heroSubtitle": "La plataforma completa ERP, POS y SaaS para empresas modernas.",
+    "getStarted": "Comenzar",
+    "learnMore": "Más información",
+
+    "featuresTitle": "Todo lo que tu negocio necesita",
+
+    "feature1Title": "Gestión de Ventas",
+    "feature1Description": "Controla ventas, facturas y pagos en tiempo real.",
+
+    "feature2Title": "Control de Inventario",
+    "feature2Description": "Gestiona productos, movimientos de stock y almacenes de manera eficiente.",
+
+    "feature3Title": "Gestión de Clientes",
+    "feature3Description": "Construye relaciones sólidas con tus clientes y aumenta su fidelidad.",
+
+    "contactUs": "Contáctanos"
+  },
+
+   "dashboard": {
+    "title": "Panel de Control",
+    "subtitle": "Resumen y análisis del negocio",
+    "welcome": "¡Bienvenido de nuevo!",
+    "totalSales": "Ventas Totales",
+    "totalCustomers": "Clientes Totales",
+    "totalProducts": "Productos Totales",
+    "totalRevenue": "Ingresos Totales",
+    "salesOverview": "Resumen de Ventas",
+    "monthlySales": "Ventas Mensuales",
+    "topProducts": "Productos Más Vendidos",
+    "recentActivity": "Actividad Reciente",
+    "quickActions": "Acciones Rápidas",
+     "operations": "Operaciones",
+    "netProfit": "Ganancia Neta",
+    "totalExpenses": "Gastos Totales",
+    "todaySales": "Ventas Hoy",
+
+    "incomeVsExpenses": "💵 Ingresos vs Gastos",
+    "dailyIncome": "💰 Ingresos Diarios",
+   "topCustomersDebt": "💳 Top Clientes por Deuda"
+  },
+  
+  "register": {
+      "createProfessionalAccount": "Crear tu cuenta profesional",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "emailAddress": "Correo electrónico",
+      "fullAddress": "Dirección completa",
+      "addressPlaceholder": "Calle 123",
+      "city": "Ciudad",
+      "zipCode": "Código postal",
+      "confirmPassword": "Confirmar contraseña",
+      "provisioningWorkspace": "Preparando espacio de trabajo...",
+      "registerButton": "Crear cuenta",
+      "backToHome": "Volver al inicio",
+      "signIn": "Iniciar sesión",
+      "fillRequiredFields": "Por favor complete todos los campos obligatorios",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "registrationError": "Error al registrarse"
+    },
+      
+    "customers":{
+     "detail": {
+      "invalidAmount": "Por favor, ingrese un monto válido.",
+      "paymentError": "Hubo un error al registrar el pago.",
+      "deleteConfirmation": "¿Eliminar cliente?",
+
+      "loadingProfile": "Cargando perfil...",
+      "customerNotFound": "Cliente no encontrado",
+      "back": "Volver",
+
+      "customerName": "Nombre del Cliente",
+      "active": "Activo",
+      "inactive": "Inactivo",
+
+      "edit": "Editar",
+      "delete": "Eliminar",
+
+      "contactInformation": "Datos de Contacto",
+      "email": "Email",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "notSpecified": "No especificado",
+
+      "debtStatus": "Estado de Deuda",
+      "debtPaid": "¡Deuda saldada!",
+
+      "additionalInformation": "Información Adicional",
+      "registrationDate": "Fecha de Registro",
+
+      "registerPayment": "Registrar un Nuevo Pago",
+      "paymentAmount": "Monto del Pago",
+      "processing": "Registrando...",
+      "addPayment": "Añadir Pago",
+
+      "paymentHistory": "Historial de Pagos",
+      "noPayments": "No hay pagos registrados para este cliente.",
+
+      "initialPayment": "💰 Pago Inicial",
+      "receivedPayment": "💵 Pago Recibido",
+
+      "remainingBalance": "Saldo restante",
+
+      "backToList": "← Volver al listado"
+    },
+
+    "form": {
+    "editCustomer": "Editar Cliente",
+    "newCustomer": "Nuevo Cliente",
+    "subtitle": "Complete la información de contacto y las preferencias del cliente.",
+
+    "name": "Nombre",
+    "namePlaceholder": "Ej. Juan Pérez",
+
+    "totalDebt": "Deuda Total",
+    "initialPayment": "Pago Inicial",
+    "initialPaymentHelper": "El historial de pagos se administra desde la página de detalles del cliente.",
+
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "contacto@correo.com",
+
+    "phone": "Teléfono",
+    "phonePlaceholder": "+54 9 11 ...",
+
+    "address": "Dirección",
+    "addressPlaceholder": "Calle, Ciudad, etc.",
+
+    "activeCustomer": "Cliente Activo - Habilitar para nuevas transacciones",
+
+    "cancel": "Cancelar",
+    "syncing": "Sincronizando...",
+    "updateCustomer": "Actualizar Cliente",
+    "saveCustomer": "Guardar Cliente",
+
+    "loadingCustomerError": "Error al cargar los datos del cliente",
+    "saveCustomerError": "Error al guardar el cliente"
+   },
+
+  "list": {
+  "title": "Clientes",
+  "subtitle": "Administra tu cartera de clientes y la información de contacto.",
+  "newCustomer": "Nuevo Cliente",
+
+  "totalCustomers": "Total de Clientes",
+  "activeCustomers": "Activos",
+  "newCustomersMonth": "Nuevos este Mes",
+
+  "directory": "Directorio de Clientes",
+  "noCustomers": "No se encontraron clientes",
+  "noCustomersDescription": "Crea tu primer cliente para comenzar.",
+  "createCustomer": "Crear Cliente",
+
+  "customer": "Cliente",
+  "email": "Correo Electrónico",
+  "phone": "Teléfono",
+  "debt": "Deuda",
+  "lastPayment": "Último Pago",
+  "noPayments": "Sin pagos",
+
+  "status": "Estado",
+  "active": "Activo",
+  "inactive": "Inactivo",
+
+  "actions": "Acciones",
+  "edit": "Editar",
+  "delete": "Eliminar",
+
+  "confirmDelete": "¿Desea eliminar este cliente?",
+  "deleteError": "Error al eliminar el cliente"
+}
+
+  },
+  
+  "payment":{
+  "payment": {
+    "title": "Suscripción",
+    "premium": "Premium",
+    "subtitle": "Renovación y gestión de suscripción",
+
+    "plan": "Plan",
+    "method": "Método",
+    "total": "Total",
+
+    "configuration": "Configuración",
+    "selectPlanMethod": "Seleccione plan y método",
+
+    "basic": "Basic",
+    "medium": "Medium",
+    "premiumPlan": "Premium",
+
+    "generatePayment": "Generar Pago",
+    "generating": "Generando...",
+
+    "payment": "Pago",
+    "scanQr": "Escanee el QR para completar la transacción",
+
+    "generateToViewQr": "Genera un pago para visualizar el QR",
+
+    "paymentVerified": "Una vez realizado el pago, nuestro equipo verificará la transacción.",
+    "status": "Estado",
+
+    "paymentError": "Error al procesar pago",
+    "generateError": "Error generando pago"
+  }
+},
+
+  "products": {
+  "detail": {
+    "notFound": "Producto no encontrado",
+    "notFoundDescription": "Este producto no existe o fue eliminado.",
+
+    "confirmDelete": "¿Eliminar producto?",
+    "deleteError": "Error eliminando producto",
+
+    "subtitle": "Información completa del producto",
+
+    "active": "Activo",
+    "hidden": "Oculto",
+
+    "salePrice": "Precio de Venta",
+    "cost": "Costo",
+    "availableStock": "Stock Disponible",
+
+    "generalInfo": "Información General",
+    "generalInfoDescription": "Datos principales del producto",
+
+    "category": "Categoría",
+    "noCategory": "Sin categoría",
+
+    "status": "Estado",
+
+    "description": "Descripción",
+    "noDescription": "Sin descripción disponible.",
+
+    "back": "Volver",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+
+   "form": {
+    "loadError": "Error cargando producto",
+    "saveError": "Error al guardar producto",
+
+    "imageMaxSize": "Cada imagen no puede superar los 5 MB.",
+    "imagesMaxTotalSize": "El total de imágenes no puede superar los 10 MB.",
+
+    "editTitle": "Editar",
+    "newTitle": "Nuevo",
+    "product": "Producto",
+
+    "subtitle": "Gestión de catálogo e inventario",
+
+    "gallery": "Galería de Imágenes",
+    "galleryDescription": "{{count}} imágenes seleccionadas · {{size}} en archivos nuevos",
+    "addImages": "Añadir Imágenes",
+    "noImages": "No hay imágenes seleccionadas",
+
+    "currentPrice": "Precio Actual",
+    "stock": "Stock",
+    "status": "Estado",
+
+    "active": "Activo",
+    "inactive": "Inactivo",
+
+    "generalInfo": "Información General",
+    "generalInfoDescription": "Datos básicos del producto",
+
+    "name": "Nombre",
+    "description": "Descripción",
+
+    "businessInfo": "Información Comercial",
+    "businessInfoDescription": "Precios, stock y categoría",
+
+    "price": "Precio",
+    "cost": "Costo",
+    "category": "Categoría",
+
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "updateProduct": "Actualizar Producto",
+    "createProduct": "Crear Producto",
+
+    "categories": {
+      "general": "General",
+      "electronics": "Electrónica",
+      "office": "Oficina",
+      "services": "Servicios",
+      "clothing": "Ropa",
+      "footwear": "Calzado",
+      "food": "Comida",
+      "beverages": "Bebidas",
+      "grocery": "Almacén",
+      "health": "Salud",
+      "beauty": "Belleza",
+      "home": "Hogar",
+      "furniture": "Muebles",
+      "sports": "Deportes",
+      "toys": "Juguetes",
+      "automotive": "Automotor",
+      "hardware": "Ferretería",
+      "construction": "Construcción",
+      "books": "Libros",
+      "pets": "Mascotas",
+      "jewelry": "Joyería",
+      "accessories": "Accesorios",
+      "technology": "Tecnología",
+      "cleaning": "Limpieza",
+      "pharmacy": "Farmacia",
+      "other": "Otros"
+    }
+  },
+
+   "list": {
+    "confirmDelete": "¿Desea eliminar este producto?",
+    "deleteError": "Error eliminando producto",
+
+    "title": "Gestión de",
+    "highlight": "Productos",
+    "subtitle": "Administración de inventario",
+    "newProduct": "Nuevo Producto",
+
+    "totalProducts": "Productos",
+    "lowStock": "Stock Bajo",
+    "activeProducts": "Activos",
+    "inventoryValue": "Valor Inventario",
+
+    "inventory": "Inventario",
+    "inventoryDescription": "Listado completo de productos",
+
+    "noProducts": "No hay productos",
+    "noProductsDescription": "Crea tu primer producto para comenzar a vender.",
+    "createProduct": "Crear producto",
+
+    "placeholderImage": "Producto",
+
+    "stock": "Stock",
+
+    "edit": "Editar",
+    "delete": "Eliminar"
+  }
+},
+"sales": {
+  "detail": {
+    "notFound": "Venta no encontrada",
+    "notFoundDescription": "Esta venta no existe o fue eliminada.",
+
+    "confirmDelete": "¿Eliminar venta?",
+    "delete": "Eliminar",
+
+    "sale": "Venta",
+    "saleInfo": "Información de la Venta",
+
+    "total": "Total",
+    "paid": "Pagado",
+    "change": "Vuelto",
+    "customer": "Cliente",
+
+    "subtotal": "Subtotal",
+    "averageItem": "Promedio/Item",
+    "estimatedProfit": "Est. Ganancia",
+
+    "products": "Productos en esta Venta",
+    "items": "{{count}} artículos",
+
+    "product": "Producto",
+    "quantity": "Cantidad",
+    "unitPrice": "Precio Unit.",
+
+    "placeholderProduct": "Producto",
+
+    "back": "Volver",
+    "viewTicket": "Ver Ticket"
+  },
+
+  "form": {
+    "completeData": "Completa los datos",
+    "processError": "Error al procesar la venta",
+    "newTransaction": "Nueva Transacción",
+    "subtitle": "Selecciona cliente y agrega productos al carrito",
+    "customer": "Cliente",
+    "selectCustomer": "Selecciona un cliente...",
+    "searchProducts": "Buscar Productos",
+    "searchPlaceholder": "Escribe el nombre del producto...",
+    "stock": "Stock",
+    "noMatches": "No hay productos que coincidan",
+    "typeToSearch": "Escribe para buscar productos",
+    "saleSummary": "Resumen de Venta",
+    "items": "artículos",
+    "emptyCart": "El carrito está vacío",
+    "remove": "Quitar",
+    "subtotal": "Subtotal",
+    "taxes": "Impuestos",
+    "total": "Total",
+    "finishSale": "Finalizar Venta",
+    "cancel": "Cancelar"
+  },
+
+"list": {
+    "reference": "Referencia",
+    "customer": "Cliente",
+    "finalConsumer": "Consumidor Final",
+    "date": "Fecha",
+    "items": "Items",
+    "pieces": "pzs",
+    "status": "Estado",
+    "total": "Total",
+    "actions": "Acciones",
+    "details": "Detalles",
+
+    "title": "Gestión de",
+    "highlight": "Ventas",
+    "subtitle": "Panel operativo de transacciones",
+
+    "refresh": "Actualizar",
+    "newSale": "Nueva Venta",
+
+    "totalRevenue": "Ingresos Totales",
+    "transactions": "Transacciones",
+    "averageTicket": "Ticket Promedio",
+    "netProfit": "Ganancia Neta",
+    "margin": "Margen %",
+
+    "revenueVsExpenses": "Ingresos vs Gastos",
+    "dailyComparison": "Comparación diaria",
+
+    "revenue": "Ingresos",
+    "expenses": "Gastos",
+
+    "noChartData": "No hay datos disponibles",
+
+    "activityLog": "Registro de Actividad",
+    "activityDescription": "Historial detallado de transacciones",
+
+    "emptyTitle": "Sin registros de venta",
+    "emptyDescription": "No hay ventas registradas aún."
+  },
+
+  "ticket": {
+      "sendWhatsappError": "Error enviando WhatsApp",
+      "sendTelegramError": "Error enviando Telegram",
+
+      "notFound": "No se encontró el ticket",
+
+      "title": "Ticket de Venta 🧾",
+
+      "customer": "Cliente",
+      "finalConsumer": "Consumidor Final",
+
+      "seller": "Vendedor",
+      "date": "Fecha",
+
+      "total": "Total",
+      "paid": "Pagado",
+      "change": "Cambio",
+
+      "method": "Método",
+      "status": "Estado",
+
+      "note": "Nota",
+
+      "back": "Volver",
+      "print": "Imprimir",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram"
+    }
+  },
+  
+  "stock": {
+    "critical": {
+      "outOfStock": "Agotado",
+      "critical": "Crítico",
+      "low": "Bajo",
+
+      "title": "Alertas de Stock",
+      "subtitle": "Monitoreo de inventario crítico",
+
+      "refresh": "Actualizar",
+
+      "healthyInventory": "Inventario Saludable",
+      "healthyInventoryDescription": "No hay productos con stock crítico en este momento.",
+
+      "stock": "STOCK",
+
+      "restock": "Reponer"
+    },
+    "filter": {
+    "searchPlaceholder": "Buscar por ID de producto...",
+    "filter": "Filtrar",
+    "clear": "Limpiar"
+  },
+   "movements": {
+    "noData": "Sin datos",
+    "entries": "Entradas",
+    "exits": "Salidas",
+    "title": "Movimientos de Stock",
+    "subtitle": "Gestión de entradas y salidas de inventario",
+    "today": "Hoy",
+    "netBalance": "Balance Neto",
+    "stockTrend": "Tendencia de Stock",
+    "entriesVsExits": "Ingresos vs Salidas",
+    "registeredMovements": "Movimientos Registrados",
+    "product": "Producto",
+    "type": "Tipo",
+    "quantity": "Cantidad",
+    "date": "Fecha",
+    "entry": "Entrada",
+    "exit": "Salida",
+    "registerMovement": "Registrar Movimiento"
+  },
+    "form": {
+    "success": "Movimiento creado correctamente",
+    "error": "Error al crear movimiento",
+
+    "title": "Registrar Movimiento",
+    "subtitle": "Actualiza el inventario registrando entradas o salidas manuales.",
+
+    "productId": "ID del Producto",
+    "productPlaceholder": "Escriba o pegue el ID del producto",
+
+    "operationType": "Tipo de Operación",
+    "entry": "Entrada (+)",
+    "exit": "Salida (-)",
+
+    "quantity": "Cantidad",
+
+    "reason": "Motivo",
+    "manualAdjustment": "Ajuste Manual",
+    "sale": "Venta",
+    "purchase": "Compra / Abastecimiento",
+
+    "save": "Guardar Movimiento",
+    "cancel": "Cancelar"
+  },
+   "summary": {
+    "loading": "Obteniendo balance...",
+    "entries": "Entradas",
+    "exits": "Salidas",
+    "balance": "Balance"
+  }
+  },
+
+  "users": {
+  "detail": {
+    "notFoundTitle": "Usuario no encontrado",
+    "notFoundDescription": "Este usuario no existe o fue eliminado.",
+    "personalInfo": "Información Personal",
+    "email": "Email",
+    "role": "Rol",
+    "registerDate": "Fecha de Registro",
+    "status": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "edit": "Editar",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "backToList": "← Volver al listado",
+    "updateError": "Error actualizando el estado del usuario."
+  },
+
+   "form": {
+      "success": "Movimiento creado correctamente",
+      "error": "Error al crear movimiento",
+      "title": "Registrar Movimiento",
+      "subtitle": "Actualiza el inventario registrando entradas o salidas manuales.",
+      "productId": "ID del Producto",
+      "productPlaceholder": "Escriba o pegue el ID del producto",
+      "operationType": "Tipo de Operación",
+      "entry": "Entrada (+)",
+      "exit": "Salida (-)",
+      "quantity": "Cantidad",
+      "reason": "Motivo",
+      "manualAdjustment": "Ajuste Manual",
+      "sale": "Venta",
+      "purchase": "Compra / Abastecimiento",
+      "save": "Guardar Movimiento",
+      "cancel": "Cancelar"
+    },
+     "page": {
+      "confirmDeactivate": "¿Desea desactivar este usuario?",
+      "errorUpdatingStatus": "Error actualizando el estado del usuario",
+      "errorUpdatingUser": "Error actualizando usuario",
+
+      "title": "Usuarios",
+      "subtitle": "Administración de usuarios, permisos y suscripciones.",
+      "newUser": "Nuevo Usuario",
+
+      "totalUsers": "Total Usuarios",
+      "activeUsers": "Activos",
+      "admins": "Admins",
+      "employees": "Empleados",
+
+      "userList": "Lista de Usuarios",
+      "refresh": "Actualizar",
+
+      "noUsers": "No hay usuarios",
+      "noUsersDescription": "Crea tu primer usuario para comenzar.",
+      "createUser": "Crear usuario",
+
+      "user": "Usuario",
+      "email": "Email",
+      "role": "Rol",
+      "plan": "Plan",
+      "status": "Estado",
+      "actions": "Acciones",
+
+      "active": "Activo",
+      "inactive": "Inactivo",
+
+      "notAvailable": "N/A",
+      "free": "Free",
+
+      "loading": "Cargando..."
+    },
+
+    "forms": {
+    "loadError": "Error cargando usuario",
+
+    "noPermission": "No tienes permisos",
+    "completeFields": "Completa todos los campos",
+    "passwordRequired": "Password requerida",
+    "invalidRole": "No puedes asignar este rol",
+    "selfDisable": "No puedes desactivar tu propio usuario.",
+
+    "updated": "Usuario actualizado",
+    "created": "Usuario creado",
+    "updateError": "Error actualizando usuario",
+    "createError": "Error creando usuario",
+
+    "accessDenied": "Acceso Denegado",
+    "teamPermission": "No tienes permisos para gestionar el equipo.",
+    "back": "Volver",
+
+    "editTitle": "Editar Perfil",
+    "newTitle": "Nuevo Integrante",
+    "subtitle": "Configura la información de acceso y privilegios.",
+
+    "name": "Nombre",
+    "namePlaceholder": "Ej. John",
+
+    "lastName": "Apellido",
+    "lastNamePlaceholder": "Ej. Doe",
+
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "john@empresa.com",
+    "emailHelper": "El email no puede modificarse",
+
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+
+    "phone": "Teléfono",
+
+    "street": "Calle",
+    "number": "Número",
+    "city": "Ciudad",
+    "state": "Provincia",
+    "country": "País",
+    "postalCode": "Código Postal",
+
+    "adminRole": "Rol Administrativo",
+
+    "superadmin": "Superadmin",
+    "admin": "Administrador",
+    "employee": "Empleado",
+
+    "subscriptionPlan": "Plan de Suscripción",
+
+    "free": "Free",
+    "basic": "Basic",
+    "medium": "Medium",
+    "premium": "Premium",
+
+    "selfUserActive": "El usuario propio no puede desactivarse",
+    "userActive": "Usuario activo y con acceso al sistema",
+
+    "cancel": "Cancelar",
+
+    "saving": "Guardando...",
+    "updateUser": "Actualizar Usuario",
+    "createUser": "Crear Usuario"
+  },
+
+   "roles": {
+    "loadError": "Error cargando usuarios:",
+    "loadUsersError": "No se pudieron cargar los usuarios",
+
+    "updated": "Rol de {{name}} actualizado correctamente.",
+    "saveError": "Error al guardar el rol.",
+
+    "loading": "Cargando usuarios...",
+
+    "title": "Gestión de Roles",
+    "subtitle": "Asigna roles a los usuarios para controlar sus permisos en el sistema.",
+
+    "user": "Usuario",
+    "role": "Rol",
+    "action": "Acción",
+
+    "employee": "Empleado",
+    "client": "Cliente",
+    "admin": "Administrador",
+    "superadmin": "Super Admin",
+
+    "save": "Guardar"
+  }
+  },
+  "pos": {
+  "page": {
+    "emptyCart": "El carrito está vacío",
+    "insufficientPayment": "Pago insuficiente",
+    "saleSuccess": "Venta realizada correctamente ✅",
+
+    "title": "Punto de Venta",
+    "subtitle": "Gestión de ventas",
+
+    "refresh": "Actualizar",
+
+    "productsCount": "Productos",
+    "itemsCount": "Items",
+    "total": "Total",
+    "paymentMethod": "Método",
+
+    "cash": "Efectivo",
+    "card": "Tarjeta",
+    "transfer": "Transferencia",
+
+    "searchPlaceholder": "Buscar por nombre, categoría o precio...",
+
+    "products": "Productos",
+    "productsSubtitle": "Seleccioná productos para vender",
+
+    "stock": "Stock {{count}}",
+
+    "add": "Agregar",
+
+    "saleDetail": "Detalle de Venta",
+    "articles": "{{count}} artículos",
+
+    "remove": "Eliminar",
+
+    "paymentMethodLabel": "Método de pago",
+
+    "amountReceived": "Monto recibido",
+
+    "change": "Cambio",
+
+    "processing": "Procesando...",
+    "checkout": "Finalizar Venta • ${{total}}",
+
+    "placeholderImage": "https://placehold.co/400x300?text=Producto"
+  }
+},
+"audit": {
+  "page": {
+    "loadError": "Error cargando actividad",
+
+    "title": "📋 Registro de Actividad",
+    "subtitle": "Auditoría de las acciones realizadas por los usuarios en la plataforma.",
+
+    "refresh": "Actualizar",
+
+    "totalLogs": "Total Registros",
+    "creations": "Creaciones",
+    "updates": "Actualizaciones",
+    "deletions": "Eliminaciones",
+
+    "systemActivity": "Actividad del Sistema",
+    "eventsList": "Listado completo de eventos",
+
+    "errorLoading": "Error al cargar",
+
+    "noActivity": "Sin actividad",
+    "noActivityDescription": "No existen registros para mostrar.",
+
+    "user": "Usuario",
+    "action": "Acción",
+    "details": "Detalles",
+    "date": "Fecha",
+
+    "system": "Sistema",
+    "notAvailable": "N/A"
+  }
+ }
+}
