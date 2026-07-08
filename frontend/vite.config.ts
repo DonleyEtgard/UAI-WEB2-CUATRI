@@ -11,7 +11,7 @@ function serviceWorkerPlugin(): Plugin {
       try {
         // Leer el service worker TypeScript
         let swContent = fs.readFileSync(
-          path.resolve(__dirname, 'public/service-worker.ts'),
+          path.resolve(__dirname, 'public/service-worker.js'),
           'utf-8'
         )
 

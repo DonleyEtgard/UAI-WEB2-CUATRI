@@ -1,12 +1,21 @@
 import axios from "axios";
 
-const API_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:3000/api";
+const getApiUrl = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
 
-  console.log("API_URL =", API_URL);
+  if (!apiUrl) {
+    // En desarrollo, permitimos el fallback. En producción, lanzamos un error.
+    if (import.meta.env.PROD) {
+      throw new Error("VITE_API_URL is not defined in the production environment.");
+    }
+    return "http://localhost:3000/api";
+  }
+  return apiUrl;
+};
 
+const API_URL = getApiUrl();
+
+console.log("API_URL =", API_URL);
 const API = axios.create({
   baseURL: API_URL,
 });
