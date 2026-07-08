@@ -60,7 +60,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://uai-web2-cuatri.onrender.com"
+      "https://haitibiz.onrender.com"
     ],
      credentials: true,
       methods: [
