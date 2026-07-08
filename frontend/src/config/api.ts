@@ -5,7 +5,24 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+const getApiUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+
+    if (!apiUrl) {
+        if (import.meta.env.PROD) {
+            throw new Error("VITE_API_URL no está definida");
+        }
+
+        return "http://localhost:3000/api";
+    }
+
+    return apiUrl;
+};
+
+const API_BASE_URL = getApiUrl();
+
+    console.log("CONFIG API_BASE_URL =", API_BASE_URL);
+    console.log("PROD =", import.meta.env.PROD);
 
 /**
  * Create and configure the main API instance
