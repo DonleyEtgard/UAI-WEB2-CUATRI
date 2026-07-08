@@ -1,4 +1,9 @@
-import express from "express";
+import express, {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
+
 import path from "path";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -72,7 +77,11 @@ app.use(
   })
 );
 
-app.use((req, _res, next) => {
+app.use((
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
   console.log("ORIGIN:", req.headers.origin);
   console.log("METHOD:", req.method);
   console.log("URL:", req.url);
@@ -98,7 +107,11 @@ app.use(
 );
 
 // LOGGING
-app.use((req, _res, next) => {
+app.use((
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   console.log(`➡️ ${req.method} ${req.path}`);
   next();
 });
@@ -113,7 +126,10 @@ app.post("/api/payments/mercadopago/webhook", mercadoPagoWebhook);
 // HEALTH CHECK
 // ============================================================================
 
-app.get("/", (_req, res) => {
+app.get("/", (
+  _req: Request,
+  res: Response
+) => {
   res.json({
     message: "🚀 API funcionando correctamente",
     version: "1.0.0",

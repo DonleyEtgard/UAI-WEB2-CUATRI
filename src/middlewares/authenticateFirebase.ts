@@ -1,4 +1,4 @@
-import { Response, NextFunction } from "express";
+import {Request, Response, NextFunction } from "express";
 import admin from "../firebase";
 import User from "../models/User";
 import type { AuthRequest, FirebaseDecoded, DBUser } from "../types/auth";

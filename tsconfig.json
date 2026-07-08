@@ -1,16 +1,30 @@
-
-  {
-    "compilerOptions": {
+{
+  "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "rootDir": "src",         // ✅ corregido
+    "rootDir": "src",
     "outDir": "dist",
+
     "strict": true,
+
     "esModuleInterop": true,
+
     "resolveJsonModule": true,
-    "typeRoots": [".vscode/node_modules/@types", "src/types"],
+
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],     // solo backend
-  "exclude": [".vscode/node_modules", "frontend"]  // excluimos frontend
+
+  "include": [
+    "src/**/*"
+  ],
+
+  "exclude": [
+    "frontend",
+    "node_modules"
+  ]
 }
