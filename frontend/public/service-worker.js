@@ -5,9 +5,7 @@ const API_CACHE = 'haitibiz-api-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/styles/index.css',
-];
+  '/manifest.json' ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
