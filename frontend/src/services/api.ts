@@ -19,6 +19,10 @@ API.interceptors.request.use((config) => {
     console.log("METHOD:", config.method?.toUpperCase());
     console.log("URL:", config.url);
     console.log("TOKEN EXISTS:", !!token);
+    console.log("BASE URL:", config.baseURL);
+    console.log("URL:", config.url);
+    console.log("Authorization:", token ? "Sí" : "No");
+
   }
 
   if (token) {
@@ -35,6 +39,9 @@ API.interceptors.response.use(
     console.error("STATUS:", error.response?.status);
     console.error("URL:", error.config?.url);
     console.error("RESPONSE:", error.response?.data);
+    console.log("STATUS:", error.response?.status);
+    console.log("DATA:", error.response?.data);
+    console.log("MESSAGE:", error.message);
 
     if (error.response?.status === 401) {
       console.warn("401 Unauthorized");

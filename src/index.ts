@@ -53,13 +53,32 @@ app.use(
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"]
+    origin: [
+      "http://localhost:5173",
+      "https://uai-web2-cuatri.onrender.com"
+    ],
+     credentials: true,
+      methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization"
+    ]
   })
 );
 
+app.use((req, _res, next) => {
+  console.log("ORIGIN:", req.headers.origin);
+  console.log("METHOD:", req.method);
+  console.log("URL:", req.url);
+
+  next();
+});
 // FIX: Increase default JSON body parser limit to accommodate larger payloads
 // (avoids PayloadTooLargeError when clients previously sent Base64 images)
 app.use(express.json({ limit: "10mb" }));
@@ -121,8 +140,8 @@ app.get("/cors-test", (_req, res) => {
 // ============================================================================
 
 // 🔐 USERS (RBAC completo)
-app.use("/api/users", 
-  authenticateFirebase, 
+app.use(
+  "/api/users",
   userRoutes
 );
 
@@ -208,7 +227,6 @@ app.get("/*splat", (req, res) => {
 const startServer = async () => {
   await connectDB();
 
-  // 🔥 CREA SUPERADMIN SI NO EXISTE
   await createSuperadminIfNotExists();
 
   app.listen(PORT, () => {
