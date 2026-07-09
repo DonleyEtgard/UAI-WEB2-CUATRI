@@ -22,14 +22,27 @@ const PublicNavbar = () => {
           </h1>
 
          <p className="haitibiz-subtitle">
-         ERP • POS • SaaS Platform
+         ERP • SaaS Platform
         </p>
         </div>
        </div>
       </div>
 
       
-     <nav className="flex items-center gap-6 text-on-surface-variant">
+     <nav
+      className="
+      flex
+      flex-wrap
+      items-center
+      justify-center
+      gap-2
+      sm:gap-3
+      md:gap-4
+      lg:gap-6
+      text-sm
+      text-on-surface-variant
+     "
+     >
        <Link to="/" className="hover:text-white transition">
         {t("navigation.publicNavbar.home")}
        </Link>

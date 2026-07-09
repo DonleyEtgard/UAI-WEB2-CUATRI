@@ -38,15 +38,15 @@ type PaymentMethod =
 
 const prices = {
   moncash: {
-    basic: 3000,
-    medium: 10800,
-    premium: 25000,
+    basic: 3400,
+    medium: 10500,
+    premium: 21000,
   },
 
   mercadopago: {
-    basic: 45000,
-    medium: 130000,
-    premium: 250000,
+    basic: 50000,
+    medium: 140000,
+    premium: 280000,
   },
 } as const;
 
@@ -90,16 +90,19 @@ export default function PaymentPage() {
       }
 
       if (response.paymentUrl) {
-        window.location.href = response.paymentUrl;
+        // Usamos un pequeño timeout para evitar el error de "message channel closed".
+        // Esto le da tiempo a las extensiones del navegador a procesar antes de la redirección.
+        setLoading(true); // Mantenemos el estado de carga
+        setTimeout(() => { window.location.href = response.paymentUrl; }, 100);
         return;
       }
 
-      const qr = response.qr;
-      if (qr) {
+      // Si la respuesta contiene 'qr' (el payload JSON), la guardamos en el estado.
+      if (response.qr) {
         setPaymentData({
           ...response,
-          qr,
-        });
+          qr: response.qr, // Aseguramos que el estado contenga el payload del QR
+        }); 
       }
     } catch (error: any) {
       console.error("❌ ERROR GENERANDO PAGO COMPLETO:", error);
@@ -436,7 +439,7 @@ export default function PaymentPage() {
                     >
                       <QRCodeCanvas
                         value={
-                          paymentData.qr
+                          paymentData.qr // Ahora esto es un string JSON, ej: '{"transactionId": "...", "amount": ...}'
                         }
                         size={260}
                         includeMargin

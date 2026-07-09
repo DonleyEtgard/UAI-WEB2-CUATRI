@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
+import { CircularProgress, Button } from '@mui/material';
 
 
 // Features
@@ -27,19 +27,13 @@ const stockHook = useStockMovements();
 
 const salesHook = useSales();
 
-// 🔍 Debug de estructura real (Ver en consola F12)
-console.log("DASHBOARD DEBUG - salesHook data:", salesHook?.sales);
-
-// Obtener array de ventas de forma segura
 const sales = useMemo(() => {
   const rawSales = salesHook?.sales as any;
-  // Soporta tanto array directo como respuesta envuelta en { success, data }
-  if (Array.isArray(rawSales)) return rawSales;
-  if (rawSales && typeof rawSales === 'object' && 'data' in rawSales && Array.isArray(rawSales.data)) return rawSales.data;
-  return [];
+  if (Array.isArray(rawSales)) return rawSales; // Soporta array directo
+  if (rawSales && Array.isArray(rawSales.data)) return rawSales.data; // Soporta { success, data }
+  return []; // Devuelve array vacío si no hay datos válidos
 }, [salesHook?.sales]); 
 
-// Obtener movimientos de stock de forma segura
 const movements = useMemo(() => {
   const rawMovements = stockHook?.movements as any;
   if (Array.isArray(rawMovements)) return rawMovements;
@@ -48,24 +42,6 @@ const movements = useMemo(() => {
   }
   return [];
 }, [stockHook?.movements]);
-console.log("MOVEMENTS:", movements);
-console.log("MOVIMIENTOS:", movements);
-console.log(
-  "MOVIMIENTOS ENTRADA:",
-  movements.filter((m: any) => m.type === "in")
-);
-console.log("FIRST MOVEMENT:", movements[0]);
-console.log(
-  "ALL MOVEMENTS",
-  movements.map((m: any) => ({
-    type: m.type,
-    quantity: m.quantity,
-    product: m.product?.name,
-    cost: m.product?.cost,
-    reason: m.reason
-  }))
-);
-console.log("STOCK HOOK:", stockHook);
 
 const salesLoading = salesHook?.loading ?? false;
 const stockLoading = stockHook?.loading ?? false;
@@ -122,13 +98,16 @@ const metrics = useMemo(() => {
     0
   );
 
-  // Inversión Total en Inventario: Suma de (costo * stock) de todos los productos
-  const totalExpenses = safeProducts.reduce((acc, p: any) => {
-    const cost = Number(p.cost || 0);
-    const stock = Number(p.stock || 0);
-    return acc + (cost * stock);
-  }, 0);
-
+  // Gastos Totales: Costo de los productos en movimientos de salida (ventas, ajustes, etc.)
+  const totalExpenses = safeMovements
+    .filter((m: any) => m.type === 'out')
+    .reduce((acc, m: any) => {
+      // Asegurarse de que product y cost existen y son números
+      const cost = Number(m.product?.cost || 0);
+      const quantity = Number(m.quantity || 0);
+      return acc + (cost * quantity);
+    }, 0);
+    
   const netProfit = totalRevenue - totalExpenses;
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
@@ -157,14 +136,17 @@ const metrics = useMemo(() => {
       .reduce((acc, s: any) => acc + (s.status === 'paid' ? getSafeAmount(s) : 0), 0);
   });
 
-  // Los gastos históricos basados en movimientos ya no aplican a la nueva regla de inversión actual.
-  // Se inicializan en 0 para mantener la compatibilidad con los gráficos sin usar StockMovements.
-  const monthlyExpenses = last6Months.map(() => {
-  return products.reduce(
-    (acc, product) => acc + (product.cost * product.stock),
-    0
-  );
-});
+  // Gastos Mensuales basados en movimientos de salida
+  const monthlyExpenses = last6Months.map(m => {
+    return safeMovements
+      .filter((mov: any) => {
+        const movDate = new Date(mov.timestamp);
+        return mov.type === 'out' && movDate.getMonth() === m.monthIdx && movDate.getFullYear() === m.year;
+      })
+      .reduce((acc, mov: any) => {
+        return acc + (Number(mov.product?.cost || 0) * Number(mov.quantity || 0));
+      }, 0);
+  });
 
   // Category distribution
   const categoriesMap: Record<string, number> = {};
@@ -215,21 +197,14 @@ const metrics = useMemo(() => {
       .reduce((acc, s: any) => acc + (s.status === 'paid' ? getSafeAmount(s) : 0), 0);
   });
 
-  // Se inicializan en 0 para evitar el uso de StockMovements en el cálculo de gastos.
-  const dailyExpenses = last7Days.map(() => 0);
-
-  console.log("TOTAL EXPENSES:", totalExpenses);
-
-  console.log(
-   safeMovements
-     .filter((m: any) => m.type === "in")
-     .map((m: any) => ({
-      producto: m.product?.name,
-      cantidad: m.quantity,
-      costo: m.product?.cost,
-      subtotal: m.quantity * (m.product?.cost || 0)
-    }))
-   );
+  // Gastos Diarios (last 7 days)
+  const dailyExpenses = last7Days.map(day => {
+    return safeMovements
+      .filter(m => m.type === 'out' && isSameDay(new Date(m.timestamp), day))
+      .reduce((acc, m: any) => {
+        return acc + (Number(m.product?.cost || 0) * Number(m.quantity || 0));
+      }, 0);
+  });
 
   return {
     todayRevenue,
@@ -327,7 +302,7 @@ dailySales: {
         borderColor: 'divider' 
       }}>
         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1.8, display: 'block' }}>
-          Panel general
+          {t("dashboard.welcome")}
         </Typography>
         <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 1 }}>
           📊 {t("dashboard.title")}
@@ -528,15 +503,12 @@ dailySales: {
             <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
               📦 Stock Crítico
             </Typography>
-            <button 
+            <Button
               onClick={() => navigate('/app/stock/critical')}
-              style={{ 
-                color: 'var(--mui-palette-primary-main, #6366f1)', 
-                fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', background: 'none', border: 'none', padding: 0 
-              }}
+              sx={{ textTransform: 'none' }}
             >
               Gestionar Alertas
-            </button>
+            </Button>
           </Box>
 
           {metrics.criticalStock.map((product) => (

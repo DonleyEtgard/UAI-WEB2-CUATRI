@@ -476,19 +476,23 @@ button:hover,
   position: sticky;
   top: 0;
   z-index: 50;
-  height: 100px;
-  padding: 0 32px;
+  height: 80px;
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  background: rgba(19, 19, 21, 0.7);
+}
+
+.public-navbar .container {
+  padding: 0 1rem;
 }
 
 .public-navbar nav {
+  /* Flexbox para alinear los elementos de navegación */
   display: flex;
   align-items: center;
-  gap: 1.5rem; /* Este es el espacio que faltaba entre los enlaces */
+  gap: 1.5rem;
 }
 
 .public-navbar nav a {
@@ -496,6 +500,26 @@ button:hover,
   border-radius: 12px;
   font-weight: 500;
   transition: all 0.3s ease;
+}
+.public-navbar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.mobile-menu {
+  background: rgba(19, 19, 21, 0.9);
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.btn-access {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  color: white;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
 }
 
 /* =========================================================
@@ -527,8 +551,8 @@ button:hover,
 ========================= */
 
 .haitibiz-logo {
-  width: 70px;
-  height: 70px;
+  width: 44px;
+  height: 44px;
 
   display: flex;
   align-items: center;
@@ -558,13 +582,13 @@ button:hover,
 }
 
 .haitibiz-logo-icon {
-  font-size: 2rem;
+  font-size: 1.5rem;
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
 }
 
 .haitibiz-title {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: 0.18em;
   line-height: 1;
@@ -581,7 +605,7 @@ button:hover,
 
 .haitibiz-subtitle {
   margin-top: 4px;
-  font-size: 0.78rem;
+  font-size: 0.65rem;
   letter-spacing: 0.18em;
   color: #9ca3af;
   text-transform: uppercase;
@@ -605,3 +629,31 @@ button:hover,
 .text-center { text-align: center; }
 .fade-in-up { opacity: 0; transform: translateY(16px); transition: 0.7s; }
 .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+/* =========================================================
+   RESPONSIVE OVERRIDES
+========================================================= */
+@media (min-width: 640px) { /* sm */
+  .public-navbar .container {
+    padding: 0 1.5rem;
+  }
+  .haitibiz-logo {
+    width: 50px;
+    height: 50px;
+  }
+  .haitibiz-logo-icon {
+    font-size: 2rem;
+  }
+  .haitibiz-title {
+    font-size: 1.5rem;
+  }
+  .haitibiz-subtitle {
+    font-size: 0.78rem;
+  }
+}
+
+@media (min-width: 1024px) { /* lg */
+  .public-navbar .container {
+    padding: 0 2rem;
+  }
+}

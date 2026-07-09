@@ -1,11 +1,8 @@
-import React, { useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSearchContext } from "../../context/GlobalSearchContext";
-import { useGlobalSearch } from "../../hooks/useGlobalSearch";
+import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import type { SearchGroup } from "../../types/search";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
+import { AppBar, Toolbar, IconButton, Typography, Box, Avatar, Menu, MenuItem, Divider } from "@mui/material";
 
 type NavbarProps = {
   title?: string;
@@ -22,212 +19,82 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const { query, setQuery, results, isOpen, setIsOpen } = useSearchContext();
-  useGlobalSearch();
-  const searchRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Cerrar el buscador si se hace click fuera del componente
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [setIsOpen]);
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   return (
-    <header
-   className="
-    sticky top-0 z-30
-    w-full
-    min-h-[72px]
-    flex items-center justify-between
-    px-6 lg:px-8
-    border-b border-zinc-800/50
-    bg-zinc-950/80
-    backdrop-blur-md
-  "
->
-      {/* LEFT AREA: Sidebar Toggle & Title */}
-      <div className="flex items-center gap-4">
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        bgcolor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider',
+        color: 'text.primary',
+      }}
+    >
+      <Toolbar sx={{ minHeight: { xs: 64, md: 72 }, px: { xs: 2, lg: 3 } }}>
+        {/* LEFT AREA: Sidebar Toggle & Title */}
         {onToggleSidebar && (
-          <button
+          <IconButton
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-900 border border-zinc-800 transition-all"
+            edge="start"
+            color="inherit"
             aria-label="Toggle sidebar"
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
-            <span className="text-xl">☰</span>
-          </button>
+            ☰
+          </IconButton>
         )}
 
-        <div className="flex flex-col min-w-0">
-          <h1 className="text-sm font-bold text-white truncate leading-none">
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <Typography variant="h6" noWrap component="h1" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}>
             {title}
-          </h1>
-          <div className="flex items-center gap-1.5 mt-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Sistema Online</span>
-          </div>
-        </div>
-      </div>
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+            <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'success.main', boxShadow: (theme) => `0 0 8px ${theme.palette.success.main}` }} />
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', textTransform: 'uppercase' }}>
+              Sistema Online
+            </Typography>
+          </Box>
+        </Box>
 
-      {/* ================================================================== */}
-      {/* RIGHT */}
-      {/* ================================================================== */}
-
-      <div className="flex items-center gap-3 md:gap-4" ref={searchRef}>
-
-        {/* SEARCH */}
-        <div className="hidden xl:block relative group">
-          <span className="text-zinc-600 text-sm absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-indigo-500 transition-colors">
-            🔎
-          </span>
-
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => query.length >= 2 && setIsOpen(true)}
-            placeholder="Buscar en el sistema..."
-            className="
-              h-10 w-[240px] rounded-xl 
-              bg-zinc-900/50 border border-zinc-800 
-              pl-9 pr-3
-              text-sm text-zinc-200
-              outline-none
-              focus:border-indigo-500/50
-              transition-all
-            "
-          />
-
-          {/* DROPDOWN DE RESULTADOS */}
-          {isOpen && results.length > 0 && (
-            <div className="
-              absolute top-full mt-2 w-[350px] max-h-[400px] 
-              bg-zinc-950 border border-zinc-800 rounded-2xl 
-              shadow-2xl overflow-y-auto z-50 p-2
-              animate-in fade-in slide-in-from-top-2 duration-200
-            ">
-              {results.map((group: SearchGroup) => (
-                <div key={group.category} className="mb-2">
-                  <div className="px-3 py-1 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">
-                    {group.label}
-                  </div>
-                  {group.items.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setIsOpen(false);
-                        setQuery('');
-                        navigate(item.url);
-                      }}
-                      className="
-                        w-full flex items-center justify-between
-                        px-3 py-2 rounded-xl
-                        hover:bg-indigo-500/10 transition-colors
-                        group text-left
-                      "
-                    >
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-zinc-200 truncate">
-                          {item.title}
-                        </div>
-                        <div className="text-xs text-zinc-500 truncate">
-                          {item.subtitle}
-                        </div>
-                      </div>
-                      {item.badge && (
-                        <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 
-                        text-red-400 border border-red-500/20">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-         <div className="flex items-center gap-3">
+        {/* RIGHT AREA */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
           <LanguageSelector />
-          {/* <UserMenu /> */}
-          {/* <LogoutButton /> */}
-        </div>
 
-{/* UTILS & USER */}
-<div
-  className="flex items-center justify-end min-w-[320px]"
->
-  {/* USUARIO */}
-  <div className="relative group/user">
-    <button
-  className="
-    flex items-center
-    gap-3
-    px-4 py-2
-    rounded-2xl
-    bg-zinc-900/40
-    border border-zinc-800
-    hover:border-indigo-500/40
-    hover:bg-zinc-900/70
-    transition-all
-  "
->
-      {/* Avatar a la izquierda */}
-      <div
-        className="
-          w-11 h-11
-          rounded-full
-          bg-gradient-to-br
-          from-indigo-500
-          to-indigo-700
-          flex items-center justify-center
-          text-white
-          font-bold
-          text-lg
-          shadow-lg
-        "
-      >
-        {Name?.charAt(0).toUpperCase()}
-        {/* UTILS & USER */}
-       
-      </div>
-
-      {/* Nombre y rol */}
-      <div className="flex flex-col items-start w-[220px]">
-        <span className="text-sm font-bold text-white">
-          {Name}
-        </span>
-
-      </div>
-      </button>
-
-    {/* Dropdown */}
-    <div className="absolute top-full right-0 mt-2 w-56 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden opacity-0 invisible group-hover/user:opacity-100 group-hover/user:visible transition-all p-1.5 z-50">
-      <div className="px-4 py-3 border-b border-zinc-900 mb-1">
-        <p className="text-xs text-zinc-500">
-          Sesión iniciada como
-        </p>
-
-        <p className="text-sm font-bold text-white truncate">
-          {user?.email}
-        </p>
-      </div>
-
-      <button
-        onClick={onLogout}
-        className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold text-rose-400 hover:bg-rose-500/10 transition-colors"
-      >
-        🚪 {t("navigation.navbar.logout")}
-      </button>
-       </div>
-      </div>
-      </div>
-          </div>
-    </header>
+          {/* USER MENU */}
+          <Box>
+            <IconButton onClick={handleMenu} sx={{ p: 0 }}>
+              <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
+                {Name?.charAt(0).toUpperCase()}
+              </Avatar>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              keepMounted
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              slotProps={{ paper: { sx: { mt: 1.5, width: 240, borderRadius: 2 } } }}
+            >
+              <Box sx={{ px: 2, py: 1 }}>
+                <Typography variant="caption" color="text.secondary">Sesión iniciada como</Typography>
+                <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold' }}>{user?.email}</Typography>
+              </Box>
+              <Divider />
+              <MenuItem onClick={() => { handleClose(); onLogout?.(); }}>
+                <Typography color="error">🚪 {t("navigation.navbar.logout")}</Typography>
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 

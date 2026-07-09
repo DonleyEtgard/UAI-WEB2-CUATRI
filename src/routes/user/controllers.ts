@@ -1221,15 +1221,15 @@ export const createSubscriptionPayment = async (
 
   const planPrices = {
    mercadopago: {
-    basic: 45000,
-    medium: 130000,
-    premium: 250000,
+    basic: 50000,
+    medium: 140000,
+    premium: 280000,
   },
 
   moncash: {
-    basic: 3000,
-    medium: 10800,
-    premium: 25000,
+    basic: 3400,
+    medium: 10500,
+    premium: 21000,
   },
 };
 
