@@ -14,7 +14,7 @@ const PublicNavbar = () => {
 
            <div className="haitibiz-logo">
              <span className="haitibiz-logo-icon">🌐</span>
-           </div>
+          </div>
 
            {/* TEXT */}
           <div className="flex flex-col">

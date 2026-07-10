@@ -38,7 +38,7 @@ function serviceWorkerPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), serviceWorkerPlugin()],
+  plugins: [react()],
  resolve: {
   alias: {
     '@': path.resolve(__dirname, './src'),
@@ -48,6 +48,7 @@ export default defineConfig({
     'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
   },
 },
+
 optimizeDeps: {
   include: [
     'react',
