@@ -18,52 +18,57 @@ const PublicNavbar = () => {
 
            {/* TEXT */}
           <div className="flex flex-col">
-          <h1 className="haitibiz-title">
+          <h1 className="haitibiz-title text-sm sm:text-lg md:text-xl">
             HAITI<span>BIZ</span>
           </h1>
 
-         <p className="haitibiz-subtitle">
+         <p className="haitibiz-subtitle text-[9px] sm:text-[10px] md:text-xs">
          ERP • SaaS • POS
         </p>
         </div>
        </div>
       </div>
 
-     <nav
+    <nav
       className="
       flex
       flex-wrap
-      items-center
+     items-center
       justify-center
-      gap-2
-      sm:gap-3
+      gap-1
+      sm:gap-2
       md:gap-4
       lg:gap-6
-      text-sm
-      text-on-surface-variant
-      "
+
+     text-[11px]
+     sm:text-xs
+     md:text-sm
+
+     text-on-surface-variant
+    "
       >
-       <Link to="/" className="hover:text-white transition">
+       <Link to="/" className=" px-1 sm:px-2  py-1  whitespace-nowrap hover:text-white transition ">
         {t("navigation.publicNavbar.home")}
        </Link>
 
-      <Link to="/about" className="hover:text-white transition">
+      <Link to="/about"  className=" px-1 sm:px-2 py-1 whitespace-nowrap hover:text-white transition">
         {t("navigation.publicNavbar.about")}
       </Link>
 
-       <Link to="/contact" className="hover:text-white transition">
+       <Link to="/contact"  className=" px-1 sm:px-2 py-1 whitespace-nowrap hover:text-white transition ">
         {t("navigation.publicNavbar.contact")}
        </Link>
 
-       <Link to="/login" className="hover:text-emerald-300 transition">
+       <Link to="/login"  className=" px-1 sm:px-2 py-1 whitespace-nowrap hover:text-white transition">
          {t("navigation.publicNavbar.login")}
         </Link>
 
-        <div className="hover:text-white transition">
+        <div  className=" text-[11px] sm:text-xs md:text-sm hover:text-white transition ">
          <InstallPWAButton />
        </div>
 
-      <div className="flex items-center gap-4">
+      <div className="
+        flex items-center gap-1 sm:gap-2 text-[11px]  sm:text-xs md:text-sm ">
         <LanguageSelector />
 
         <Link to="/login">
@@ -78,7 +83,10 @@ const PublicNavbar = () => {
           {t("navigation.publicNavbar.status")}
         </div>
         
-      <Link to="/register" className="hover:text-white transition">
+      <Link to="/register"  className=" text-[11px] sm:text-xs
+        md:text-sm whitespace-nowrap hover:text-white transition
+        "
+      >
         🚀 {t("navigation.publicNavbar.access")}
       </Link>
       </div>

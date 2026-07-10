@@ -304,10 +304,10 @@ dailySales: {
         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1.8, display: 'block' }}>
           {t("dashboard.welcome")}
         </Typography>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: 'blue', mt: 1 }}>
           📊 {t("dashboard.title")}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+        <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
           {t("dashboard.subtitle")} — {new Date().toLocaleString()}
         </Typography>
       </Box>
