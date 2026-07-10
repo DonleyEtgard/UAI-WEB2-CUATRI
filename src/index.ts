@@ -1,10 +1,11 @@
+import path from "path";
+
 import express, {
   Request,
   Response,
   NextFunction,
 } from "express";
 
-import path from "path";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
@@ -94,7 +95,6 @@ app.use(express.json({ limit: "10mb" }));
 // FIX: Also allow larger URL-encoded bodies for form submissions
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // FIX: Serve uploaded images from the uploads folder
-app.use("/api/dashboard", dashboardRoutes);
 
 console.log(
   "UPLOADS PATH:",
@@ -161,6 +161,14 @@ app.use(
   userRoutes // Middleware will be applied inside this router
 );
 
+// 🔐 DASHBOARD
+app.use(
+  "/api/dashboard",
+  requireVerifiedEmail,
+  checkSubscription,
+  dashboardRoutes
+);
+
 // 🔐 PRODUCTS (solo admin o superadmin)
 app.use(
   "/api/products",
@@ -218,12 +226,16 @@ app.use((err: any, _req: express.Request, res: express.Response, next: express.N
 
 // ================= FRONTEND (REACT BUILD) =================
 
-const frontendPath = path.resolve("frontend/dist");
+const frontendPath = path.join(process.cwd(), "frontend", "dist");
+
+console.log("FRONTEND PATH:", frontendPath);
 
 app.use(express.static(frontendPath));
 
-app.get("/*splat", (req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
+app.get("*", (_req: Request, res: Response) => {
+  res.sendFile(
+    path.join(frontendPath, "index.html")
+  );
 });
 
 // ============================================================================
