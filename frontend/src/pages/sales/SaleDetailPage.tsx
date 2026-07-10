@@ -28,7 +28,7 @@ export interface SaleItem {
 
 export interface Sale {
   _id: string;
-  customerId: string;
+  customer: { _id: string; name: string; lastName: string } | null;
   total: number;
   amountPaid: number;
   status: SaleStatus;
@@ -151,7 +151,9 @@ const SaleDetailPage = () => {
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Box>
                       <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, display: 'block', textTransform: 'uppercase', mb: 0.5 }}>{t("sales.detail.customer")}</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>{sale.customerId}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {sale.customer ? `${sale.customer.name} ${sale.customer.lastName}` : t("sales.list.finalConsumer")}
+                      </Typography>
                     </Box>
                   </Grid>
                 </Grid>

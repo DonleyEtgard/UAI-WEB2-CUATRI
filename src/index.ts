@@ -157,53 +157,43 @@ app.get("/cors-test", (_req, res) => {
 
 // 🔐 USERS (RBAC completo)
 app.use(
-  "/api/users",
-  userRoutes
+  "/api/users", // No global middleware here
+  userRoutes // Middleware will be applied inside this router
 );
 
 // 🔐 PRODUCTS (solo admin o superadmin)
 app.use(
   "/api/products",
-  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   productRoutes
 );
 
-// 🔐 CUSTOMERS
+// 🔐 CUSTOMERS (solo admin o superadmin)
 app.use(
   "/api/customers",
-  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   customerRoutes
 );
 
-// 🔐 SALES (employees incluidos)
+// 🔐 SALES (empleados incluidos)
 app.use(
   "/api/sales",
-  authenticateFirebase,
   requireVerifiedEmail,
   checkSubscription,
   saleRoutes
 );
 
 // 🔐 SALE ITEMS
-app.use(
-  "/api/sale-items",
-  authenticateFirebase,
-  requireVerifiedEmail,
-  checkSubscription,
-  saleItem
-);
+app.use("/api/sale-items", requireVerifiedEmail, checkSubscription, saleItem);
 
 
 // 🔐 STOCK (solo admin/superadmin)
 app.use(
   "/api/stock",
-  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
