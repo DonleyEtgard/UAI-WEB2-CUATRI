@@ -354,7 +354,7 @@ export const AppRouter: React.FC = () => {
           }
         />
 
-        {/* ================= GLOBAL 404 ================= */}
+        {/* ================ GLOBAL 404 ================ */}
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
 

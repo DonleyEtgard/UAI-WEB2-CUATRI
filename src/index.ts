@@ -11,7 +11,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-// ================= ROUTES =================
+
 import userRoutes from "./routes/user";
 import productRoutes from "./routes/product";
 import customerRoutes from "./routes/customer";
