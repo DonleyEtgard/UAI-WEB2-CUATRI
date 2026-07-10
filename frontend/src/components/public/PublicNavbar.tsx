@@ -11,9 +11,10 @@ const PublicNavbar = () => {
       <div className="flex items-center gap-3">
        <div className="flex items-center gap-4">
            {/* LOGO */}
+
            <div className="haitibiz-logo">
-          <span className="haitibiz-logo-icon">🌐</span>
-            </div>
+             <span className="haitibiz-logo-icon">🌐</span>
+           </div>
 
            {/* TEXT */}
           <div className="flex flex-col">
@@ -22,13 +23,12 @@ const PublicNavbar = () => {
           </h1>
 
          <p className="haitibiz-subtitle">
-         ERP • SaaS Platform
+         ERP • SaaS • POS
         </p>
         </div>
        </div>
       </div>
 
-      
      <nav
       className="
       flex
@@ -41,8 +41,8 @@ const PublicNavbar = () => {
       lg:gap-6
       text-sm
       text-on-surface-variant
-     "
-     >
+      "
+      >
        <Link to="/" className="hover:text-white transition">
         {t("navigation.publicNavbar.home")}
        </Link>
