@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as API from "../../services/customers.service";
+import API from "../../services/api";
 import { Box, Typography, Button, Skeleton, Paper, Chip, Divider, Pagination, ToggleButtonGroup, ToggleButton } from "@mui/material";
 
 interface Movement {
