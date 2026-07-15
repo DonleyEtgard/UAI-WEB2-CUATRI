@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Container, Card, CardContent, CardHeader, Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
-
+import * as API from "../../services/stock.service";
 import StockFilterForm from "./StockFilterForm";
 import StockSummaryPanel from "./StockSummaryPanel";
 

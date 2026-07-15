@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { Box, Card, CardContent, CardHeader, TextField, Button, Grid, FormControlLabel, Switch } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import API from "../../services/api";
+import { getCustomerById, createCustomer, updateCustomer } from "../../services/customers.service";
+
+import type { Customer } from "../../services/customers.service";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 
 const CustomerForm = () => {
@@ -16,7 +18,7 @@ const CustomerForm = () => {
   const [fetching, setFetching] = useState(false);
   const { t } = useTranslation();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Partial<Customer> & { initialPayment?: number }>({
     name: '',
     email: '',
     phone: '',
@@ -31,9 +33,9 @@ const CustomerForm = () => {
     const loadCustomer = async () => {
       try {
         setFetching(true);
-        const res = await API.get(`/customers/${id}`);
+        const customerData = await getCustomerById(id);
         // Ajustado para coincidir con la respuesta directa del backend
-        setForm({ ...res.data });
+        setForm(customerData);
       } catch (err) {
         console.error(err);
         alert(t("customers.form.loadingCustomerError"));
@@ -51,9 +53,9 @@ const CustomerForm = () => {
     setLoading(true);
 
     if (isEdit) {
-      await API.put(`/customers/${id}`, form);
+      await updateCustomer(id!, form);
     } else {
-      await API.post("/customers", form);
+      await createCustomer(form as Customer);
     }
 
     navigate("/app/customers");

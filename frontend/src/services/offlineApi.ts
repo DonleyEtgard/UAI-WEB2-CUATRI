@@ -14,14 +14,23 @@ const isOfflineError = (error: unknown): boolean => {
 
 export const getWithCache = async <T>(endpoint: string): Promise<T> => {
   try {
+    console.log("GET API:", endpoint);
+
     const response = await API.get<T>(endpoint);
+
+    console.log("API RESPONSE:", response.data);
+
     offlineSync.cacheApiData(endpoint, response.data, 60);
+
     return response.data;
   } catch (error) {
+    console.error("API ERROR:", error);
+
     const cached = offlineSync.getCachedData(endpoint);
     if (cached) {
       return cached as T;
     }
+
     throw error;
   }
 };
@@ -51,7 +60,7 @@ export const requestOrQueue = async <T>(
       data,
     });
 
-    await offlineSync.processQueue(API);
+    await offlineSync.processQueue();
     return response.data;
   } catch (error) {
     if (isOfflineError(error)) {

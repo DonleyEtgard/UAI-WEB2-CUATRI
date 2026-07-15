@@ -177,11 +177,14 @@ const imageUrls = parseImageUrls(
 );
 
 const uploadedUrls = getUploadedImageUrls(req);
+console.log("UPLOADED URLS:", uploadedUrls);
+console.log("FILES:", req.files);
 
 const images = [
   ...imageUrls,
   ...uploadedUrls,
 ];
+console.log("IMAGES TO SAVE:", images);
 
 // Multipart/FormData envía todo como string
 const payload = {
@@ -248,6 +251,7 @@ const product = await Product.create({
 });
 
 console.log("PRODUCT CREATED:", product._id);
+console.log("PRODUCT SAVED:", product.images);
 
 return res.status(201).json({
   success: true,

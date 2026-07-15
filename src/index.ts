@@ -1,17 +1,11 @@
+import express from "express";
 import path from "path";
-
-import express, {
-  Request,
-  Response,
-  NextFunction,
-} from "express";
-
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-
+// ================= ROUTES =================
 import userRoutes from "./routes/user";
 import productRoutes from "./routes/product";
 import customerRoutes from "./routes/customer";
@@ -61,13 +55,14 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://haitibiz.onrender.com"
+      "https://uai-web2-cuatri.onrender.com"
     ],
      credentials: true,
       methods: [
       "GET",
       "POST",
       "PUT",
+      "PATCH",
       "DELETE",
       "OPTIONS"
     ],
@@ -78,23 +73,13 @@ app.use(
   })
 );
 
-app.use((
-  req: Request,
-  _res: Response,
-  next: NextFunction
-) => {
-  console.log("ORIGIN:", req.headers.origin);
-  console.log("METHOD:", req.method);
-  console.log("URL:", req.url);
-
-  next();
-});
 // FIX: Increase default JSON body parser limit to accommodate larger payloads
 // (avoids PayloadTooLargeError when clients previously sent Base64 images)
 app.use(express.json({ limit: "10mb" }));
 // FIX: Also allow larger URL-encoded bodies for form submissions
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // FIX: Serve uploaded images from the uploads folder
+app.use("/api/dashboard", dashboardRoutes);
 
 console.log(
   "UPLOADS PATH:",
@@ -107,11 +92,7 @@ app.use(
 );
 
 // LOGGING
-app.use((
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+app.use((req, _res, next) => {
   console.log(`➡️ ${req.method} ${req.path}`);
   next();
 });
@@ -126,10 +107,7 @@ app.post("/api/payments/mercadopago/webhook", mercadoPagoWebhook);
 // HEALTH CHECK
 // ============================================================================
 
-app.get("/", (
-  _req: Request,
-  res: Response
-) => {
+app.get("/", (_req, res) => {
   res.json({
     message: "🚀 API funcionando correctamente",
     version: "1.0.0",
@@ -156,52 +134,54 @@ app.get("/cors-test", (_req, res) => {
 // ============================================================================
 
 // 🔐 USERS (RBAC completo)
-app.use(
-  "/api/users", // No global middleware here
-  userRoutes // Middleware will be applied inside this router
-);
-
-// 🔐 DASHBOARD
-app.use(
-  "/api/dashboard",
-  requireVerifiedEmail,
-  checkSubscription,
-  dashboardRoutes
+app.use("/api/users", 
+  authenticateFirebase, 
+  userRoutes
 );
 
 // 🔐 PRODUCTS (solo admin o superadmin)
 app.use(
   "/api/products",
+  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
-  productRoutes
+  productRoutes(path.join(process.cwd(), "src", "uploads"))
 );
 
-// 🔐 CUSTOMERS (solo admin o superadmin)
+// 🔐 CUSTOMERS
 app.use(
   "/api/customers",
+  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
   customerRoutes
 );
 
-// 🔐 SALES (empleados incluidos)
+// 🔐 SALES (employees incluidos)
 app.use(
   "/api/sales",
+  authenticateFirebase,
   requireVerifiedEmail,
   checkSubscription,
   saleRoutes
 );
 
 // 🔐 SALE ITEMS
-app.use("/api/sale-items", requireVerifiedEmail, checkSubscription, saleItem);
+app.use(
+  "/api/sale-items",
+  authenticateFirebase,
+  requireVerifiedEmail,
+  checkSubscription,
+  saleItem
+);
 
 
 // 🔐 STOCK (solo admin/superadmin)
 app.use(
   "/api/stock",
+  authenticateFirebase,
   requireVerifiedEmail,
   authorizeAdminOrSuperadmin,
   checkSubscription,
@@ -226,16 +206,14 @@ app.use((err: any, _req: express.Request, res: express.Response, next: express.N
 
 // ================= FRONTEND (REACT BUILD) =================
 
-const frontendPath = path.join(process.cwd(), "frontend", "dist");
-
-console.log("FRONTEND PATH:", frontendPath);
+const frontendPath = path.resolve("frontend/dist");
 
 app.use(express.static(frontendPath));
 
-app.get("/{*splat}", (_req: Request, res: Response) => {
-  res.sendFile(
-    path.join(frontendPath, "index.html")
-  );
+console.log("Frontend path:", frontendPath);
+
+app.get("/*splat", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 // ============================================================================
@@ -245,6 +223,7 @@ app.get("/{*splat}", (_req: Request, res: Response) => {
 const startServer = async () => {
   await connectDB();
 
+  // 🔥 CREA SUPERADMIN SI NO EXISTE
   await createSuperadminIfNotExists();
 
   app.listen(PORT, () => {

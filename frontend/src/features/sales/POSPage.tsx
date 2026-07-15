@@ -322,6 +322,8 @@ const [search, setSearch] = useState("");
 
   console.log("Producto:", p.name);
   console.log("Imagen:", p.images?.[0]);
+  console.log("Todas las imágenes:", p.images);
+  console.log(JSON.stringify(p, null, 2));
   console.log("Objeto completo:", p);
 
   return (

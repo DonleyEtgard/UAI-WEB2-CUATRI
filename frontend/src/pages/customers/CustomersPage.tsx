@@ -2,29 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid, Card, CardContent, CardHeader, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import API from "../../services/api";
 import DataGridWrapper from "../../components/common/DataGridWrapper";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import EmptyState from "../../components/common/EmptyState";
 import UiBadge from "../../components/common/UiBadge";
-
-interface Payment {
-  amount: number;
-  date: string;
-  type: "initial" | "payment";
-  remainingDebt: number;
-}
-
-interface Customer {
-  _id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  debt?: number;
-  payments?: Payment[];
-  isActive: boolean;
-  createdAt?: string;
-}
+import { getCustomers, deleteCustomer } from "../../services/customers.service";
+import type { Customer } from "../../services/customers.service";
 
 const CustomersPage = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -37,20 +20,11 @@ const CustomersPage = () => {
   try {
     setLoading(true);
 
-    const res = await API.get("/customers");
+    const data = await getCustomers();
 
-    console.log("RAW RESPONSE:", res);
-    console.log("RESPONSE DATA:", res.data);
+    console.log("CUSTOMERS SERVICE:", data);
 
-    const data =
-      res.data?.data?.customers ||
-      res.data?.customers ||
-      res.data ||
-      [];
-
-    console.log("CUSTOMERS ARRAY:", data);
-
-    setCustomers(Array.isArray(data) ? data : []);
+    setCustomers(data);
   } catch (err) {
     console.error("Error loading customers:", err);
     setCustomers([]);
@@ -68,7 +42,7 @@ const CustomersPage = () => {
 
     try {
       setDeletingId(id);
-      await API.delete(`/customers/${id}`);
+      await deleteCustomer(id);
       setCustomers((prev) => prev.filter((c) => c._id !== id));
     } catch (err) {
       console.error(err);

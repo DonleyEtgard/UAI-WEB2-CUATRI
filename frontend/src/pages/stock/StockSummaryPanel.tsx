@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStockSummary } from "../../services/stock.service.ts";
+import { getStockSummary } from "../../services/stock.service";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 

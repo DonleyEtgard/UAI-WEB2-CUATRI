@@ -111,20 +111,13 @@ export interface CreateSubscriptionPaymentResponse {
 // 📌 GET ALL
 export const getPaymentMethods = async (): Promise<
   PaymentMethod[]
-> => {
-  return await getWithCache<PaymentMethod[]>(
-    "/payment-methods"
-  );
-};
+> => await getWithCache<PaymentMethod[]>("/payment-methods");
 
 // 📌 GET ONE
 export const getPaymentMethodById = async (
   id: string
-): Promise<PaymentMethod> => {
-  return await getWithCache<PaymentMethod>(
-    `/payment-methods/${id}`
-  );
-};
+): Promise<PaymentMethod> =>
+  await getWithCache<PaymentMethod>(`/payment-methods/${id}`);
 
 // ➕ CREATE
 export const createPaymentMethod = async (data: {

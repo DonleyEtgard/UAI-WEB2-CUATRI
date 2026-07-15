@@ -13,12 +13,11 @@ import {
   logoutUser,
   observeAuth,
   getFirebaseIdToken,
-  sendEmailVerificationEmail
-,
+  sendEmailVerificationEmail,
   forgotPassword as firebaseForgotPassword,
 } from "../firebase/auth";
 
-import apiClient from "../config/api";
+import API from "../services/api";
 
 import type {
   AuthContextType,
@@ -167,7 +166,7 @@ export const AuthProvider: React.FC<
           );
 
           const response =
-            await apiClient.get<{
+            await API.get<{
               success: boolean;
               data: {
                 user: DBUser | null;
@@ -287,7 +286,7 @@ export const AuthProvider: React.FC<
       // Guardar token antes de llamar a /me
       localStorage.setItem("firebaseToken", idToken);
 
-      const response = await apiClient.get<{
+      const response = await API.get<{
         success: boolean;
         data: { user: DBUser | null };
       }>("/users/me");
@@ -369,7 +368,7 @@ export const AuthProvider: React.FC<
       // ================================================================
 
       const response =
-        await apiClient.post<{
+        await API.post<{
           success: boolean;
           data: {
             user: DBUser;

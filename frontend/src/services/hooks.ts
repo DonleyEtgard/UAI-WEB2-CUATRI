@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getSalesSummary as fetchSalesSummary } from "./sales.service";
+import { getSalesSummary } from "./sales.service";
 import { getStockSummary as fetchStockStatus } from "./stock.service";
 import type { SalesSummary, StockReport } from "./types";
 
@@ -15,7 +15,7 @@ export const useSalesReport = (startDate?: string, endDate?: string) => {
     setLoading(true);
     setError(null);
     try {
-      const summary = await fetchSalesSummary(startDate, endDate);
+      const summary = await getSalesSummary(startDate, endDate);
       setData(summary);
     } catch (err: any) {
       setError(err.message || "Error al cargar reporte de ventas");

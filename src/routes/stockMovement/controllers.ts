@@ -25,6 +25,48 @@ export const getOrganizationScope = (req: AuthRequest) => {
 };
 
 // 📌 Crear producto
+export const handleCreateProduct = [
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { name, price, cost, stock, category } = req.body;
+      const imageFiles = req.files as Express.Multer.File[];
+      const images = imageFiles.map((file) => `/uploads/products/${file.filename}`);
+
+      const product = await Product.create({
+        name,
+        price,
+        cost,
+        stock,
+        category,
+        images, // Guardar las rutas de las imágenes
+        createdBy: req.dbUser?._id,
+        ownerAdmin: req.dbUser?.ownerAdmin || req.dbUser?._id,
+        isActive: true,
+      });
+
+      // ✅ Registrar movimiento inicial
+      if (stock > 0) {
+        await StockMovement.create({
+          product: product._id,
+          type: "in",
+          quantity: stock,
+          user: req.dbUser?._id,
+          reason: "initial_stock",
+          stockAfter: stock,
+          createdBy: req.dbUser?._id,
+          ownerAdmin: req.dbUser?.ownerAdmin || req.dbUser?._id,
+        });
+      }
+      res.status(201).json(product);
+    } catch (error: any) {
+      res.status(500).json({
+        message: "Error creating product",
+        error: error.message,
+      });
+    }
+  },
+];
+
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const {
@@ -79,35 +121,45 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
   }
 };
 // 📌 Actualizar producto
-export const updateProduct = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const { id } = req.params;
+export const handleUpdateProduct = [
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { imageUrls, ...productData } = req.body;
+      const imageFiles = (req.files as Express.Multer.File[]) || [];
+      const newImages = imageFiles.map((file) => `/uploads/products/${file.filename}`);
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      req.body,
-      {
-        new: true
+      // Combina las imágenes existentes (si las hay) con las nuevas
+      let existingImages: string[] = [];
+      if (imageUrls) {
+        try {
+          existingImages = Array.isArray(imageUrls) ? imageUrls : JSON.parse(imageUrls);
+        } catch (e) {
+          existingImages = imageUrls.split(',').map((i: string) => i.trim()).filter(Boolean);
+        }
       }
-    );
 
-    if (!updatedProduct) {
-      return res.status(404).json({
-        message: "Product not found"
+      const allImages = [...existingImages, ...newImages];
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        { ...productData, images: allImages },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(updatedProduct);
+    } catch (error: any) {
+      res.status(500).json({
+        message: "Error updating product",
+        error: error.message,
       });
     }
-
-    res.json(updatedProduct);
-
-  } catch (error: any) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
-};
+  },
+];
+export const updateProduct = handleUpdateProduct;
 // 📌 Actualizar stock manualmente
 export const updateProductStock = async (
   req: AuthRequest,

@@ -13,115 +13,84 @@ import {
   getProductStats,
 } from "./controllers";
 
-const router = express.Router();
+export default (uploadsDir: string) => {
+  const router = express.Router();
 
-// ======================================================
-// UPLOADS DIRECTORY
-// ======================================================
+  // ======================================================
+  // UPLOADS DIRECTORY
+  // ======================================================
 
-const uploadPath = path.resolve(
-  __dirname,
-  "../../uploads/products"
-);
+  const uploadPath = path.join(uploadsDir, "products");
 
-fs.mkdirSync(uploadPath, {
-  recursive: true,
-});
+  fs.mkdirSync(uploadPath, {
+    recursive: true,
+  });
 
-// ======================================================
-// MULTER STORAGE
-// ======================================================
+  // ======================================================
+  // MULTER STORAGE
+  // ======================================================
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadPath);
-  },
+  const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      cb(null, uploadPath);
+    },
 
-  filename: (_req, file, cb) => {
-    const timestamp = Date.now();
+    filename: (_req, file, cb) => {
+      const timestamp = Date.now();
 
-    const safeName = file.originalname
-      .replace(/\s+/g, "-")
-      .replace(/[^a-zA-Z0-9.-]/g, "")
-      .toLowerCase();
+      const safeName = file.originalname
+        .replace(/\s+/g, "-")
+        .replace(/[^a-zA-Z0-9.-]/g, "")
+        .toLowerCase();
 
-    cb(
-      null,
-      `${timestamp}-${safeName}`
-    );
-  },
-});
+      cb(null, `${timestamp}-${safeName}`);
+    },
+  });
 
-// ======================================================
-// MULTER CONFIG
-// ======================================================
+  // ======================================================
+  // MULTER CONFIG
+  // ======================================================
 
-const upload = multer({
-  storage,
+  const upload = multer({
+    storage,
 
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
-  },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
 
-  fileFilter: (_req, file, cb) => {
-    if (!file.mimetype.startsWith("image/")) {
-      return cb(
-        new Error(
-          "Only image files are allowed"
-        )
-      );
-    }
+    fileFilter: (_req, file, cb) => {
+      if (!file.mimetype.startsWith("image/")) {
+        return cb(new Error("Only image files are allowed"));
+      }
 
-    cb(null, true);
-  },
-});
+      cb(null, true);
+    },
+  });
 
-// ======================================================
-// ROUTES
-// ======================================================
+  // ======================================================
+  // ROUTES
+  // ======================================================
 
-// Crear producto
-router.post(
-  "/",
-  upload.array("images", 5),
-  createProduct
-);
+  // Crear producto
+  router.post("/", upload.array("images", 5), createProduct);
 
-// Obtener todos
-router.get(
-  "/",
-  getProducts
-);
+  // Obtener todos
+  router.get("/", getProducts);
 
-// Obtener uno
-router.get(
-  "/:id",
-  getProductById
-);
+  // Obtener uno
+  router.get("/:id", getProductById);
 
-// Actualizar
-router.put(
-  "/:id",
-  upload.array("images", 5),
-  updateProduct
-);
+  // Actualizar
+  router.put("/:id", upload.array("images", 5), updateProduct);
 
-// Eliminar (soft delete)
-router.delete(
-  "/:id",
-  deleteProduct
-);
+  // Eliminar (soft delete)
+  router.delete("/:id", deleteProduct);
 
-// Ajustar stock
-router.patch(
-  "/:id/stock",
-  updateStock
-);
+  // Ajustar stock
+  router.patch("/:id/stock", updateStock);
 
-// Estadísticas
-router.get(
-  "/:id/stats",
-  getProductStats
-);
+  // Estadísticas
+  router.get("/:id/stats", getProductStats);
 
-export default router;
+  return router;
+};

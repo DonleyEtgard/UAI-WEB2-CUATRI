@@ -32,25 +32,21 @@ const router = express.Router();
 
 router.get(
   "/stats/daily",
-  authenticateFirebase,
   getDailySales
 );
 
 router.get(
   "/stats/monthly",
-  authenticateFirebase,
   getMonthlySales
 );
 
 router.get(
   "/stats/top-products",
-  authenticateFirebase,
   getTopProducts
 );
 
 router.get(
   "/",
-  authenticateFirebase,
   getSales
 );
 
@@ -60,13 +56,11 @@ router.get(
 
 router.get(
   "/ticket/:id",
-  authenticateFirebase,
   getTicket
 );
 
 router.get(
   "/summary",
-  authenticateFirebase,
   getSummary
 );
 
@@ -76,13 +70,11 @@ router.get(
 
 router.post(
   "/ticket/send-whatsapp",
-  authenticateFirebase,
   sendTicketWhatsApp
 );
 
 router.post(
   "/ticket/send-telegram",
-  authenticateFirebase,
   sendTicketTelegram
 );
 
@@ -93,13 +85,11 @@ router.post(
 
 router.post(
   "/",
-  authenticateFirebase,
   createSale
 );
 
 router.patch(
   "/:id/status",
-  authenticateFirebase,
   updateSaleStatus
 );
 
@@ -109,30 +99,25 @@ router.patch(
 
 router.get(
   "/items",
-  authenticateFirebase,
   getSaleItems
 );
 
 router.get(
   "/items/sale/:saleId",
-  authenticateFirebase,
   getItemsBySale
 );
 
 router.get(
   "/items/:id",
-  authenticateFirebase,
   getSaleItemById
 );
 
 router.delete(
   "/items/:id",
-  authenticateFirebase,
   deleteSaleItem
 );
 
-router.get("/:id", 
-  authenticateFirebase, 
+router.get("/:id",
   getSaleById
 );
 

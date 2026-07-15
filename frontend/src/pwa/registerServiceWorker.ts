@@ -1,5 +1,4 @@
 import { offlineSync } from '../services/offlineSync';
-import API from '../services/api';
 
 export const registerServiceWorker = () => {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -33,7 +32,7 @@ export const registerServiceWorker = () => {
   });
 
   window.addEventListener('online', () => {
-    offlineSync.processQueue(API).then((result) => {
+    offlineSync.processQueue().then((result) => {
       if (result.success > 0) {
         console.log(`🔄 Sincronizados ${result.success} cambios offline`);
       }

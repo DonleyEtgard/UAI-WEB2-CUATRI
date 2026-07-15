@@ -1,5 +1,5 @@
 export type UserRole = "superadmin" | "admin" | "employee";
-export type Currency = "ARS" | "USD" | "EUR";
+export type Currency = "ARS" | "HTG";
 
 export interface AppUser {
   _id: string;

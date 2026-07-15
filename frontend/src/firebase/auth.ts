@@ -28,7 +28,7 @@ const requireAuth = () => {
 };
 
 const actionCodeSettings = {
-  url: `${import.meta.env.VITE_APP_URL}/verify-email`,
+  url: `${window.location.origin}/verify-email`,
   handleCodeInApp: false,
 };
 

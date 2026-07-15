@@ -90,6 +90,7 @@ export default function PaymentPage() {
       }
 
       if (response.paymentUrl) {
+        window.location.href = response.paymentUrl;
         // Usamos un pequeño timeout para evitar el error de "message channel closed".
         // Esto le da tiempo a las extensiones del navegador a procesar antes de la redirección.
         setLoading(true); // Mantenemos el estado de carga

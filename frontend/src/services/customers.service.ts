@@ -1,28 +1,44 @@
 import { getWithCache, requestOrQueue } from "./offlineApi";
 
+// ==========================
+// Interfaces
+// ==========================
+
 export interface Payment {
   amount: number;
-  date: string;
+  date: string | Date;
+  type?: "initial" | "payment";
+  remainingDebt?: number;
+
+  createdBy?: string;
+  ownerAdmin?: string;
 }
 
 export interface Customer {
   _id?: string;
+
   name: string;
   lastName?: string;
+
   address?: string;
   email?: string;
   phone?: string;
 
-  user?: string; // 🔥 IMPORTANTE (Mongo ObjectId)
-
   debt?: number;
 
-  payments?: {
-    amount: number;
-    date: string | Date;
-  }[];
+  /**
+   * El backend lo recibe al crear un cliente
+   * y luego calcula debt = debt - initialPayment
+   */
+  initialPayment?: number;
+
+  payments?: Payment[];
 
   isActive?: boolean;
+
+  user?: string;
+  createdBy?: string;
+  ownerAdmin?: string;
 
   createdAt?: string;
   updatedAt?: string;
@@ -32,17 +48,23 @@ export interface Customer {
 // API
 // ==========================
 
-// 📌 Obtener todos
+// Obtener todos los clientes
 export const getCustomers = async (): Promise<Customer[]> => {
-  return getWithCache<Customer[]>("/customers");
+  const response = await getWithCache<Customer[]>("/customers");
+
+  console.log("SERVICE RESPONSE:", response);
+
+  return response;
 };
 
-// 📌 Obtener por ID
-export const getCustomerById = async (id: string): Promise<Customer> => {
-  return getWithCache<Customer>(`/customers/${id}`);
+// Obtener cliente por ID
+export const getCustomerById = async (
+  id: string
+): Promise<Customer> => {
+  return await getWithCache<Customer>(`/customers/${id}`);
 };
 
-// 📌 Crear cliente
+// Crear cliente
 export const createCustomer = async (
   data: Customer
 ): Promise<Customer> => {
@@ -50,51 +72,64 @@ export const createCustomer = async (
     ...data,
     _id: `offline_customer_${Date.now()}`,
     isActive: true,
-    debt: data.debt || 0,
-    payments: [],
+    debt:
+      (data.debt ?? 0) -
+      (data.initialPayment ?? 0),
+    payments:
+      data.initialPayment && data.initialPayment > 0
+        ? [
+            {
+              amount: data.initialPayment,
+              type: "initial",
+              remainingDebt:
+                (data.debt ?? 0) -
+                (data.initialPayment ?? 0),
+              date: new Date(),
+            },
+          ]
+        : [],
   };
 
-  const result = await requestOrQueue<Customer>(
+  return await requestOrQueue<Customer>(
     "POST",
     "/customers",
     data,
     fallbackCustomer
   );
-
-  return result;
 };
 
-// 📌 Actualizar cliente
+// Actualizar cliente
 export const updateCustomer = async (
   id: string,
   data: Partial<Customer>
 ): Promise<Customer> => {
-  const result = await requestOrQueue<Customer>(
+  return await requestOrQueue<Customer>(
     "PUT",
     `/customers/${id}`,
     data
   );
-
-  return result;
 };
 
-// 📌 Agregar pago (CORREGIDO endpoint + offline)
+// Agregar pago
 export const addPayment = async (
   id: string,
   amount: number
 ): Promise<Customer> => {
-  const result = await requestOrQueue<Customer>(
+  return await requestOrQueue<Customer>(
     "POST",
     `/customers/${id}/payment`,
-    { amount }
+    {
+      amount,
+    }
   );
-
-  return result;
 };
 
-// 📌 Eliminar cliente (soft delete + offline)
-export const deleteCustomer = async (id: string): Promise<void> => {
-  await requestOrQueue<void>(
+
+// Eliminar cliente (soft delete)
+export const deleteCustomer = async (
+  id: string
+): Promise<{ message: string }> => {
+  return await requestOrQueue<{ message: string }>(
     "DELETE",
     `/customers/${id}`
   );

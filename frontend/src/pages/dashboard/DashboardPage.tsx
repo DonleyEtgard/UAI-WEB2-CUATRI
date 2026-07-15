@@ -301,13 +301,13 @@ dailySales: {
         border: '1px solid', 
         borderColor: 'divider' 
       }}>
-        <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1.8, display: 'block' }}>
+        <Typography variant="overline" sx={{ color: 'blue', fontWeight: 700, letterSpacing: 1.8, display: 'block' }}>
           {t("dashboard.welcome")}
         </Typography>
         <Typography variant="h4" sx={{ fontWeight: 800, color: 'blue', mt: 1 }}>
           📊 {t("dashboard.title")}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
+        <Typography variant="body2" sx={{ color: '#ffffff', mt: 1 }}>
           {t("dashboard.subtitle")} — {new Date().toLocaleString()}
         </Typography>
       </Box>

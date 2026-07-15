@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import API from "../../services/api";
+import API from "@/services/api";
 import SkeletonLoader from "../../components/common/SkeletonLoader";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
@@ -80,13 +80,6 @@ const ProductFormPage = () => {
     loadProduct();
   }, [id]);
 
-  // FIX: Clean up object URLs on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      newImageFiles.forEach(imageFile => URL.revokeObjectURL(imageFile.preview));
-    };
-  }, [newImageFiles]);
-
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
     const sizes = ["Bytes", "KB", "MB", "GB"];
@@ -108,11 +101,13 @@ const ProductFormPage = () => {
     const selectedBytes = files.reduce((sum, file) => sum + file.size, 0);
 
     if (files.some((file) => file.size > maxFileBytes)) {
+      alert("Cada imagen no puede superar los 5 MB.");
       alert(t("products.form.imageMaxSize"));
       return;
     }
 
     if (currentBytes + selectedBytes > maxTotalBytes) {
+      alert("El total de imágenes no puede superar los 10 MB.");
       alert(t("products.form.imagesMaxTotalSize"));
       return;
     }
@@ -173,13 +168,11 @@ const ProductFormPage = () => {
 
   console.log(
     "SERVER RESPONSE:",
-    err?.response?.data
+    err?.response?.data,
   );
 
   alert(
-    err?.response?.data?.error ||
-    err?.response?.data?.message ||
-    t("products.form.saveError")
+    err?.response?.data?.error || err?.response?.data?.message || t("products.form.saveError"),
   );
 } finally {
       setLoading(false);
@@ -225,13 +218,9 @@ const ProductFormPage = () => {
             }}
           >
             {isEdit ? (
-              <>
-                {t("products.form.editTitle")} <span style={{ color: "#6366f1" }}>{t("products.form.product")}</span>
-              </>
+              <>{t("products.form.editTitle")} <span style={{ color: "#6366f1" }}>{t("products.form.product")}</span></>
             ) : (
-              <>
-                {t("products.form.newTitle")} <span style={{ color: "#6366f1" }}>{t("products.form.product")}</span>
-              </>
+              <>{t("products.form.newTitle")} <span style={{ color: "#6366f1" }}>{t("products.form.product")}</span></>
             )}
           </h1>
 
@@ -329,7 +318,7 @@ const ProductFormPage = () => {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
-              <Typography variant="overline">
+              <Typography variant="overline">                
                 {t("products.form.currentPrice")}
               </Typography>
 
@@ -346,7 +335,7 @@ const ProductFormPage = () => {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
-              <Typography variant="overline">
+              <Typography variant="overline">                
                 {t("products.form.stock")}
               </Typography>
 
@@ -363,14 +352,13 @@ const ProductFormPage = () => {
         <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
-              <Typography variant="overline">
+              <Typography variant="overline">                
                 {t("products.form.status")}
               </Typography>
 
               <Box sx={{ mt: 1 }}>
                 <Chip
-                  label={
-                    form.isActive
+                  label={form.isActive
                       ? t("products.form.active")
                       : t("products.form.inactive")
                   }
@@ -637,11 +625,10 @@ const ProductFormPage = () => {
             startIcon={<SaveIcon />}
             disabled={loading}
           >
-            {loading
-              ? t("products.form.saving")
-              : isEdit
-              ? t("products.form.updateProduct")
-              : t("products.form.createProduct")}
+            {loading ? t("products.form.saving") : 
+              isEdit ? t("products.form.updateProduct") 
+              : t("products.form.createProduct")
+            }
           </Button>
         </Box>
       </form>

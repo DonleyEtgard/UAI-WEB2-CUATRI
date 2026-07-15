@@ -601,18 +601,18 @@ button:hover,
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-/* =========================================================
-   GLOBAL RESPONSIVE
-========================================================= */
-
-/* Tablets */
+/* =========================
+   TABLET
+========================= */
 @media (max-width: 992px) {
 
+  /* Container */
   .container {
     padding-left: 16px;
     padding-right: 16px;
   }
 
+  /* Typography */
   .title-xl {
     font-size: 2rem;
   }
@@ -629,6 +629,7 @@ button:hover,
     font-size: 1.25rem;
   }
 
+  /* Forms */
   .form-grid-2,
   .form-grid-3,
   .register-grid,
@@ -638,6 +639,7 @@ button:hover,
     grid-template-columns: 1fr;
   }
 
+  /* Tables */
   .table {
     font-size: 13px;
   }
@@ -649,14 +651,63 @@ button:hover,
 
 }
 
-/* Mobile */
+/* =========================
+   MOBILE
+========================= */
 @media (max-width: 768px) {
 
+  /* Container */
   .container {
     padding-left: 12px;
     padding-right: 12px;
   }
 
+  /* Navbar */
+  .public-navbar {
+    height: auto;
+    min-height: 64px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .public-navbar nav {
+    gap: .5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .public-navbar nav a {
+    padding: 6px 8px;
+    font-size: .75rem;
+  }
+
+  /* Logo */
+  .haitibiz-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .haitibiz-logo-icon {
+    font-size: 1.2rem;
+  }
+
+  .haitibiz-title {
+    font-size: 1rem;
+    letter-spacing: .08em;
+  }
+
+  .haitibiz-subtitle {
+    font-size: .55rem;
+    letter-spacing: .08em;
+  }
+
+  .btn-access {
+    padding: 6px 10px;
+    font-size: .75rem;
+  }
+
+  /* Typography */
   .title-xl {
     font-size: 1.8rem;
   }
@@ -681,6 +732,7 @@ button:hover,
     font-size: .9rem;
   }
 
+  /* Cards */
   .card,
   .form-container,
   .summary-card,
@@ -688,6 +740,7 @@ button:hover,
     padding: 20px;
   }
 
+  /* Forms */
   input,
   select,
   textarea {
@@ -702,6 +755,7 @@ button:hover,
     max-width: 100%;
   }
 
+  /* Tables */
   .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -713,14 +767,55 @@ button:hover,
 
 }
 
-/* Small Mobile */
+/* =========================
+   SMALL MOBILE
+========================= */
 @media (max-width: 480px) {
 
+  /* Container */
   .container {
     padding-left: 10px;
     padding-right: 10px;
   }
 
+  /* Navbar */
+  .public-navbar {
+    padding: 6px 8px;
+  }
+
+  .public-navbar nav {
+    gap: .25rem;
+  }
+
+  .public-navbar nav a {
+    padding: 4px 6px;
+    font-size: .68rem;
+  }
+
+  /* Logo */
+  .haitibiz-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .haitibiz-logo-icon {
+    font-size: 1rem;
+  }
+
+  .haitibiz-title {
+    font-size: .9rem;
+  }
+
+  .haitibiz-subtitle {
+    font-size: .5rem;
+  }
+
+  .btn-access {
+    padding: 5px 8px;
+    font-size: .68rem;
+  }
+
+  /* Typography */
   .title-xl {
     font-size: 1.5rem;
   }
@@ -745,6 +840,7 @@ button:hover,
     font-size: .85rem;
   }
 
+  /* Cards */
   .card,
   .form-container,
   .summary-card,

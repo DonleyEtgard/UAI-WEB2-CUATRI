@@ -21,9 +21,8 @@ export const useMe = () => {
     try {
       // La respuesta de la API viene anidada, la extraemos aquí
       const response = await fetchMe();
-      if (response?.success && response.data?.user) {
-        setMe(response.data.user || null);
-      }
+      const user = response?.data?.user ?? null;
+      setMe(user);
     } catch (err: any) {
       setError(err.message);
     } finally {

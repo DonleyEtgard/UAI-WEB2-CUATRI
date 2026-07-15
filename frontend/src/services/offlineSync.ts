@@ -1,3 +1,5 @@
+import API from "./api";
+
 // Sistema de sincronización offline
 interface OfflineAction {
   id: string;
@@ -41,7 +43,7 @@ export const offlineSync = {
   },
 
   // Procesar la cola cuando se recupera la conexión
-  processQueue: async (api: any) => {
+  processQueue: async () => {
     const queue = offlineSync.getQueue();
     const failed: OfflineAction[] = [];
 
@@ -49,16 +51,16 @@ export const offlineSync = {
       try {
         switch (action.type) {
           case 'POST':
-            await api.post(action.endpoint, action.data);
+            await API.post(action.endpoint, action.data);
             break;
           case 'PUT':
-            await api.put(action.endpoint, action.data);
+            await API.put(action.endpoint, action.data);
             break;
           case 'PATCH':
-            await api.patch(action.endpoint, action.data);
+            await API.patch(action.endpoint, action.data);
             break;
           case 'DELETE':
-            await api.delete(action.endpoint);
+            await API.delete(action.endpoint);
             break;
         }
       } catch (error) {

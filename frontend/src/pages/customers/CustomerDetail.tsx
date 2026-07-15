@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import API from "../../services/api";
 import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip, TextField, InputAdornment, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { getCustomerById, addPayment, deleteCustomer } from "../../services/customers.service";
+import type { Customer, Payment } from "../../services/customers.service";
 
 const CustomerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [customer, setCustomer] = useState<any>(null);
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -19,10 +20,9 @@ const CustomerDetail = () => {
       if (!id) return;
       setLoading(true);
       try {
-        const res = await API.get(`/customers/${id}`);
-        // El backend devuelve el objeto directamente
-        console.log("DEBUG: Customer Detail Loaded:", res.data);
-        setCustomer(res.data);
+        const customerData = await getCustomerById(id);
+        console.log("DEBUG: Customer Detail Loaded:", customerData);
+        setCustomer(customerData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -40,10 +40,8 @@ const CustomerDetail = () => {
 
     try {
       setPaymentLoading(true);
-      const res = await API.post(`/customers/${id}/payment`, {
-        amount: Number(newPaymentAmount),
-      });
-      setCustomer(res.data); // Actualiza el estado del cliente con la respuesta
+      const updatedCustomer = await addPayment(id, Number(newPaymentAmount));
+      setCustomer(updatedCustomer); // Actualiza el estado del cliente con la respuesta
       setNewPaymentAmount(""); // Limpia el input
     } catch (err) {
       console.error("Error adding payment:", err);
@@ -59,7 +57,7 @@ const CustomerDetail = () => {
     if (!ok) return;
     try {
       setDeleting(true);
-      await API.delete(`/customers/${id}`);
+      await deleteCustomer(id);
       navigate("/app/customers");
     } finally {
       setDeleting(false);
@@ -152,7 +150,7 @@ const CustomerDetail = () => {
               <CardContent sx={{ pt: 2, textAlign: 'center' }}>
                 <Typography variant="overline" sx={{ color: 'text.secondary' }}>{t("customers.detail.registrationDate")}</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600, mt: 1 }}>
-                  {new Date(customer.createdAt).toLocaleDateString('es-ES')}
+                  {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('es-ES') : 'N/A'}
                 </Typography>
               </CardContent>
             </Card>
@@ -202,7 +200,7 @@ const CustomerDetail = () => {
               <Typography sx={{ color: 'text.secondary', fontStyle: 'italic', py: 2, textAlign: 'center' }}>{t("customers.detail.noPayments")}</Typography>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {customer.payments.map((p: any, i: number) => (
+                {[...customer.payments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((p: Payment, i: number) => (
                   <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
                     <Box>
                       <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
