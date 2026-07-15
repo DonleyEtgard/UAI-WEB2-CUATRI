@@ -62,19 +62,22 @@ export const createCustomer = async (
       });
     }
 
-    const finalDebt = debt - initialPayment;
+    const totalDebt = Number(debt ?? 0);
+    const paid = Number(initialPayment ?? 0);
+
+    const finalDebt = Math.max(0, totalDebt - paid);
 
     const payments = [];
 
     if (initialPayment > 0) {
-      payments.push({
-        amount: initialPayment,
-        type: "initial",
-        remainingDebt: finalDebt,
-        createdBy: userId,
-        ownerAdmin: getOwnerAdmin(req),
-        date: new Date(),
-      });
+     payments.push({
+     amount: paid,
+     type: "initial",
+     remainingDebt: finalDebt,
+     createdBy: userId,
+     ownerAdmin: getOwnerAdmin(req),
+     date: new Date(),
+});
     }
 
     const customer = await Customer.create({
@@ -234,18 +237,23 @@ export const addPayment = async (
       });
     }
 
-    const remainingDebt = customer.debt - amount;
+    const paymentAmount = Number(amount);
 
-    customer.payments.push({
-      amount,
-      type: "payment",
-      remainingDebt,
-      createdBy: req.dbUser?._id,
-      ownerAdmin: getOwnerAdmin(req),
-      date: new Date(),
-    });
+    const remainingDebt = Math.max(
+     0,
+     customer.debt - paymentAmount
+    );
 
-    customer.debt = remainingDebt;
+   customer.payments.push({
+    amount: paymentAmount,
+    type: "payment",
+    remainingDebt,
+    createdBy: req.dbUser?._id,
+     ownerAdmin: getOwnerAdmin(req),
+    date: new Date(),
+});
+
+customer.debt = remainingDebt;
 
     await customer.save();
 

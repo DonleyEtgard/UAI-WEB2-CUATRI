@@ -68,28 +68,31 @@ export const getCustomerById = async (
 export const createCustomer = async (
   data: Customer
 ): Promise<Customer> => {
-  const fallbackCustomer: Customer = {
-    ...data,
-    _id: `offline_customer_${Date.now()}`,
-    isActive: true,
-    debt:
-      (data.debt ?? 0) -
-      (data.initialPayment ?? 0),
-    payments:
-      data.initialPayment && data.initialPayment > 0
-        ? [
-            {
-              amount: data.initialPayment,
-              type: "initial",
-              remainingDebt:
-                (data.debt ?? 0) -
-                (data.initialPayment ?? 0),
-              date: new Date(),
-            },
-          ]
-        : [],
-  };
 
+  const totalDebt = Number(data.debt ?? 0);
+const paid = Number(data.initialPayment ?? 0);
+
+const remainingDebt = Math.max(0, totalDebt - paid);
+
+const fallbackCustomer: Customer = {
+  ...data,
+  _id: `offline_customer_${Date.now()}`,
+  isActive: true,
+
+  debt: remainingDebt,
+
+  payments:
+    paid > 0
+      ? [
+          {
+            amount: paid,
+            type: "initial",
+            remainingDebt,
+            date: new Date(),
+          },
+        ]
+      : [],
+};
   return await requestOrQueue<Customer>(
     "POST",
     "/customers",

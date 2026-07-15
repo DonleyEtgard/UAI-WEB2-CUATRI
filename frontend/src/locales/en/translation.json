@@ -149,7 +149,6 @@
 
       "edit": "Edit",
       "delete": "Delete",
-
       "contactInformation": "Contact Information",
       "email": "Email",
       "phone": "Phone",
@@ -158,6 +157,7 @@
 
       "debtStatus": "Debt Status",
       "debtPaid": "Debt paid!",
+    
 
       "additionalInformation": "Additional Information",
       "registrationDate": "Registration Date",
@@ -228,6 +228,7 @@
     "email": "Email",
     "phone": "Phone",
     "debt": "Debt",
+    "remainingDebt": "Remaining Debt",
     "lastPayment": "Last Payment",
     "noPayments": "No payments",
 

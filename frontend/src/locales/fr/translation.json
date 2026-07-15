@@ -153,6 +153,7 @@
 
       "debtStatus": "État de la Dette",
       "debtPaid": "Dette réglée !",
+      "remainingDebt": "Dette non réglée",
 
       "additionalInformation": "Informations Complémentaires",
       "registrationDate": "Date d'Inscription",

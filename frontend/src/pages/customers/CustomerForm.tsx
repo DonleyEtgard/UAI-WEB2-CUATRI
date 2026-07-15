@@ -103,18 +103,23 @@ const CustomerForm = () => {
 
               <Grid size={{ xs: 12, sm: 4 }}>
                <TextField
-  fullWidth
-  type="number"
-  label={t("customers.form.totalDebt")}
-  placeholder="0"
-  value={form.debt}
-  onChange={(e) =>
-    setForm({
-      ...form,
-      debt: Number(e.target.value),
-    })
-  }
-/>
+               fullWidth
+               type="number"
+               label={
+              isEdit
+             ? t("customers.form.remainingDebt")
+             : t("customers.form.totalDebt")
+             }
+             placeholder="0"
+            value={form.debt ?? 0}
+            disabled={isEdit}
+            onChange={(e) =>
+         setForm({
+           ...form,
+            debt: Number(e.target.value),
+       })
+          }
+        />
                    </Grid>
 
               <Grid size={{ xs: 12, sm: 4 }}>

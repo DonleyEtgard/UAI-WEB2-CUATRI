@@ -215,29 +215,39 @@ const CustomersPage = () => {
                   headerName: t("customers.list.phone"),
                   width: 120,
                 },
-                {
-  field: "debt",
-  headerName: t("customers.list.debt"),
-  width: 120,
-  renderCell: (params: any) => (
-    <span>
-      ${params.row.debt?.toLocaleString() || 0}
-    </span>
-  ),
-},
-{
-  field: "payments",
-  headerName: t("customers.list.lastPayment"),
-  width: 150,
-  renderCell: (params: any) => {
-    const lastPayment =
-      params.row.payments?.[params.row.payments.length - 1];
+               {
+               field: "debt",
+               headerName: t("customers.list.remainingDebt"),
+               width: 170,
+               renderCell: (params: any) => (
+               <span style={{ fontWeight: 600 }}>
+               ${Number(params.row.debt ?? 0).toLocaleString()}
+             </span>
+             ),
+              },
+           {
+          field: "payments",
+           headerName: t("customers.list.lastPayment"),
+          width: 220,
+          renderCell: (params: any) => {
+          const lastPayment =
+         params.row.payments?.[params.row.payments.length - 1];
 
-    if (!lastPayment) {
-      return <span>{t("customers.list.noPayments")}</span>;
-    }
+        if (!lastPayment) {
+         return <span>{t("customers.list.noPayments")}</span>;
+        }
 
-    return <span>${lastPayment.amount.toLocaleString()}</span>;
+    return (
+      <Box>
+        <div>
+          ${Number(lastPayment.amount).toLocaleString()}
+        </div>
+        <small style={{ color: "#64748b" }}>
+          {t("customers.list.remainingDebt")}: $
+          {Number(lastPayment.remainingDebt ?? 0).toLocaleString()}
+        </small>
+      </Box>
+    );
   },
 },
                 {

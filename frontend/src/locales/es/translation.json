@@ -152,7 +152,7 @@
 
       "debtStatus": "Estado de Deuda",
       "debtPaid": "¡Deuda saldada!",
-
+      "remainingDebt": "Deuda Restante",
       "additionalInformation": "Información Adicional",
       "registrationDate": "Fecha de Registro",
 
@@ -181,6 +181,7 @@
     "namePlaceholder": "Ej. Juan Pérez",
 
     "totalDebt": "Deuda Total",
+    "remainingDebt": "Deuda Restante",
     "initialPayment": "Pago Inicial",
     "initialPaymentHelper": "El historial de pagos se administra desde la página de detalles del cliente.",
 

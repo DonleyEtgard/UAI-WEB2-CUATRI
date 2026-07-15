@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip, TextField, InputAdornment, CircularProgress } from "@mui/material";
+import { Container, Box, Typography, Card, CardContent, CardHeader, Button, Avatar, Chip, TextField, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { getCustomerById, addPayment, deleteCustomer } from "../../services/customers.service";
 import type { Customer, Payment } from "../../services/customers.service";
@@ -32,24 +32,35 @@ const CustomerDetail = () => {
     loadCustomer();
   }, [id]);
 
+
   const handleAddPayment = async () => {
-    if (!id || !newPaymentAmount || Number(newPaymentAmount) <= 0) {
-      alert(t("customers.detail.invalidAmount"));
-      return;
+  const payment = Number(newPaymentAmount);
+
+    if (!id || payment <= 0) {
+    alert(t("customers.detail.invalidAmount"));
+    return;
     }
 
+  // No permitir pagar más de la deuda restante
+    if (payment > (customer?.debt ?? 0)) {
+    alert(t("customers.detail.paymentTooLarge"));
+    return;
+   }
+
     try {
-      setPaymentLoading(true);
-      const updatedCustomer = await addPayment(id, Number(newPaymentAmount));
-      setCustomer(updatedCustomer); // Actualiza el estado del cliente con la respuesta
-      setNewPaymentAmount(""); // Limpia el input
-    } catch (err) {
-      console.error("Error adding payment:", err);
-      alert(t("customers.detail.paymentError"));
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
+    setPaymentLoading(true);
+
+    const updatedCustomer = await addPayment(id, payment);
+
+    setCustomer(updatedCustomer);
+    setNewPaymentAmount("");
+  } catch (err) {
+    console.error("Error adding payment:", err);
+    alert(t("customers.detail.paymentError"));
+  } finally {
+    setPaymentLoading(false);
+  }
+};
 
   const handleDelete = async () => {
     if (!id || deleting) return;
@@ -161,34 +172,60 @@ const CustomerDetail = () => {
         <Card sx={{ borderRadius: 3, boxShadow: 2, mt: 4 }}>
           <CardHeader title={t("customers.detail.registerPayment")} />
           <CardContent>
-          <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: "center" }}>
-             <TextField
-             fullWidth
-             type="number"
-             label={t("customers.detail.paymentAmount")}
-             value={newPaymentAmount}
-             onChange={(e) => setNewPaymentAmount(e.target.value)}
-             slotProps={{
-             input: {
-             startAdornment: (
-             <InputAdornment position="start">
-            $
-            </InputAdornment>
-        ),
-      },
+       <Box
+  sx={{
+    display: "flex",
+    flexDirection: { xs: "column", sm: "row" },
+    gap: 2,
+    alignItems: { xs: "stretch", sm: "center" },
+  }}
+>
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      flex: 1,
+      gap: 1,
+    }}
+  >
+     <Typography
+       variant="h6"
+       sx={{
+        fontWeight: "bold",
+        minWidth: 20,
       }}
-       disabled={paymentLoading}
-      />
+    >
+      $
+    </Typography>
 
-     <Button
-       variant="contained"
-       onClick={handleAddPayment}
-      disabled={paymentLoading || !newPaymentAmount}
-      sx={{ width: { xs: '100%', sm: 'auto' }, minWidth: '150px' }}
-       >
-      {paymentLoading ? t("customers.detail.processing") : t("customers.detail.addPayment")}
-     </Button>
-      </Box>
+    <TextField
+      fullWidth
+      type="number"
+      label={t("customers.detail.paymentAmount")}
+      value={newPaymentAmount}
+      onChange={(e) => setNewPaymentAmount(e.target.value)}
+      disabled={paymentLoading}
+    />
+  </Box>
+
+  <Button
+    variant="contained"
+    onClick={handleAddPayment}
+    disabled={
+      paymentLoading ||
+      !newPaymentAmount ||
+      (customer.debt ?? 0) <= 0
+    }
+       sx={{
+        width: { xs: "100%", sm: "auto" },
+        minWidth: 150,
+       }}
+      >
+        {paymentLoading
+        ? t("customers.detail.processing")
+         : t("customers.detail.addPayment")}
+        </Button>
+    </Box>
           </CardContent>
         </Card>
 
@@ -203,9 +240,15 @@ const CustomerDetail = () => {
                 {[...customer.payments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((p: Payment, i: number) => (
                   <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                        {p.type === 'initial' ? t("customers.detail.initialPayment") : t("customers.detail.receivedPayment")}
-                      </Typography>
+                      <Chip
+                      size="small"
+                      color={p.type === "initial" ? "primary" : "success"}
+                      label={
+                       p.type === "initial"
+                       ? t("customers.detail.initialPayment")
+                       : t("customers.detail.receivedPayment")
+                       }
+                      />
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {new Date(p.date).toLocaleString('es-ES')}
                       </Typography>
@@ -216,7 +259,7 @@ const CustomerDetail = () => {
                           mt: 0.5,
                         }}
                       >
-                        {t("customers.detail.remainingBalance")}: ${p.remainingDebt?.toLocaleString()}
+                        {t("customers.detail.remainingDebt")}: ${p.remainingDebt?.toLocaleString()}
                       </Typography>
                     </Box>
                     <Typography sx={{ color: 'success.main', fontWeight: 800, fontSize: '1.2rem' }}>+ ${p.amount?.toLocaleString()}</Typography>
