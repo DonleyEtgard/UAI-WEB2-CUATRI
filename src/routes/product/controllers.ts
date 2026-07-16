@@ -75,6 +75,7 @@ const createProductSchema = Joi.object({
     .default([]),
 });
 
+
 // 📌 Desactivar producto
 export const deactivateProduct = async (
   req: AuthRequest,
@@ -114,6 +115,7 @@ export const deactivateProduct = async (
     });
   }
 };
+
 // 📌 Reactivar producto
 export const activateProduct = async (
   req: AuthRequest,
@@ -176,9 +178,23 @@ const imageUrls = parseImageUrls(
   req.body.imageUrls || req.body.images
 );
 
-const uploadedUrls = getUploadedImageUrls(req);
-console.log("UPLOADED URLS:", uploadedUrls);
-console.log("FILES:", req.files);
+const BASE_URL = process.env.BACKEND_URL || "https://uai-web2-cuatri.onrender.com";
+
+let uploadedUrls: string[] = [];
+    if (req.files && Array.isArray(req.files)) {
+      uploadedUrls = req.files.map(
+        (file: Express.Multer.File) => `${BASE_URL}/uploads/products/${file.filename}`
+      );
+    } else {
+      uploadedUrls = getUploadedImageUrls(req);
+    }
+
+    console.log("UPLOADED URLS:", uploadedUrls);
+
+    // Asegurarnos de que las imágenes existentes no tengan "localhost:3000"
+    const cleanedImageUrls = imageUrls.map((url: string) =>
+      url.replace("http://localhost:3000", BASE_URL)
+    );
 
 const images = [
   ...imageUrls,
