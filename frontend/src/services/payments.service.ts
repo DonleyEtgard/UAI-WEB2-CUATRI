@@ -167,7 +167,6 @@ export const deletePaymentMethod = async (
 // 💳 SUBSCRIPTION PAYMENTS
 // ==========================
 
-
 // 🔥 Alias para mantener compatibilidad
 export const paySubscription = (
   plan: SubscriptionPlan,

@@ -22,11 +22,9 @@ export type Product = {
   cost: number;
 
   stock: number;
-
   category?: string | Category;
 
   images?: string[];
-
   isActive: boolean;
 
   createdAt?: string;

@@ -17,7 +17,6 @@ export const getWithCache = async <T>(endpoint: string): Promise<T> => {
     console.log("GET API:", endpoint);
 
     const response = await API.get<T>(endpoint);
-
     console.log("API RESPONSE:", response.data);
 
     offlineSync.cacheApiData(endpoint, response.data, 60);

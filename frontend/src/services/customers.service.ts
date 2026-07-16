@@ -31,9 +31,7 @@ export interface Customer {
    * y luego calcula debt = debt - initialPayment
    */
   initialPayment?: number;
-
   payments?: Payment[];
-
   isActive?: boolean;
 
   user?: string;
