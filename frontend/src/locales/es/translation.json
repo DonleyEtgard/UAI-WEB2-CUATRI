@@ -152,7 +152,6 @@
 
       "debtStatus": "Estado de Deuda",
       "debtPaid": "¡Deuda saldada!",
-      "remainingDebt": "Deuda Restante",
       "additionalInformation": "Información Adicional",
       "registrationDate": "Fecha de Registro",
 
@@ -224,6 +223,7 @@
   "phone": "Teléfono",
   "debt": "Deuda",
   "lastPayment": "Último Pago",
+  "remainingDebt": "Deuda Restante",
   "noPayments": "Sin pagos",
 
   "status": "Estado",

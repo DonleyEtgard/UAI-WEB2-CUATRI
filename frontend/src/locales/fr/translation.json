@@ -153,7 +153,6 @@
 
       "debtStatus": "État de la Dette",
       "debtPaid": "Dette réglée !",
-      "remainingDebt": "Dette non réglée",
 
       "additionalInformation": "Informations Complémentaires",
       "registrationDate": "Date d'Inscription",
@@ -206,7 +205,7 @@
       "saveCustomerError": "Erreur lors de l'enregistrement du client"
     },
 
-     "list": {
+    "list": {
     "title": "Clients",
     "subtitle": "Gérez votre portefeuille clients et leurs coordonnées.",
     "newCustomer": "Nouveau client",
@@ -225,6 +224,7 @@
     "phone": "Téléphone",
     "debt": "Dette",
     "lastPayment": "Dernier paiement",
+    "remainingDebt": "Dette non réglée",
     "noPayments": "Aucun paiement",
 
     "status": "Statut",

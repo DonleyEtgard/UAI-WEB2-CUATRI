@@ -39,6 +39,13 @@ api.interceptors.request.use(
     try {
       const token = localStorage.getItem("firebaseToken");
 
+      // FIX: Si se envía FormData, Axios debe establecer el Content-Type.
+      // Eliminar el header 'Content-Type' predefinido para permitir que el navegador lo establezca
+      // con el 'boundary' correcto para multipart/form-data.
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+      }
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

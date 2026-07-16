@@ -151,7 +151,6 @@
 
       "debtStatus": "Eta Dèt la",
       "debtPaid": "Dèt la peye!",
-      "remainingDebt": "Dèt",
 
       "additionalInformation": "Lòt Enfòmasyon",
       "registrationDate": "Dat Enskripsyon",
@@ -224,6 +223,7 @@
     "debt": "Dèt",
     "lastPayment": "Dènye Peman",
     "noPayments": "Pa gen peman",
+    "remainingDebt": "Dèt",
 
     "status": "Estati",
     "active": "Aktif",
