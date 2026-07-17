@@ -82,6 +82,7 @@ export const AppRouter: React.FC = () => {
           <Route path="about" element={<AboutPage />} />
           <Route path="form-demo" element={<FormDemo />} />
           <Route path="redux-demo" element={<ReduxDemoPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Route>
 
         {/* ================= PRIVATE ================= */}
