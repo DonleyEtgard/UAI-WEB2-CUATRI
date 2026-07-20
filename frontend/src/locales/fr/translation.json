@@ -815,35 +815,46 @@
   }
 },
 
-"audit": {
-  "page": {
-    "loadError": "Erreur lors du chargement de l'activité",
+  "audit": {
 
-    "title": "📋 Journal d'Activité",
-    "subtitle": "Audit des actions réalisées par les utilisateurs sur la plateforme.",
+    "actions": {
+    "product": "Produit",
+    "customer": "Client",
+    "sale": "Vente"
+     },
 
-    "refresh": "Actualiser",
+    "details": {
+    "productCreated": "Produit {{name}} Créer ",
+    "customerCreated": "Cliente {{name}} Créer ",
+    "saleCreated": "Vente pour ${{total}}"
+    },
+    "page": {
+      "title": "Journal d'Audit",
+      "subtitle": "Historique des activités effectuées dans le système",
+      "refresh": "Actualiser",
 
-    "totalLogs": "Total des Enregistrements",
-    "creations": "Créations",
-    "updates": "Mises à jour",
-    "deletions": "Suppressions",
+      "totalLogs": "Nombre total d'enregistrements",
+      "creations": "Créations",
+      "updates": "Mises à jour",
+      "deletions": "Suppressions",
 
-    "systemActivity": "Activité du Système",
-    "eventsList": "Liste complète des événements",
+      "systemActivity": "Activité du système",
+      "eventsList": "Liste des événements enregistrés",
 
-    "errorLoading": "Erreur de chargement",
+      "user": "Utilisateur",
+      "action": "Action",
+      "details": "Détails",
+      "date": "Date",
 
-    "noActivity": "Aucune activité",
-    "noActivityDescription": "Aucun enregistrement à afficher.",
+      "system": "Système",
+      "notAvailable": "Non disponible",
 
-    "user": "Utilisateur",
-    "action": "Action",
-    "details": "Détails",
-    "date": "Date",
+      "loadError": "Impossible de charger le journal d'audit.",
+      "errorLoading": "Erreur lors du chargement des données",
 
-    "system": "Système",
-    "notAvailable": "N/A"
+      "noActivity": "Aucune activité enregistrée",
+      "noActivityDescription": "Aucun événement d'audit n'est disponible pour le moment."
+    }
   }
- }
+
 }

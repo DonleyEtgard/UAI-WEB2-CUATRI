@@ -1,28 +1,13 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-
+import React, { createContext, useContext, useEffect, useState, } from "react";
 import type { User as FirebaseUser } from "firebase/auth";
 
-import {
-  loginUser,
-  registerUser,
-  logoutUser,
-  observeAuth,
-  getFirebaseIdToken,
-  sendEmailVerificationEmail,
+import { loginUser, registerUser, logoutUser, observeAuth,
+  getFirebaseIdToken, sendEmailVerificationEmail,
   forgotPassword as firebaseForgotPassword,
 } from "../firebase/auth";
-
 import API from "../services/api";
 
-import type {
-  AuthContextType,
-  AppUser,
-  DBUser,
+import type { AuthContextType, AppUser, DBUser,
 } from "../types/auth";
 
 // ============================================================================

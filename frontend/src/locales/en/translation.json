@@ -807,35 +807,47 @@
     "placeholderImage": "https://placehold.co/400x300?text=Product"
   }
  },
- "audit": {
-  "page": {
-    "loadError": "Error loading activity",
 
-    "title": "📋 Activity Log",
-    "subtitle": "Audit of actions performed by users on the platform.",
+  "audit": {
+    
+    "actions": {
+    "product": "Product",
+    "customer": "Customer",
+    "sale": "Sale"
+     },
 
-    "refresh": "Refresh",
+    "details": {
+    "productCreated": "Product {{name}} created",
+    "customerCreated": "Customer {{name}} created",
+    "saleCreated": "Sale for ${{total}}"
+    },
 
-    "totalLogs": "Total Logs",
-    "creations": "Creations",
-    "updates": "Updates",
-    "deletions": "Deletions",
+    "page": {
+      "title": "Audit Log",
+      "subtitle": "History of activities performed in the system",
+      "refresh": "Refresh",
 
-    "systemActivity": "System Activity",
-    "eventsList": "Complete event list",
+      "totalLogs": "Total Logs",
+      "creations": "Creations",
+      "updates": "Updates",
+      "deletions": "Deletions",
 
-    "errorLoading": "Loading Error",
+      "systemActivity": "System Activity",
+      "eventsList": "List of recorded events",
 
-    "noActivity": "No Activity",
-    "noActivityDescription": "There are no records to display.",
+      "user": "User",
+      "action": "Action",
+      "details": "Details",
+      "date": "Date",
 
-    "user": "User",
-    "action": "Action",
-    "details": "Details",
-    "date": "Date",
+      "system": "System",
+      "notAvailable": "Not available",
 
-    "system": "System",
-    "notAvailable": "N/A"
+      "loadError": "Failed to load audit log.",
+      "errorLoading": "Error loading data",
+
+      "noActivity": "No activity found",
+      "noActivityDescription": "There are no audit events to display yet."
+    }
   }
-}
 }

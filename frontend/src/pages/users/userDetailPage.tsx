@@ -136,7 +136,16 @@ const UserDetailPage = () => {
         </Card>
 
         {/* Info Grid */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 4 }}>
+       <Box 
+       sx={{ 
+       display: 'grid',
+       gridTemplateColumns: { 
+       xs: '1fr',
+       md: 'repeat(3, 1fr)'
+       },
+       gap: 4
+       }}
+       >
           {/* Main Info */}
           <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
             <CardHeader title={t("users.detail.personalInfo")} sx={{ pb: 1 }} />
@@ -170,7 +179,99 @@ const UserDetailPage = () => {
                   sx={{ mb: 2, fontSize: 14, fontWeight: 700, p: '20px 12px' }}
                 />
               </Box>
-            </CardContent>
+              <CardHeader 
+              title="Subscription"
+              sx={{ pb: 1 }}
+             /> {/* This CardHeader should probably be outside the first CardContent or this is a copy-paste error. */}
+
+             <CardContent>
+
+            <Box sx={{ mb: 2 }}>
+
+            <Typography
+            variant="caption"
+           sx={{
+             color: '#64748b',
+             fontWeight: 600,
+             display: 'block',
+           textTransform: 'uppercase'
+           }}
+          >
+           Plan
+          </Typography>
+
+
+         <Typography
+           variant="body2"
+          sx={{
+          fontWeight: 600,
+          textTransform: "capitalize"
+          }}
+         >
+         {user.plan || "free"}
+        </Typography>
+
+        </Box>
+
+       <Box sx={{ mb: 2 }}>
+
+       <Typography
+        variant="caption"
+        sx={{
+          color: '#64748b',
+          fontWeight: 600,
+          display: 'block',
+          textTransform: 'uppercase'
+        }}
+      >
+        Subscription Status
+      </Typography>
+
+
+      <Chip
+        label={
+          user.subscriptionStatus || "expired"
+        }
+        size="small"
+        color={
+          user.subscriptionStatus === "active"
+          ? "success"
+          : "warning"
+        }
+      />
+
+     </Box>
+
+     <Box>
+
+      <Typography
+        variant="caption"
+        sx={{
+          color: '#64748b',
+          fontWeight: 600,
+          display: 'block',
+          textTransform: 'uppercase'
+        }}
+      >
+        Payment Status
+      </Typography>
+
+
+      <Chip
+        label={
+          user.paymentStatus || "unpaid"
+        }
+        size="small"
+        color={
+          user.paymentStatus === "paid"
+          ? "success"
+          : "error"
+        }
+      />
+
+     </Box>
+             </CardContent>
+            </CardContent> {/* Closing the outer CardContent */}
           </Card>
         </Box>
 

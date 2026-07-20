@@ -145,7 +145,6 @@ app.use(
   "/api/products",
   authenticateFirebase,
   requireVerifiedEmail,
-  authorizeAdminOrSuperadmin,
   checkSubscription,
   productRoutes(path.join(process.cwd(), "src", "uploads"))
 );
@@ -155,7 +154,6 @@ app.use(
   "/api/customers",
   authenticateFirebase,
   requireVerifiedEmail,
-  authorizeAdminOrSuperadmin,
   checkSubscription,
   customerRoutes
 );
@@ -184,7 +182,6 @@ app.use(
   "/api/stock",
   authenticateFirebase,
   requireVerifiedEmail,
-  authorizeAdminOrSuperadmin,
   checkSubscription,
   stockRoutes
 );

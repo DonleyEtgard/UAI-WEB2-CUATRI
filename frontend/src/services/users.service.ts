@@ -11,6 +11,13 @@ export type PlanType =
   | "medium"
   | "premium";
 
+
+export type PaymentStatus =
+  | "paid"
+  | "unpaid"
+  | "pending";
+
+
 export type SubscriptionStatus =
   | "active"
   | "expired"
@@ -23,6 +30,10 @@ export type PaymentMethod =
   | "moncash"
   | "mercado pago";
 
+export type PaymentProvider =
+  | "mercadopago"
+  | "moncash";
+
 export type Address = {
   street?: string;
   number?: string;
@@ -31,6 +42,12 @@ export type Address = {
   country?: string;
   postalCode?: string;
 };
+
+
+export type Currency =
+  | "ARS"
+  | "HTG";
+
 
 export type RegisterData = {
   firebaseUid: string;
@@ -50,6 +67,8 @@ export type UpdateUserData = {
   isActive?: boolean;
   role?: UserRole;
   plan?: PlanType;    // FALTA
+
+  paymentStatus?: PaymentStatus;
 };
 
 export type CreateEmployeeData = {
@@ -81,7 +100,7 @@ export interface User {
 
   subscriptionStatus?: SubscriptionStatus;
 
-  subscriptionPaid?: boolean;
+  paymentStatus?: PaymentStatus;
 
   lastPaymentMethod?: PaymentMethod;
 
@@ -131,7 +150,7 @@ export interface Payment {
 
   method: PaymentMethod;
 
-  status: "pending" | "paid" | "rejected";
+  status: "pending" | "paid" | "rejected" | "pending_verification";
 
   qrData?: string;
 
@@ -261,53 +280,49 @@ export const toggleUserActiveState = async (
 
 export const paySubscription = async (
   plan: "basic" | "medium" | "premium",
-  paymentMethod: PaymentMethod
+  provider: PaymentProvider
 ) => {
   return await requestOrQueue(
     "POST",
     "/users/pay-subscription",
     {
       plan,
-      paymentMethod,
+      provider,
     }
   );
 };
 
-export const createSubscriptionPayment =
-  async (
-    plan:
-      | "basic"
-      | "medium"
-      | "premium"
-  ) => {
-    return await requestOrQueue(
-      "POST",
-      "/users/create-payment",
-      {
-        plan,
-      }
-    );
-  };
+export const createSubscriptionPayment = async (
+  plan: "basic" | "medium" | "premium",
+  provider: PaymentProvider,
+  currency: Currency
+) => {
+  return await requestOrQueue(
+    "POST",
+    "/users/create-payment",
+    {
+      plan,
+      provider,
+      currency,
+    }
+  );
+};
 
 // ==========================
 // PAYMENTS (SUPERADMIN)
 // ==========================
 
-export const getPendingPayments =
-  async () => {
-   return await getWithCache<
-      Payment[]
-    >(
-      "/users/pending-payments"
-    );
-  };
+export const getPendingPayments = async () => {
+  return await getWithCache<ApiResponse<Payment[]>>(
+    "/users/payments/pending"
+  );
+};
 
-export const approvePayment =
-  async (paymentId: string) => {
-     return await requestOrQueue<
-      ApprovePaymentResponse
-    >(
-      "PATCH",
-      `/users/approve-payment/${paymentId}`
-    );
-  };
+export const approvePayment = async (
+  paymentId: string
+) => {
+  return await requestOrQueue<ApprovePaymentResponse>(
+    "PUT",
+    `/users/payments/${paymentId}/approve`
+  );
+};

@@ -71,10 +71,16 @@ trialEnd: {
 subscriptionEnd: {
   type: Date
 },
-subscriptionPaid: {
-  type: Boolean,
-  default: false
+paymentStatus: {
+  type: String,
+  enum: [
+    "paid",
+    "unpaid",
+    "pending"
+  ],
+  default: "unpaid"
 },
+
     role: {
   type: String,
   enum: ["superadmin", "admin", "employee"],

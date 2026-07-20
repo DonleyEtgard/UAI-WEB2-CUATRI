@@ -32,7 +32,13 @@ const AuditLogPage: React.FC = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const { t , i18n } = useTranslation();
+  const localeMap = {
+         es: "es-ES",
+         en: "en-US",
+         fr: "fr-FR",
+         ht: "fr-HT"
+         };
 
 const loadLogs = async () => {
   try {
@@ -61,7 +67,7 @@ productsRes.data.forEach((p: any) => {
       name: t("audit.page.system"),
       email: "-",
     },
-    action: "Producto",
+    action: "product",
     details: `Producto ${p.name} creado`,
     timestamp: p.createdAt,
   });
@@ -76,7 +82,7 @@ if (customersRes.data?.data?.customers) {
         name: t("audit.page.system"),
         email: "-",
       },
-      action: "Cliente",
+      action: "customer",
       details: `Cliente ${c.name} creado`,
       timestamp: c.createdAt,
     });
@@ -92,7 +98,7 @@ if (salesRes.data?.data) {
         name: t("audit.page.system"),
         email: "-",
       },
-      action: "Venta",
+      action: "sale",
       details: `Venta por $${s.total}`,
       timestamp: s.createdAt,
     });
@@ -217,7 +223,7 @@ if (salesRes.data?.data) {
                     width: 160,
                     renderCell: (params: any) => (
                       <Chip
-                        label={params.value}
+                        label={t(`audit.actions.${params.value}`)}
                         size="small"
                         color={
                           params.value.includes("CREATE")
@@ -233,15 +239,30 @@ if (salesRes.data?.data) {
                   },
                   { field: "details", headerName: t("audit.page.details"), flex: 2 },
                   {
-                    field: "timestamp",
-                    headerName: t("audit.page.date"),
-                    width: 220,
-                    renderCell: (params: any) =>
-                      new Date(params.value).toLocaleString("es-ES", {
-                        year: "numeric", month: "long", day: "numeric",
-                        hour: "2-digit", minute: "2-digit", second: "2-digit",
-                      }),
-                  },
+                   field: "timestamp",
+                      headerName: t("audit.page.date"),
+                      width: 220,
+                     renderCell: (params: any) => {
+                     const localeMap: Record<string, string> = {
+                     es: "es-ES",
+                     en: "en-US",
+                     fr: "fr-FR",
+                     ht: "fr-HT",
+                    };
+
+                   return new Date(params.value).toLocaleString(
+                   localeMap[i18n.language] || "en-US",
+                {
+                 year: "numeric",
+                 month: "long",
+                 day: "numeric",
+                 hour: "2-digit",
+                 minute: "2-digit",
+                second: "2-digit",
+             }
+          );
+        },
+        },
                 ]}
                 pageSize={10}
               />

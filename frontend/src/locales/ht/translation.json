@@ -807,35 +807,45 @@
     "placeholderImage": "https://placehold.co/400x300?text=Pwodwi"
   }
 },
-"audit": {
-  "page": {
-    "loadError": "Erè pandan chajman aktivite yo",
 
-    "title": "📋 Rejis Aktivite",
-    "subtitle": "Odit sou aksyon itilizatè yo fè sou platfòm la.",
+  "audit": {
+    "actions": {
+    "product": "Prodwi",
+    "customer": "kliyan",
+    "sale": "Vann"
+     },
 
-    "refresh": "Rafrechi",
+    "details": {
+    "productCreated": "Prodwi {{name}} Kreye",
+    "customerCreated": "Kliyan {{name}} Kreye",
+    "saleCreated": "Vann pou ${{total}}"
+    },
+    "page": {
+      "title": "Jounal Odit",
+      "subtitle": "Istwa tout aktivite ki fèt nan sistèm nan",
+      "refresh": "Rafrechi",
 
-    "totalLogs": "Total Rejis",
-    "creations": "Kreyasyon",
-    "updates": "Mizajou",
-    "deletions": "Sipresyon",
+      "totalLogs": "Total anrejistreman",
+      "creations": "Kreyasyon",
+      "updates": "Mizajou",
+      "deletions": "Sipresyon",
 
-    "systemActivity": "Aktivite Sistèm nan",
-    "eventsList": "Lis konplè evènman yo",
+      "systemActivity": "Aktivite Sistèm nan",
+      "eventsList": "Lis evènman ki anrejistre",
 
-    "errorLoading": "Erè pandan chajman",
+      "user": "Itilizatè",
+      "action": "Aksyon",
+      "details": "Detay",
+      "date": "Dat",
 
-    "noActivity": "Pa gen aktivite",
-    "noActivityDescription": "Pa gen okenn rejis pou montre.",
+      "system": "Sistèm",
+      "notAvailable": "Pa disponib",
 
-    "user": "Itilizatè",
-    "action": "Aksyon",
-    "details": "Detay",
-    "date": "Dat",
+      "loadError": "Pa t kapab chaje jounal odit la.",
+      "errorLoading": "Erè pandan chajman done yo",
 
-    "system": "Sistèm",
-    "notAvailable": "N/A"
+      "noActivity": "Pa gen aktivite",
+      "noActivityDescription": "Poko gen okenn evènman odit pou montre."
+    }
   }
- }
 }

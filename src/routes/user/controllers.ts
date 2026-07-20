@@ -63,28 +63,43 @@ export const getMeController = async (
     // GET USER FROM DATABASE
     // ===================================================================
 
-    const user = await User.findOne({
-      firebaseUid: req.firebaseUser.uid,
+   const user = await User.findOne({
+   firebaseUid: req.firebaseUser.uid,
     }).select("-__v");
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User profile not found",
-        error: "USER_NOT_FOUND",
-      });
-    }
+   return res.status(404).json({
+    success: false,
+    message: "User profile not found",
+    error: "USER_NOT_FOUND",
+   });
+  }
 
-    // ===================================================================
-    // RESPONSE
-    // ===================================================================
+// ============================================================
+// CHECK SUBSCRIPTION EXPIRATION
+// ============================================================
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        user,
-      },
-    });
+  if (
+  user.subscriptionEnd &&
+  new Date() > user.subscriptionEnd &&
+  user.subscriptionStatus !== "expired"
+  ) {
+  user.subscriptionStatus = "expired";
+  user.paymentStatus = "unpaid";
+
+  await user.save();
+  }
+
+// ============================================================
+// RESPONSE
+// ============================================================
+
+return res.status(200).json({
+  success: true,
+  data: {
+    user,
+  },
+});
 
   } catch (error: any) {
 
@@ -198,9 +213,9 @@ export const registerController = async (
 
       subscriptionStart: now,
 
-     subscriptionEnd: trialEnd,
+      subscriptionEnd: trialEnd,
 
-     subscriptionPaid: false,
+      paymentStatus: "unpaid",
 
      isVerified: false,
 
@@ -717,7 +732,6 @@ export const updateUserController = async (
     }
 
     if (req.body.plan !== undefined) {
-
       const validPlans = [
         "free",
         "basic",
@@ -752,6 +766,89 @@ export const updateUserController = async (
             ? "expired"
             : "active";
       }
+    }
+
+    // ==========================================================
+    // MANUAL PAYMENT STATUS UPDATE
+    // SOLO SUPERADMIN
+    // ==========================================================
+
+    if (req.body.paymentStatus !== undefined) {
+
+      const validPaymentStatus = [
+        "paid",
+        "unpaid",
+        "pending",
+      ];
+
+      if (
+        !validPaymentStatus.includes(
+          req.body.paymentStatus
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid payment status",
+        });
+      }
+
+      if (req.dbUser.role !== "superadmin") {
+
+        return res.status(403).json({
+          success: false,
+          message:
+            "Only superadmin can update payment status",
+        });
+
+      }
+
+      updateData.paymentStatus =
+        req.body.paymentStatus;
+
+      // Si marcas como pagado
+      if (
+        req.body.paymentStatus === "paid"
+      ) {
+
+        updateData.subscriptionStatus =
+          "active";
+
+        updateData.subscriptionStart =
+          new Date();
+
+        const subscriptionEnd =
+          new Date();
+
+        subscriptionEnd.setMonth(
+          subscriptionEnd.getMonth() + 1
+        );
+
+        updateData.subscriptionEnd =
+          subscriptionEnd;
+
+        updateData.lastPaymentDate =
+          new Date();
+      }
+
+      // Si marcas como no pagado
+      if (
+        req.body.paymentStatus === "unpaid"
+      ) {
+
+        updateData.subscriptionStatus =
+          "expired";
+      }
+
+      // Si está pendiente
+      if (
+        req.body.paymentStatus === "pending"
+      ) {
+
+        updateData.subscriptionStatus =
+          "pending";
+
+      }
+
     }
 
     if (req.body.address) {
@@ -983,6 +1080,46 @@ export const toggleUserStateController = async (
     user.isActive = newState;
 
     await user.save();
+    // ==========================================================
+// IF ADMIN -> TOGGLE ALL EMPLOYEES
+// ==========================================================
+
+if (user.role === "admin") {
+
+  const employees = await User.find({
+    ownerAdmin: user._id,
+    role: "employee",
+  });
+
+  for (const employee of employees) {
+
+    employee.isActive = newState;
+
+    await employee.save();
+
+    if (employee.firebaseUid) {
+      try {
+
+        await admin.auth().updateUser(
+          employee.firebaseUid,
+          {
+            disabled: !newState,
+          }
+        );
+
+      } catch (err) {
+
+        console.error(
+          `Error updating employee ${employee.email}`,
+          err
+        );
+
+      }
+    }
+
+  }
+
+}
 
     // ==========================================================
     // RESPONSE
@@ -1168,9 +1305,12 @@ export const approvePayment = async (
 
     user.plan = payment.plan;
     user.subscriptionStatus = "active";
-    user.subscriptionPaid = true;
+    user.paymentStatus = "paid";
     user.subscriptionStart = start;
     user.subscriptionEnd = end;
+
+    user.lastPaymentDate = start;
+    user.lastPaymentAmount = payment.amount;
 
     await payment.save();
     await user.save();
@@ -1221,15 +1361,15 @@ export const createSubscriptionPayment = async (
 
   const planPrices = {
    mercadopago: {
-    basic: 50000,
-    medium: 140000,
-    premium: 280000,
+    basic: 30000,
+    medium: 85000,
+    premium: 170000,
   },
 
   moncash: {
-    basic: 3400,
-    medium: 10500,
-    premium: 21000,
+    basic: 2500,
+    medium: 7500,
+    premium: 15000,
   },
 };
 
@@ -1403,9 +1543,12 @@ export const mercadoPagoWebhook = async (req: AuthRequest, res: Response) => {
 
       user.plan = payment.plan;
       user.subscriptionStatus = "active";
-      user.subscriptionPaid = true;
+      user.paymentStatus = "paid";
       user.subscriptionStart = start;
       user.subscriptionEnd = end;
+
+      user.lastPaymentDate = start;
+      user.lastPaymentAmount = payment.amount;
 
       await user.save();
     }

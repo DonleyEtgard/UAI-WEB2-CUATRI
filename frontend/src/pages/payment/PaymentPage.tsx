@@ -38,15 +38,15 @@ type PaymentMethod =
 
 const prices = {
   moncash: {
-    basic: 3400,
-    medium: 10500,
-    premium: 21000,
+    basic: 2500,
+        medium: 7500,
+        premium: 15000,
   },
 
   mercadopago: {
-    basic: 50000,
-    medium: 140000,
-    premium: 280000,
+    basic: 30000,
+    medium: 85000,
+    premium: 170000,
   },
 } as const;
 

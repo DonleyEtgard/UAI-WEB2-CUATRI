@@ -818,35 +818,46 @@
     "placeholderImage": "https://placehold.co/400x300?text=Producto"
   }
 },
-"audit": {
-  "page": {
-    "loadError": "Error cargando actividad",
 
-    "title": "📋 Registro de Actividad",
-    "subtitle": "Auditoría de las acciones realizadas por los usuarios en la plataforma.",
+  "audit": {
+    "actions": {
+    "product": "Producto",
+    "customer": "Cliente",
+    "sale": "Venta"
+     },
 
-    "refresh": "Actualizar",
+    "details": {
+    "productCreated": "Producto {{name}} creado",
+    "customerCreated": "Cliente {{name}} creado",
+    "saleCreated": "Venta por ${{total}}"
+    },
+    "page": {
+      "title": "Registro de Auditoría",
+      "subtitle": "Historial de actividades realizadas en el sistema",
+      "refresh": "Actualizar",
 
-    "totalLogs": "Total Registros",
-    "creations": "Creaciones",
-    "updates": "Actualizaciones",
-    "deletions": "Eliminaciones",
+      "totalLogs": "Total de registros",
+      "creations": "Creaciones",
+      "updates": "Actualizaciones",
+      "deletions": "Eliminaciones",
 
-    "systemActivity": "Actividad del Sistema",
-    "eventsList": "Listado completo de eventos",
+      "systemActivity": "Actividad del Sistema",
+      "eventsList": "Lista de eventos registrados",
 
-    "errorLoading": "Error al cargar",
+      "user": "Usuario",
+      "action": "Acción",
+      "details": "Detalles",
+      "date": "Fecha",
 
-    "noActivity": "Sin actividad",
-    "noActivityDescription": "No existen registros para mostrar.",
+      "system": "Sistema",
+      "notAvailable": "No disponible",
 
-    "user": "Usuario",
-    "action": "Acción",
-    "details": "Detalles",
-    "date": "Fecha",
+      "loadError": "No se pudo cargar el historial de auditoría.",
+      "errorLoading": "Error al cargar los datos",
 
-    "system": "Sistema",
-    "notAvailable": "N/A"
+      "noActivity": "No hay actividad registrada",
+      "noActivityDescription": "Todavía no existen eventos de auditoría para mostrar."
+    }
   }
- }
+
 }

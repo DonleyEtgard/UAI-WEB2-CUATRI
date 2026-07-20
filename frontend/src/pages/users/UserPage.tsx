@@ -11,21 +11,27 @@ import UiBadge from "../../components/common/UiBadge";
 
 
 interface User {
-  _id: string;
-  name: string;
-  lastName: string;
-  email: string;
+   _id: string;
+    name: string;
+    lastName: string;
+    email: string;
 
-  role: string;
+    role: string;
 
-  plan?: string;
-  subscriptionStatus?: string;
-  subscriptionPaid?: boolean;
-  subscriptionEnd?: string;
+    plan?: string;
 
-  ownerAdmin?: string;
-  isActive: boolean;
-  createdAt?: string;
+    paymentStatus?: API.PaymentStatus;
+
+    subscriptionStatus?: string;
+
+    subscriptionPaid?: boolean;
+
+    subscriptionEnd?: string;
+
+    ownerAdmin?: string;
+
+    isActive: boolean;
+    createdAt?: string;
 }
 
 const UserPage = () => {
@@ -61,6 +67,28 @@ const UserPage = () => {
   }, []);
 
 
+    const handlePaymentStatus = async (
+    id: string,
+    status: API.PaymentStatus
+     ) => {
+    try {
+
+        await API.updateUser(id, {
+            paymentStatus: status,
+        });
+
+        await loadUsers();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(
+            t("users.page.errorUpdatingUser")
+        );
+
+    }
+    };
 
   const handleDelete = async (
   id: string
@@ -196,14 +224,14 @@ const UserPage = () => {
                   </Box>
                 )},
                 {field: 'email', headerName: t("users.page.email"), flex: 1},
-                {field: 'role', headerName: t("users.page.role"), width: 140, renderCell: (params: any)=> <Chip label={params.value || t("users.page.notAvailable")} size="small" variant="outlined" />},
-                {field: 'plan', headerName: t("users.page.plan"), width: 120, renderCell: (params: any)=> <Chip label={params.value || t("users.page.free")} size="small" />},
-                {field: 'isActive', headerName: t("users.page.status"), width: 140, renderCell: (params: any)=> params.value ? <UiBadge label={t("users.page.active")} color='success' /> : <UiBadge label={t("users.page.inactive")} color='error' />},
-                {field: 'actions', headerName: t("users.page.actions"), width: 200, sortable: false, renderCell: (params: any)=> (
-                  <Box sx={{ display: 'flex', gap: 2, width: '90%', justifyContent: 'flex-end' }}>
+                {field: 'role', headerName: t("users.page.role"), width: 120, renderCell: (params: any)=> <Chip label={params.value || t("users.page.notAvailable")} size="small" variant="outlined" />},
+                {field: 'plan', headerName: t("users.page.plan"), width: 100, renderCell: (params: any)=> <Chip label={params.value || t("users.page.free")} size="small" />},
+                {field: 'isActive', headerName: t("users.page.status"), width: 100, renderCell: (params: any)=> params.value ? <UiBadge label={t("users.page.active")} color='success' /> : <UiBadge label={t("users.page.inactive")} color='error' />},
+                {field: 'actions', headerName: t("users.page.actions"), width: 280, sortable: false, renderCell: (params: any)=> (
+                  <Box sx={{ display: 'flex', gap: 1, width: '100%', justifyContent: 'flex-end' }}>
                     {canPerformActionOn(params.row) && (
                       <>
-                        <Button size="small" variant="outlined" onClick={(e) => { e.stopPropagation(); navigate(`/app/users/edit/${params.row._id}`); }}>
+                        <Button size="small" variant="outlined" sx={{ minWidth: 32 }} onClick={(e) => { e.stopPropagation(); navigate(`/app/users/edit/${params.row._id}`); }}>
                           ✏️
                         </Button>
                        <Button
@@ -215,6 +243,7 @@ const UserPage = () => {
                   }
               onClick={(e) => { e.stopPropagation(); handleToggleActive( params.row._id );
                  }}
+                 sx={{ minWidth: 32 }}
                   >
                   {params.row.isActive
                   ? "🚫" : "✅"}
@@ -228,10 +257,65 @@ const UserPage = () => {
                         color="error"
                         disabled={deletingId === params.row._id}
                         onClick={(e) => { e.stopPropagation(); handleDelete(params.row._id); }}
+                        sx={{ minWidth: 32 }}
                       >
                         {deletingId === params.row._id ? t("users.page.loading") : '🗑️'}
                       </Button>
                     )}
+
+              <Button
+                size="small"
+              color="success"
+              variant="outlined"
+              sx={{ minWidth: 32 }}
+            onClick={(e)=>{
+            e.stopPropagation();
+
+            handlePaymentStatus(
+            params.row._id,
+            "paid"
+           );
+ 
+            }}
+          >
+           $
+           </Button>
+
+                <Button
+                size="small"
+                color="error"
+                 variant="outlined"
+                 sx={{ minWidth: 32 }}
+                 onClick={(e)=>{
+                e.stopPropagation();
+
+              handlePaymentStatus(
+             params.row._id,
+             "unpaid"
+            );
+
+          }}
+         >
+         ✖
+        </Button>
+
+          <Button
+            size="small"
+            color="warning"
+            variant="outlined"
+            sx={{ minWidth: 32 }}
+            onClick={(e)=>{
+            e.stopPropagation();
+
+             handlePaymentStatus(
+             params.row._id,
+              "pending"
+              );
+
+            }}
+           >
+          ⏳
+          </Button>
                   </Box>
                 )},
               ]}
