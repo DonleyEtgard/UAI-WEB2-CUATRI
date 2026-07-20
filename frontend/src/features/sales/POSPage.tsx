@@ -44,6 +44,9 @@ const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
   const [amountPaid, setAmountPaid] = useState(0);
+  
+  const API_URL = import.meta.env.VITE_API_BASE_URL || "";
+  const BASE_URL = API_URL.replace("/api", "");
 
   const filteredProducts = products.filter((p) => {
     const term = search.toLowerCase().trim();
@@ -359,26 +362,28 @@ const [search, setSearch] = useState("");
     }}
   >
     <img
-  src={
-    p.images?.[0]
-      ? p.images[0]
-      : t("pos.page.placeholderImage")
-  }
-  alt={p.name}
-  onLoad={() =>
+    src={
+      p.images?.[0]
+       ? p.images[0].startsWith("http")
+        ? p.images[0]
+        : `${BASE_URL}${p.images[0]}`
+      : "/placeholder.png"
+     }
+    alt={p.name}
+    onLoad={() =>
     console.log("IMG OK:", p.images?.[0])
-  }
-  onError={() =>
+    }
+    onError={() =>
 
-    console.log("IMG ERROR:", p.images?.[0])
+     console.log("IMG ERROR:", p.images?.[0])
     
-  }
+   }
   style={{
     width: "100%",
     height: "100%",
     objectFit: "cover",
-  }}
-/>
+   }}
+   />
      </Box>
 
   <Typography sx={{ fontWeight: 700 }}>

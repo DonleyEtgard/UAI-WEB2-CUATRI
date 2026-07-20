@@ -193,14 +193,14 @@ let uploadedUrls: string[] = [];
 
     // Asegurarnos de que las imágenes existentes no tengan "localhost:3000"
     const cleanedImageUrls = imageUrls.map((url: string) =>
-      url.replace("http://localhost:3000", BASE_URL)
-    );
+     url.replace("http://localhost:3000", BASE_URL)
+   );
 
-const images = [
-  ...imageUrls,
-  ...uploadedUrls,
-];
-console.log("IMAGES TO SAVE:", images);
+   const images = [
+     ...cleanedImageUrls,
+     ...uploadedUrls,
+    ];
+  console.log("IMAGES TO SAVE:", images);
 
 // Multipart/FormData envía todo como string
 const payload = {
@@ -342,10 +342,23 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const imageUrls = parseImageUrls(req.body.imageUrls || req.body.images);
-    const uploadedUrls = getUploadedImageUrls(req);
-    const images = [...imageUrls, ...uploadedUrls];
 
+    const BASE_URL =
+      process.env.BACKEND_URL ||
+      "https://uai-web2-cuatri.onrender.com";
+
+   const imageUrls = parseImageUrls(req.body.imageUrls);
+
+   const cleanedImageUrls = imageUrls.map((url: string) =>
+      url.replace("http://localhost:3000", BASE_URL)
+   );
+
+const uploadedUrls = getUploadedImageUrls(req);
+
+const images = [
+  ...cleanedImageUrls,
+  ...uploadedUrls,
+];
     const updatePayload = {
       ...req.body,
       images,

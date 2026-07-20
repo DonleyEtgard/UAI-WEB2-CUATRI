@@ -40,6 +40,9 @@ const ProductsPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const API_URL = import.meta.env.VITE_API_BASE_URL || "";
+  const placeholder = `https://placehold.co/600x400?text=${t("products.list.placeholderImage")}`;
+
   const loadProducts = async () => {
   try {
     setLoading(true);
@@ -277,13 +280,14 @@ return (
             }}
           >
             <img
-              src={
-                p.images?.[0]
-                  ? p.images[0].startsWith("http")
-                    ? p.images[0]
-                    : `http://localhost:3000${p.images[0]}` // This seems to be a local development URL, left as is.
-                  : `https://placehold.co/400x300?text=${t("products.list.placeholderImage")}`
-              }
+            
+            src={
+              p.images?.[0]
+              ? p.images[0].startsWith("http")
+              ? p.images[0]
+              : `${API_URL.replace("/api","")}${p.images[0]}`
+             : placeholder
+           }
               alt={p.name}
               style={{
                 width: "100%",

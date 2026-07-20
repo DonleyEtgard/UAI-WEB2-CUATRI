@@ -24,6 +24,8 @@ const ProductDetailPage = () => {
   const { product, loading, reload } = useProduct(id || "");
   const { handleDelete: apiDelete } = useDeleteProduct();
 
+  const API_URL = import.meta.env.VITE_API_BASE_URL || "";
+
   useEffect(() => {
     if (id) reload();
   }, [id, reload]);
@@ -98,7 +100,11 @@ const ProductDetailPage = () => {
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
           <Box
             component="img"
-            src={product.images[0]}
+            src={
+                product.images[0].startsWith("http")
+                  ? product.images[0]
+                 : `${API_URL.replace("/api","")}${product.images[0]}`
+             }
             alt={product.name}
             sx={{ width: '100%', maxHeight: 400, objectFit: 'contain', borderRadius: 4, bgcolor: 'background.paper' }}
           />
