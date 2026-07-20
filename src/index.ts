@@ -39,6 +39,9 @@ const PORT = Number(process.env.PORT) || 3000;
 // GLOBAL MIDDLEWARES
 // ============================================================================
 
+// Responde automáticamente a TODAS las peticiones OPTIONS preflight
+app.options("*", cors());
+
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
