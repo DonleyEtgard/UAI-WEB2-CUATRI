@@ -33,12 +33,6 @@ const AuditLogPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { t , i18n } = useTranslation();
-  const localeMap = {
-         es: "es-ES",
-         en: "en-US",
-         fr: "fr-FR",
-         ht: "fr-HT"
-         };
 
 const loadLogs = async () => {
   try {
