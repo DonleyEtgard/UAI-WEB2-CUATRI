@@ -831,6 +831,7 @@
     "customerCreated": "Cliente {{name}} creado",
     "saleCreated": "Venta por ${{total}}"
     },
+    
     "page": {
       "title": "Registro de Auditoría",
       "subtitle": "Historial de actividades realizadas en el sistema",

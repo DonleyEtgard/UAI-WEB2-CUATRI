@@ -74,6 +74,9 @@ app.use(
   })
 );
 
+// Responde automáticamente a TODAS las peticiones OPTIONS preflight
+app.options(/(.*)/, cors());
+
 // FIX: Increase default JSON body parser limit to accommodate larger payloads
 // (avoids PayloadTooLargeError when clients previously sent Base64 images)
 app.use(express.json({ limit: "10mb" }));
@@ -210,8 +213,8 @@ app.use(express.static(frontendPath));
 
 console.log("Frontend path:", frontendPath);
 
-app.get("/*splat", (req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
+app.get("/{*splat}", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 // ============================================================================
