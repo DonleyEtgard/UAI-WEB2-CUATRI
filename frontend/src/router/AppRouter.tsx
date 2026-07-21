@@ -228,7 +228,7 @@ export const AppRouter: React.FC = () => {
            <CustomerForm />
           </RoleGuard>
         }
-       />
+        />
 
           {/* STOCK (admin + superadmin + employee) */}
           <Route

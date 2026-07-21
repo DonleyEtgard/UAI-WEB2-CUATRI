@@ -165,7 +165,6 @@ console.log("BODY:", req.body);
 console.log("FILES:", req.files);
 console.log("DB USER:", req.dbUser);
 
-
 // Verificar usuario autenticado
 if (!req.dbUser) {
   return res.status(401).json({
@@ -301,6 +300,8 @@ export const getProducts = async (_req: AuthRequest, res: Response) => {
       .sort({ createdAt: -1 });
 
     res.json(products);
+    
+    console.log("PRODUCTS:", products);
 
   } catch (error: any) {
     res.status(500).json({

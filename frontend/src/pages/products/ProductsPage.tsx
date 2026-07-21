@@ -45,10 +45,12 @@ const ProductsPage = () => {
 
   const loadProducts = async () => {
   try {
-    setLoading(true);
 
+    setLoading(true);
     const res = await API.get("/products");
 
+     console.log("PRODUCTS:", res.data);
+     
     setProducts(
       Array.isArray(res.data)
         ? res.data
@@ -271,6 +273,7 @@ return (
         <CardContent>
 
           <Box
+          
             sx={{
               height: 180,
               mb: 2,
@@ -294,6 +297,7 @@ return (
                 height: "100%",
                 objectFit: "cover",
               }}
+              
             />
           </Box>
 
@@ -366,14 +370,14 @@ return (
               }
             >
               {t("products.list.delete")}
-            </Button>
-          </Box>
+             </Button>
+            </Box>
 
-        </CardContent>
-      </Card>
-    </Grid>
-  ))}
-</Grid>
+           </CardContent>
+          </Card>
+         </Grid>
+        ))}
+       </Grid>
           )}
           </CardContent>
           </Card>

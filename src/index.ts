@@ -15,7 +15,6 @@ import saleItem from "./routes/saleItem";
 import dashboardRoutes from "./routes/dashboard";
 import { mercadoPagoWebhook } from "./routes/user/controllers"; 
 
-
 // ================= MIDDLEWARES =================
 import { authenticateFirebase } from "./middlewares/authenticateFirebase";
 import {
@@ -94,6 +93,18 @@ app.use(
   "/uploads",
   express.static(path.join(process.cwd(), "src", "uploads"))
 );
+
+app.get("/test-upload", (_req, res) => {
+  const fs = require("fs");
+  const uploadDir = path.join(process.cwd(), "src", "uploads", "products");
+
+  res.json({
+    exists: fs.existsSync(uploadDir),
+    files: fs.existsSync(uploadDir)
+      ? fs.readdirSync(uploadDir)
+      : [],
+  });
+});
 
 // LOGGING
 app.use((req, _res, next) => {
