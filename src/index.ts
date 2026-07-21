@@ -39,9 +39,6 @@ const PORT = Number(process.env.PORT) || 3000;
 // GLOBAL MIDDLEWARES
 // ============================================================================
 
-// Responde automáticamente a TODAS las peticiones OPTIONS preflight
-app.options("*", cors());
-
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
@@ -49,7 +46,7 @@ app.use(helmet({
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
     message: "Too many requests from this IP, please try again later.",
   })
 );
